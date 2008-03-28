@@ -16,5 +16,21 @@ object HLanguage {
    
    case class Branch(pattern: Pattern, term: Term)
    case class Pattern(name: String, args: List[Variable])
+   
+   case class Function(name: String, lam: LambdaAbstraction)
+   
+   sealed abstract class Type
+   case class TypeVariable(name: String) extends Type
+   case class TypeConstructor(name: String, typeParameters: List[Type]) extends Type
+   case class Arrow(t1: Type, t2: Type) extends Type
 
+   abstract sealed class TypeDefinition
+   case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
+     extends TypeDefinition   
+   case class ArrowDefinition(name: String, ac: ArrowConstructor)
+     extends TypeDefinition
+   case class DataConstructor(name: String, args: List[Type])
+   case class ArrowConstructor(t1: Type, t2: Type)
+   
+   case class Program(ts: List[TypeDefinition], fs: List[Function])
 }
