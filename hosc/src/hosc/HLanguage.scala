@@ -16,4 +16,5 @@ object HLanguage {
    
    case class Branch(pattern: Pattern, term: Term)
    case class Pattern(name: String, args: List[Variable])
+
 }
