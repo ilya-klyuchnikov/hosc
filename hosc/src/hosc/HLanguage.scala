@@ -27,10 +27,9 @@ object HLanguage {
    abstract sealed class TypeDefinition
    case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
      extends TypeDefinition   
-   case class ArrowDefinition(name: String, ac: ArrowConstructor)
+   case class ArrowDefinition(name: String, ac: Arrow)
      extends TypeDefinition
    case class DataConstructor(name: String, args: List[Type])
-   case class ArrowConstructor(t1: Type, t2: Type)
    
    case class Program(ts: List[TypeDefinition], fs: List[Function])
 }
