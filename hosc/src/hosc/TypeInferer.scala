@@ -63,7 +63,6 @@ object TypeInferer {
     def value(tv: TypeVariable) = al find(_._1 == tv) match {
       case Some(x) => x._2
       case None => throw new TypeError("undefined: " + tv)
-      //(al find(_._1 == tv)).get._2
     }
     def dom = al map (_._1)
     def mg = for (a <- dom) yield value(a)
@@ -103,12 +102,18 @@ object TypeInferer {
   }
   case class ResultL(s: Subst, ts: List[Type])
   
+}
+
+import TypeInferer._
+class TypeInferer(p: Program) {
+  
   def tc(te: TypeEnv, expr: Expression): Result = expr match {
     case v: Variable => tcVar(te, v)
     case a: Application => tcApp(te, a)
     case l: LambdaAbstraction => tcLambda(te, l)
     case l: LetExpression => tcLet(te, l)
     case l: LetRecExpression => tcLetRec(te, l)
+    case c: Constructor => tcCon(te, c)
   }
   
   def tcVar(te: TypeEnv, v: Variable): Result = {
@@ -128,7 +133,41 @@ object TypeInferer {
       Result(s, s(tv))
     
     tcApp0(t, a)
-  }  
+  }
+  
+  def tcCon(te: TypeEnv, c: Constructor): Result = {
+    val cd = getConstructorDefinition(c.name)
+    
+    val originalTvars = cd.args    
+    val dc = getDataConstructor(cd, c.name)    
+    val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))
+    
+    val freshDcArgs: List[Type] = dc.args map s
+    val rl = tcl(te, c.args)
+    val toUnify = freshDcArgs zip rl.ts
+    val sub = mguL(toUnify, rl.s)
+    val cvars = originalTvars map (sub compose s)
+    Result(sub, TypeConstructor(cd.name, cvars))
+  }
+  
+  def getConstructorDefinition(dcn: String): TypeConstructorDefinition = {
+    
+    def isTarget(tcd: TypeConstructorDefinition): Boolean = {
+      for (dc <- tcd.cons) {if (dc.name == dcn) return true}      
+      false
+    }
+    
+    for (td <- p.ts) td match {
+      case td: TypeConstructorDefinition if isTarget(td) => return td
+      case _ => 
+    }
+    throw new TypeError("unknown constructor: " + n)
+  }
+  
+  def getDataConstructor(tcd: TypeConstructorDefinition, dcn: String): DataConstructor = {
+    for (dc <- tcd.cons) {if (dc.name == dcn) return dc}
+    throw new TypeError("unknown constructor2: " + n)
+  }
   
   def tcLambda(te: TypeEnv, l: LambdaAbstraction): Result = {    
     def tcLambda1(v: TypeVariable, r: Result) = Result(r.s, Arrow(r.s(v), r.t))
