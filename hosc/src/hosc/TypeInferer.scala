@@ -136,7 +136,7 @@ class TypeInferer(p: Program) {
   }
   
   def tcCon(te: TypeEnv, c: Constructor): Result = {
-    val cd = getConstructorDefinition(c.name)
+    val cd = getConstructorDefinition(c.name, c.args.length)
     
     val originalTvars = cd.args    
     val dc = getDataConstructor(cd, c.name)    
@@ -150,10 +150,11 @@ class TypeInferer(p: Program) {
     Result(sub, TypeConstructor(cd.name, cvars))
   }
   
-  def getConstructorDefinition(dcn: String): TypeConstructorDefinition = {
+  // dcn - data constructor name
+  def getConstructorDefinition(dcn: String, arity: Int): TypeConstructorDefinition = {
     
     def isTarget(tcd: TypeConstructorDefinition): Boolean = {
-      for (dc <- tcd.cons) {if (dc.name == dcn) return true}      
+      for (dc <- tcd.cons) {if (dc.name == dcn && dc.args.length == arity) return true}      
       false
     }
     
@@ -161,7 +162,7 @@ class TypeInferer(p: Program) {
       case td: TypeConstructorDefinition if isTarget(td) => return td
       case _ => 
     }
-    throw new TypeError("unknown constructor: " + n)
+    throw new TypeError("unknown constructor: " + dcn + " with arity=" + arity)
   }
   
   def getDataConstructor(tcd: TypeConstructorDefinition, dcn: String): DataConstructor = {
@@ -179,6 +180,28 @@ class TypeInferer(p: Program) {
     
     tcLambda1(nv, tc(te1, l.t))
   }
+  
+  def tcBranch(te: TypeEnv, b: Branch): Result = {
+    
+    val cd = getConstructorDefinition(b.pattern.name, b.pattern.args.length)
+    val dc = getDataConstructor(cd, b.pattern.name)
+    
+    val originalTvars = cd.args
+    val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
+    val freshDcArgs: List[Type] = dc.args map s
+    
+    val tcon = s(TypeConstructor(cd.name, cd.args))
+    
+    var te1 = te
+    for ((patternVar, argType) <- b.pattern.args zip freshDcArgs){
+      te1 = te1.install(TypeVariable(patternVar.name), TypeScheme(Nil, argType))
+    }
+    
+    val res = tc(te1, b.term)
+    Result(res.s, Arrow(res.s(tcon), res.t))
+  }
+  
+  
   
   //calculates schematic vars of t (given unknowns);
   // creates type scheme where schematic vars are freshed 
