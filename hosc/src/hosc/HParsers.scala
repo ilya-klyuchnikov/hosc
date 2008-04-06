@@ -60,5 +60,10 @@ object HParsers extends HTokenParsers with StrongParsers {
   
   def parseProgram(r: Reader[Char]) = strong(program, "definition or <eof> expected") (new lexical.Scanner(r))
   
-  def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p) 
+  def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
+  
+  // for representation of error encountered at second-phase checking
+  case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
+    override def toString = "[" + pos+"] error: "+msg+"\n\n"+pos.pos.longString
+  }
 }
