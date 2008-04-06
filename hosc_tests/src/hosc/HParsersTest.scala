@@ -59,7 +59,8 @@ class HParsersTest {
     val revF = Function("rev", L(V("xs"), 
         CE(V("xs"),
             B(P("Nil", Nil), C("Nil", Nil)) :: 
-            B(P("Cons", V("z") :: V("zs") :: Nil), C("Cons", A(V("app"), A(V("rev"), V("zs"))) :: V("z") :: Nil)) ::
+            B(P("Cons", V("z") :: V("zs") :: Nil), 
+                A(A(V("app"), A(V("rev"), V("zs"))), C("Cons", V("z") :: C("Nil", Nil) :: Nil))) ::
             Nil
             )
         ))
