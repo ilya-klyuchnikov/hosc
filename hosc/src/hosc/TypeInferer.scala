@@ -173,7 +173,7 @@ class TypeInferer(p: Program) {
   }
   
   def tcCon(te: TypeEnv, c: Constructor): Result = {
-    val cd = getConstructorDefinition(c.name, c.args.length)
+    val cd = getTypeDefinition(c.name, c.args.length)
     
     val originalTvars = cd.args    
     val dc = getDataConstructor(cd, c.name)    
@@ -188,21 +188,21 @@ class TypeInferer(p: Program) {
   }
   
   // dcn - data constructor name
-  def getConstructorDefinition(dcn: String, arity: Int): TypeConstructorDefinition = {
+  def getTypeDefinition(dcn: String, arity: Int): TypeDefinition = {
     
-    def isTarget(tcd: TypeConstructorDefinition): Boolean = {
+    def isTarget(tcd: TypeDefinition): Boolean = {
       for (dc <- tcd.cons) {if (dc.name == dcn && dc.args.length == arity) return true}      
       false
     }
     
     for (td <- p.ts) td match {
-      case td: TypeConstructorDefinition if isTarget(td) => return td
+      case td: TypeDefinition if isTarget(td) => return td
       case _ => 
     }
     throw new TypeError("unknown constructor: " + dcn + " with arity=" + arity)
   }
   
-  def getDataConstructor(tcd: TypeConstructorDefinition, dcn: String): DataConstructor = {
+  def getDataConstructor(tcd: TypeDefinition, dcn: String): DataConstructor = {
     for (dc <- tcd.cons) {if (dc.name == dcn) return dc}
     throw new TypeError("unknown constructor2: " + n)
   }
@@ -220,7 +220,7 @@ class TypeInferer(p: Program) {
   
   def tcBranch(te: TypeEnv, b: Branch): Result = {
     
-    val cd = getConstructorDefinition(b.pattern.name, b.pattern.args.length)
+    val cd = getTypeDefinition(b.pattern.name, b.pattern.args.length)
     val dc = getDataConstructor(cd, b.pattern.name)
     
     val originalTvars = cd.args

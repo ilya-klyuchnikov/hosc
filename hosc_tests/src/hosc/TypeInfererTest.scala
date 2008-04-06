@@ -5,7 +5,7 @@ import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch => B, Pattern => P,
   Constructor => C, LambdaAbstraction => L, TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
-  TypeConstructorDefinition => TCD, ArrowDefinition => AD, DataConstructor => DC, _}
+  TypeDefinition => TCD, DataConstructor => DC, _}
 
 class TypeInfererTest {
   

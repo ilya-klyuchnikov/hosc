@@ -35,13 +35,8 @@ object HParsers extends HTokenParsers with StrongParsers {
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ {case n ~ l => Function(n, l)})
   
-  // types
-  def typeDefinition: Parser[TypeDefinition] = p(typeConstructorDefinition | arrowDefinition)
-  
-  private def typeConstructorDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
-    {case n ~ a ~ dc => TypeConstructorDefinition(n, a, dc)})
-  
-  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
+  private def typeDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
+    {case n ~ a ~ dc => TypeDefinition(n, a, dc)})
   
   private def atype: Parser[Type] = p(typeConstructor | typeVariable | ("(" ~> `type` <~")"))
   
@@ -58,12 +53,17 @@ object HParsers extends HTokenParsers with StrongParsers {
   // program itself
   def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
   
-  def parseProgram(r: Reader[Char]) = strong(program, "definition or <eof> expected") (new lexical.Scanner(r))
+  def parseProgram(r: Reader[Char]) = validate(strong(program, "definition or <eof> expected") (new lexical.Scanner(r)))
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
   
   // for representation of error encountered at second-phase checking
   case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
     override def toString = "[" + pos+"] error: "+msg+"\n\n"+pos.pos.longString
+  }
+  
+  def validate(pr: ParseResult[Program]) = pr match {
+    case f: NoSuccess => f
+    case Success(p, _) => pr
   }
 }
