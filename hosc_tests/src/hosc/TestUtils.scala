@@ -11,6 +11,9 @@ object TestUtils {
   def termResultFromString(input: String) =
     HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     
+  def termFromString(input: String) = 
+    termResultFromString(input).get
+    
   def programResultFromString(input: String) =
     HParsers.parseProgram(new CharArrayReader(input.toCharArray))
     
