@@ -16,13 +16,13 @@ object HParsers extends HTokenParsers with StrongParsers {
   private def variable = lident ^^ Variable
   
   private def lambdaAbstraction =
-    "%" ~> variable ~ ("{" ~> aterm <~ "}") ^^ {case v ~ t => LambdaAbstraction(v, t)}
+    "%" ~> variable ~ ("{" ~> term <~ "}") ^^ {case v ~ t => LambdaAbstraction(v, t)}
     
   private def caseExpression = 
-    "case" ~> aterm ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ {case s ~ bs => CaseExpression(s, bs)}
+    "case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ {case s ~ bs => CaseExpression(s, bs)}
   
   private def branch = 
-    pattern ~ (":" ~> aterm <~ ";") ^^ {case p ~ t => Branch(p, t)}
+    pattern ~ (":" ~> term <~ ";") ^^ {case p ~ t => Branch(p, t)}
   
   private def pattern =
     uident ~ (variable*) ^^ {case name ~ args => Pattern(name, args)}
