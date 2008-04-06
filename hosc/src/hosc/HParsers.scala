@@ -1,15 +1,13 @@
 package hosc
 
-import scala.util.parsing.input.Reader
-import scala.util.parsing.input.Positional
+import scala.util.parsing.input.{Positional, Reader}
 import HLanguage._
 
 object HParsers extends HTokenParsers with StrongParsers {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "->", "::", "|")
   lexical.reserved += ("case", "of")
-  
-  // expressions
+
   def term = chainl1(aterm, success(Application(_: Term, _: Term)))
   
   private def aterm: Parser[Term] = p(variable | constructor | lambdaAbstraction | caseExpression |  ("(" ~> term <~ ")"))  
@@ -44,26 +42,28 @@ object HParsers extends HTokenParsers with StrongParsers {
   
   private def arrow = p(atype ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})
   
-  private def typeConstructor = lident ~ (atype*) ^^ {case n ~ a => TypeConstructor(n, a)}
+  private def typeConstructor = p(lident ~ (atype*) ^^ {case n ~ a => TypeConstructor(n, a)})
   
-  private def typeVariable = sident ^^ TypeVariable
+  private def typeVariable = p(sident ^^ TypeVariable)
   
-  private def dataConstructor = uident ~ (atype*) ^^ {case n ~ a => DataConstructor(n, a)}
+  private def dataConstructor = p(uident ~ (`type`*) ^^ {case n ~ a => DataConstructor(n, a)})
   
-  // program itself
   def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
   
   def parseProgram(r: Reader[Char]) = validate(strong(program, "definition or <eof> expected") (new lexical.Scanner(r)))
   
-  def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
-  
-  // for representation of error encountered at second-phase checking
-  case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
-    override def toString = "[" + pos+"] error: "+msg+"\n\n"+pos.pos.longString
+  def validate(pr: ParseResult[Program]) = pr match {
+    case n: NoSuccess => n;
+    case s @ Success(_, _) => Validator.validate(s)
   }
   
-  def validate(pr: ParseResult[Program]) = pr match {
-    case f: NoSuccess => f
-    case Success(p, _) => pr
+  def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
+  
+  def error(msg: String, pos: Positional) = {
+    lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
+  }
+  
+  case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
+    override def toString = "[" + pos.pos +"] error: "+msg+"\n\n"+pos.pos.longString
   }
 }

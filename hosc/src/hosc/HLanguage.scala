@@ -32,12 +32,20 @@ object HLanguage {
    case class DataConstructor(name: String, args: List[Type]) extends Positional
    
    case class Program(ts: List[TypeDefinition], fs: List[Function]) {
-     def getTypeDefinition(dataConsName: String): Option[TypeDefinition] = {
+     def getTypeDefinition(tName: String): Option[TypeDefinition] = {
+       for (td <- ts) if (td.name == tName) return Some(td)
+       None
+     }
+     def getTypeDefinitionForDC(dataConsName: String): Option[TypeDefinition] = {
        for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(td)
        None
      }
      def getDataConstructor(dataConsName: String): Option[DataConstructor] = {
        for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(dc)
+       None
+     }
+     def getFunction(n: String): Option[Function] = {
+       for (f <- fs) if (f.name == n) return Some(f)
        None
      }
    }

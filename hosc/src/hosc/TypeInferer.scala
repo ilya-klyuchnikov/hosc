@@ -173,7 +173,7 @@ class TypeInferer(p: Program) {
   }
   
   def tcCon(te: TypeEnv, c: Constructor): Result = {
-    val cd = p.getTypeDefinition(c.name).get
+    val cd = p.getTypeDefinitionForDC(c.name).get
     
     val originalTvars = cd.args    
     val dc = p.getDataConstructor(c.name).get 
@@ -200,7 +200,7 @@ class TypeInferer(p: Program) {
   
   def tcBranch(te: TypeEnv, b: Branch): Result = {
     
-    val cd = p.getTypeDefinition(b.pattern.name).get
+    val cd = p.getTypeDefinitionForDC(b.pattern.name).get
     val dc = p.getDataConstructor(b.pattern.name).get
     
     val originalTvars = cd.args
