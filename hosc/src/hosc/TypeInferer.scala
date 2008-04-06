@@ -105,6 +105,24 @@ object TypeInferer {
   }
   case class ResultL(s: Subst, ts: List[Type])
   
+  def equal(type1: Type, type2: Type): Boolean = {
+    def equal1(tp1: Type, tp2: Type): Boolean = {
+      var map1to2 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
+      def test(t1: Type, t2: Type): Boolean = (t1, t2) match {
+        case (v1: TypeVariable, v2: TypeVariable) => map1to2.get(v1) match {
+          case None => map1to2(v1) = v2; true
+          case Some(v) if v2 == v => true
+          case _ => false
+        }
+        case (TypeConstructor(n1, a1), TypeConstructor(n2, a2)) =>
+          n1 == n2 && a1.length == a2.length && ((a1 zip a2) forall {pair => test(pair._1, pair._2)})
+        case (Arrow(a1, v1), Arrow(a2, v2)) => test(a1, a1) && test(v1, v2)
+        case _ => false
+      }
+      test(tp1, tp2)
+    }
+    equal1(type1, type2) && equal(type2, type1)
+  }
 }
 
 import TypeInferer._
