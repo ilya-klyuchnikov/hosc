@@ -1,6 +1,7 @@
 package hosc
 
 import scala.util.parsing.input.Reader
+import scala.util.parsing.input.Positional
 import HLanguage._
 
 object HParsers extends HTokenParsers with StrongParsers {
@@ -11,42 +12,42 @@ object HParsers extends HTokenParsers with StrongParsers {
   // expressions
   def term = chainl1(aterm, success(Application(_: Term, _: Term)))
   
-  private def aterm: Parser[Term] = variable | constructor | lambdaAbstraction | caseExpression |  ("(" ~> term <~ ")")  
+  private def aterm: Parser[Term] = p(variable | constructor | lambdaAbstraction | caseExpression |  ("(" ~> term <~ ")"))  
   
-  private def variable = lident ^^ Variable
+  private def variable = p(lident ^^ Variable)
   
   private def lambdaAbstraction =
-    "%" ~> variable ~ ("{" ~> term <~ "}") ^^ {case v ~ t => LambdaAbstraction(v, t)}
+    p("%" ~> variable ~ ("{" ~> term <~ "}") ^^ {case v ~ t => LambdaAbstraction(v, t)})
     
   private def caseExpression = 
-    "case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ {case s ~ bs => CaseExpression(s, bs)}
+    p("case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ {case s ~ bs => CaseExpression(s, bs)})
   
   private def branch = 
-    pattern ~ (":" ~> term <~ ";") ^^ {case p ~ t => Branch(p, t)}
+    p(pattern ~ (":" ~> term <~ ";") ^^ {case p ~ t => Branch(p, t)})
   
   private def pattern =
-    uident ~ (variable*) ^^ {case name ~ args => Pattern(name, args)}
+    p(uident ~ (variable*) ^^ {case name ~ args => Pattern(name, args)})
 
   private def constructor =
-    uident ~ (aterm*) ^^ {case name ~ args => Constructor(name, args)}
+    p(uident ~ (aterm*) ^^ {case name ~ args => Constructor(name, args)})
   
   def parseTerm(r: Reader[Char]) = strong(term, "term or <eof> expected") (new lexical.Scanner(r))
   
-  def function = lident ~ ("=" ~> lambdaAbstraction) ^^ {case n ~ l => Function(n, l)}
+  def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ {case n ~ l => Function(n, l)})
   
   // types
-  def typeDefinition: Parser[TypeDefinition] = typeConstructorDefinition | arrowDefinition
+  def typeDefinition: Parser[TypeDefinition] = p(typeConstructorDefinition | arrowDefinition)
   
-  private def typeConstructorDefinition = lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
-    {case n ~ a ~ dc => TypeConstructorDefinition(n, a, dc)}
+  private def typeConstructorDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
+    {case n ~ a ~ dc => TypeConstructorDefinition(n, a, dc)})
   
-  private def arrowDefinition = lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)}
+  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
   
-  private def atype: Parser[Type] = typeConstructor | typeVariable | ("(" ~> `type` <~")")
+  private def atype: Parser[Type] = p(typeConstructor | typeVariable | ("(" ~> `type` <~")"))
   
   private def `type` = chainl1(atype, ("->" ~> atype), success(Arrow(_: Type, _: Type)))
   
-  private def arrow = atype ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)}
+  private def arrow = p(atype ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})
   
   private def typeConstructor = lident ~ (atype*) ^^ {case n ~ a => TypeConstructor(n, a)}
   
@@ -58,4 +59,6 @@ object HParsers extends HTokenParsers with StrongParsers {
   def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
   
   def parseProgram(r: Reader[Char]) = strong(program, "definition or <eof> expected") (new lexical.Scanner(r))
+  
+  def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p) 
 }
