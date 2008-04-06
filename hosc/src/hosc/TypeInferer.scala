@@ -23,7 +23,8 @@ object TypeInferer {
         override def apply(t: Type) = cs.apply(t)
         override def toString = cs.toString
       }
-      case true => throw new TypeError("recursive binding: " + x + " = " + t)
+      case true => 
+        throw new TypeError("recursive binding: " + x + " = " + t)
     }
     
     def compose(z: Subst): Subst = new Subst {
@@ -79,6 +80,8 @@ object TypeInferer {
   }  
 
   def mgu(t: Type, u: Type, s: Subst): Subst = (t, u) match {
+    case (a:TypeVariable, b: TypeVariable) if a == b =>
+      s
     case (a:TypeVariable, _) if s(a) == a =>
       s.extend(a, u)
     case (a:TypeVariable, _) =>
@@ -114,6 +117,7 @@ class TypeInferer(p: Program) {
     case l: LetExpression => tcLet(te, l)
     case l: LetRecExpression => tcLetRec(te, l)
     case c: Constructor => tcCon(te, c)
+    case c: CaseExpression => tcCase(te, c)
   }
   
   def tcVar(te: TypeEnv, v: Variable): Result = {
@@ -131,8 +135,23 @@ class TypeInferer(p: Program) {
     
     def tcApp2(tv: TypeVariable, s: Subst) = 
       Result(s, s(tv))
+      
+    val r = tcl(t, List(a.head, a.arg))
+    val tv = newTyvar
+    val s = mgu(r.ts.head, Arrow(r.ts.last, tv), r.s)
+    Result(s, s(tv))
+  }
+  
+  def tcCase(te: TypeEnv, caseExp: CaseExpression): Result = {    
+    val r1 = tcCaseRaw(te, caseExp)
+    //val s = r1.s
+    val r2 = tc(te, caseExp.selector)
     
-    tcApp0(t, a)
+    val arr = r1.t.asInstanceOf[Arrow]
+   
+    val s = mgu(arr.t1, r2.t, emptySubst)
+    
+    Result(s compose r1.s, s(arr.t2))
   }
   
   def tcCon(te: TypeEnv, c: Constructor): Result = {
@@ -201,6 +220,31 @@ class TypeInferer(p: Program) {
     Result(res.s, Arrow(res.s(tcon), res.t))
   }
   
+  //type-checking of list of branches
+  def tclb(tes: TypeEnv, tss: List[Branch]) = {
+    def tcl0(te: TypeEnv, ts: List[Branch]): ResultL = ts match {
+      case Nil => ResultL(emptySubst, Nil) 
+      case e :: es => tcl1(te, es, tcBranch(te, e))
+    }
+
+    def tcl1(te: TypeEnv, es: List[Branch], r: Result) = {
+      val gamma = te.sub(r.s)
+      tcl2(r.s, r.t, tcl0(gamma, es))
+    }
+
+    def tcl2(phi: Subst, t: Type, r: ResultL) = ResultL(r.s compose phi, r.s(t) :: r.ts)
+
+    tcl0(tes,tss)
+  }
+  
+  def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
+    val r = tclb(te, caseExp.branches)    
+    val tv = newTyvar
+    val pairs = r.ts map {(tv, _)}    
+    val s = mguL(pairs, r.s)
+    Result(s, s(tv))
+  }
+  
   
   
   //calculates schematic vars of t (given unknowns);
@@ -253,7 +297,7 @@ class TypeInferer(p: Program) {
       tcLetRec2(gamma1, nbvs1, e, mguL(r.ts zip ts ,r.s))
     }
     
-    def tcLetRec2(gamma: TypeEnv, nbvs: TypeEnv, e: Expression, s: Subst){
+    def tcLetRec2(gamma: TypeEnv, nbvs: TypeEnv, e: Expression, s: Subst) = {
       val nbvs1 = nbvs.sub(s)
       val ts = nbvs1.al map {_._2.t}
       val gamma1 = gamma.sub(s)
@@ -267,8 +311,6 @@ class TypeInferer(p: Program) {
     val nbvs = newBVars(xs)
     
     tcLetRec1(env, nbvs, l.expr, tcl(TypeEnv(nbvs ::: env.al), letRecExps))
-    
-    null
   }
   
   // type-checking of list of expressions
@@ -287,4 +329,5 @@ class TypeInferer(p: Program) {
     
     tcl0(tes,tss)
   }
+  
 }
