@@ -173,10 +173,10 @@ class TypeInferer(p: Program) {
   }
   
   def tcCon(te: TypeEnv, c: Constructor): Result = {
-    val cd = getTypeDefinition(c.name, c.args.length)
+    val cd = p.getTypeDefinition(c.name).get
     
     val originalTvars = cd.args    
-    val dc = getDataConstructor(cd, c.name)    
+    val dc = p.getDataConstructor(c.name).get 
     val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))
     
     val freshDcArgs: List[Type] = dc.args map s
@@ -185,26 +185,6 @@ class TypeInferer(p: Program) {
     val sub = mguL(toUnify, rl.s)
     val cvars = originalTvars map (sub compose s)
     Result(sub, TypeConstructor(cd.name, cvars))
-  }
-  
-  // dcn - data constructor name
-  def getTypeDefinition(dcn: String, arity: Int): TypeDefinition = {
-    
-    def isTarget(tcd: TypeDefinition): Boolean = {
-      for (dc <- tcd.cons) {if (dc.name == dcn && dc.args.length == arity) return true}      
-      false
-    }
-    
-    for (td <- p.ts) td match {
-      case td: TypeDefinition if isTarget(td) => return td
-      case _ => 
-    }
-    throw new TypeError("unknown constructor: " + dcn + " with arity=" + arity)
-  }
-  
-  def getDataConstructor(tcd: TypeDefinition, dcn: String): DataConstructor = {
-    for (dc <- tcd.cons) {if (dc.name == dcn) return dc}
-    throw new TypeError("unknown constructor2: " + n)
   }
   
   def tcLambda(te: TypeEnv, l: LambdaAbstraction): Result = {    
@@ -220,8 +200,8 @@ class TypeInferer(p: Program) {
   
   def tcBranch(te: TypeEnv, b: Branch): Result = {
     
-    val cd = getTypeDefinition(b.pattern.name, b.pattern.args.length)
-    val dc = getDataConstructor(cd, b.pattern.name)
+    val cd = p.getTypeDefinition(b.pattern.name).get
+    val dc = p.getDataConstructor(b.pattern.name).get
     
     val originalTvars = cd.args
     val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    

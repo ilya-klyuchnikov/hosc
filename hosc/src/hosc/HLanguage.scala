@@ -31,5 +31,14 @@ object HLanguage {
      extends Positional
    case class DataConstructor(name: String, args: List[Type]) extends Positional
    
-   case class Program(ts: List[TypeDefinition], fs: List[Function])
+   case class Program(ts: List[TypeDefinition], fs: List[Function]) {
+     def getTypeDefinition(dataConsName: String): Option[TypeDefinition] = {
+       for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(td)
+       None
+     }
+     def getDataConstructor(dataConsName: String): Option[DataConstructor] = {
+       for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(dc)
+       None
+     }
+   }
 }
