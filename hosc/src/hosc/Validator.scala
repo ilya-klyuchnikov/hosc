@@ -89,7 +89,7 @@ object Validator {
           }
           val unused = consNames -- usedNames
           if (!(unused isEmpty)) {
-            throw ValidatorError(error("case is not exghaustive. missing patterns " + unused.mkString(", "), c.selector))
+            throw ValidatorError(error("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector))
           }
         }
       }

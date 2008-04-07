@@ -189,7 +189,23 @@ class HParsersTest {
     testVal("input/err08.hl",
         "duplicate type var $a should be reported")
     testVal("input/err09.hl",
-        "useless type type var $b should be reported")
+        "useless type type var $b should be reported");
+    testVal("input/err10.hl",
+        "unbound var x should be reported");
+    testVal("input/err11.hl",
+        "wrong number of parameters for constructor Cons should be reported");
+    testVal("input/err12.hl",
+        "undefined constructor Cons2 should be reported");
+    testVal("input/err13.hl",
+        "undefined constructor Nil2 should be reported");
+    testVal("input/err14.hl",
+        "undefined (for type list) constructor Cons2 should be reported");
+    testVal("input/err15.hl",
+        "wrong number of parameters for constructor Cons should be reported");
+    testVal("input/err16.hl",
+        "duplicate var z should be reported");
+    testVal("input/err17.hl",
+        "non exhaustive should be reported");
   }
   
   def testVal(fileName: String, msg: String)  = {
