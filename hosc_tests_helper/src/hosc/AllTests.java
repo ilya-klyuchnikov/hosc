@@ -10,7 +10,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("Tests for HOSC");
 		
 		suite.addTest(new JUnit4TestAdapter(hosc.HParsersTest.class));
-		suite.addTest(new JUnit4TestAdapter(hosc.TypeInfererTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.TypeInferrerTest.class));
 		
 		return suite;
 	}

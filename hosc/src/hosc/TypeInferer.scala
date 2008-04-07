@@ -2,7 +2,7 @@ package hosc
 
 import HLanguage._
 
-object TypeInferer {
+object TypeInferrer {
   private var n: Int = 0
   def newTyvar(): TypeVariable = { n += 1; TypeVariable("$$" + n) }
   case class TypeError(s: String) extends Exception(s) {}
@@ -125,8 +125,8 @@ object TypeInferer {
   }
 }
 
-import TypeInferer._
-class TypeInferer(p: Program) {
+import TypeInferrer._
+class TypeInferrer(p: Program) {
   
   def tc(te: TypeEnv, expr: Expression): Result = expr match {
     case v: Variable => tcVar(te, v)
@@ -308,7 +308,9 @@ class TypeInferer(p: Program) {
     val xs = letRecVars map {x => TypeVariable(x.name)}
     val nbvs = newBVars(xs)
     
-    tcLetRec1(env, nbvs, l.expr, tcl(TypeEnv(nbvs ::: env.al), letRecExps))
+    val env1 = TypeEnv(nbvs ::: env.al)
+    val rl = tcl(env1, letRecExps)
+    tcLetRec1(env, nbvs, l.expr, rl)
   }
   
   // type-checking of list of expressions
