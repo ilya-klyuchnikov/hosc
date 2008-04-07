@@ -172,41 +172,31 @@ class HParsersTest {
   }
   
   @Test def validator(): Unit = {
-    val termResult1 = TestUtils.programResultFromFile("input/err01.hl")  
-    println(termResult1)
-    assertFalse("duplicate type definition should be reported", termResult1.successful)
-    
-    val termResult2 = TestUtils.programResultFromFile("input/err02.hl")  
-    println(termResult2)
-    assertFalse("undefined var should be reported", termResult2.successful)
-    
-    val termResult3 = TestUtils.programResultFromFile("input/err03.hl")  
-    println(termResult3)
-    assertFalse("wrong numbers of type parameters should be reported", termResult3.successful)
-    
-    val termResult4 = TestUtils.programResultFromFile("input/err04.hl")  
-    println(termResult4)
-    assertFalse("wrong numbers of type parameters should be reported", termResult4.successful)
-    
-    val termResult5 = TestUtils.programResultFromFile("input/err05.hl")  
-    println(termResult5)
-    assertFalse("undefined var should be reported", termResult5.successful)
-    
-    val termResult6 = TestUtils.programResultFromFile("input/err06.hl")  
-    println(termResult6)
-    assertFalse("unknown type list2 should be reported", termResult6.successful)
-    
-    val termResult7 = TestUtils.programResultFromFile("input/err07.hl")  
-    println(termResult7)
-    assertFalse("duplicate data constructor Cons should be reported", termResult7.successful)
-    
-    val termResult8 = TestUtils.programResultFromFile("input/err08.hl")  
-    println(termResult8)
-    assertFalse("duplicate type var $a should be reported", termResult8.successful)
-    
-    val termResult9 = TestUtils.programResultFromFile("input/err09.hl")  
-    println(termResult9)
-    assertFalse("useless type type var $b should be reported", termResult9.successful)
+    testVal("input/err01.hl",
+        "duplicate type definition should be reported")
+    testVal("input/err02.hl",
+        "undefined var should be reported")
+    testVal("input/err03.hl",
+        "wrong numbers of type parameters should be reported")
+    testVal("input/err04.hl",
+        "wrong numbers of type parameters should be reported")
+    testVal("input/err05.hl",
+        "undefined var should be reported")
+    testVal("input/err06.hl",
+        "unknown type list2 should be reported")
+    testVal("input/err07.hl",
+        "duplicate data constructor Cons should be reported")
+    testVal("input/err08.hl",
+        "duplicate type var $a should be reported")
+    testVal("input/err09.hl",
+        "useless type type var $b should be reported")
+  }
+  
+  def testVal(fileName: String, msg: String)  = {
+    println(fileName)
+    val r = TestUtils.programResultFromFile(fileName)  
+    println(r)
+    assertFalse(msg, r.successful)
   }
   
   def testSTerm(input: String, expected: Term): Unit = {

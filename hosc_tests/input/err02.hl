@@ -1,4 +1,4 @@
-list $a :: Nil | Cons $a list $b;
+list $a :: Nil | Cons $a (list $b);
 
 app = %xs {
   %ys {
