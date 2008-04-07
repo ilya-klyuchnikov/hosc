@@ -27,21 +27,31 @@ object HLanguage {
    case class TypeConstructor(name: String, typeParameters: List[Type]) extends Type
    case class Arrow(t1: Type, t2: Type) extends Type {pos = t1.pos}
  
-   case class TypeDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
-     extends Positional
+   abstract sealed class TypeDefinition extends Positional {
+     def name: String
+   }
+   case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
+     extends TypeDefinition
+   case class ArrowDefinition(name: String, ac: Arrow) extends TypeDefinition
    case class DataConstructor(name: String, args: List[Type]) extends Positional
    
    case class Program(ts: List[TypeDefinition], fs: List[Function]) {
-     def getTypeDefinition(tName: String): Option[TypeDefinition] = {
-       for (td <- ts) if (td.name == tName) return Some(td)
+     def getTypeConstructorDefinition(tcName: String): Option[TypeConstructorDefinition] = {
+       for (td <- ts) td match {case tcd: TypeConstructorDefinition if tcName == tcd.name => return Some(tcd); case _ => } 
        None
      }
-     def getTypeDefinitionForDC(dataConsName: String): Option[TypeDefinition] = {
-       for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(td)
+     def getTypeDefinitionForDC(dataConsName: String): Option[TypeConstructorDefinition] = {
+       for (td <- ts) td match {
+         case tcd: TypeConstructorDefinition => for (dc <- tcd.cons) if (dc.name == dataConsName) return Some(tcd)
+         case _ => 
+       }
        None
      }
      def getDataConstructor(dataConsName: String): Option[DataConstructor] = {
-       for (td <- ts; dc <- td.cons) if (dc.name == dataConsName) return Some(dc)
+       for (td <- ts) td match {
+         case tcd: TypeConstructorDefinition => for (dc <- tcd.cons) if (dc.name == dataConsName) return Some(dc)
+         case _ => 
+       }
        None
      }
      def getFunction(n: String): Option[Function] = {

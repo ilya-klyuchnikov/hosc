@@ -21,7 +21,7 @@ object Validator {
         }
         case Arrow(t1, t2) => valTypeUsage(t1); valTypeUsage(t2); 
         case tc @ TypeConstructor(n, args) => {
-          p.getTypeDefinition(n) match {
+          p.getTypeConstructorDefinition(n) match {
             case Some(td) => {
               if (td.args.length != args.length) 
                 throw ValidatorError(error("wrong numbers of argument for type " + n, tc))
@@ -39,17 +39,24 @@ object Validator {
       }
       
       if (typeNames contains td.name) throw ValidatorError(error("duplicate type name " + td.name, td))
-      typeNames += td.name      
-      for (v <- td.args){
-        if (tvs contains v) throw ValidatorError(error("duplicate type variable " + v.name, v))
-        tvs += v
-      }
-      for (dc <- td.cons) valDC(dc)
-      td.args find {!tvsUsed.contains(_)} match {
-        case Some(tv) => throw ValidatorError(error("useless type variable " + tv.name, tv))
-        case None =>
+      typeNames += td.name
+      
+      td match {
+        case tcd: TypeConstructorDefinition => {
+          for (v <- tcd.args) {
+            if (tvs contains v) throw ValidatorError(error("duplicate type variable " + v.name, v))
+            tvs += v
+          }
+          for (dc <- tcd.cons) valDC(dc)
+          tcd.args find {!tvsUsed.contains(_)} match {
+            case Some(tv) => throw ValidatorError(error("useless type variable " + tv.name, tv))
+            case None =>
+          }
+        }
+        case ad: ArrowDefinition =>      
       }
     }
+    
     
     def valFD(f: Function) = {
       
@@ -62,7 +69,6 @@ object Validator {
     } catch {
       case ValidatorError(he) => he
     }
-    
-  }  
-
+  }
+  
 }

@@ -33,8 +33,12 @@ object HParsers extends HTokenParsers with StrongParsers {
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ {case n ~ l => Function(n, l)})
   
-  private def typeDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
-    {case n ~ a ~ dc => TypeDefinition(n, a, dc)})
+  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition | arrowDefinition)
+  
+  private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
+    {case n ~ a ~ dc => TypeConstructorDefinition(n, a, dc)})
+    
+  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
   
   private def atype: Parser[Type] = p(typeConstructor | typeVariable | ("(" ~> `type` <~")"))
   
