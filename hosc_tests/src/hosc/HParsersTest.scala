@@ -9,15 +9,21 @@ import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch 
 class HParsersTest {
   @Test def simpleApplication(): Unit = {
     val expected = A(A(V("x"), V("y")), V("z"))
-    val termText ="""x 
-    y 
-    z""" 
+    val termText ="""x y z""" 
     val termResult = TestUtils.termResultFromString(termText)    
     println(termResult)
     val a =termResult.get.asInstanceOf[A].arg
     println(a.pos.longString)
     assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)    
+    assertEquals(expected, termResult.get)
+    
+    val expected1 = A(A(A(V("a"), C("Cons", Nil)), V("b")), V("c"))
+    val termText1 ="""a Cons b c"""    
+    val termResult1 = TestUtils.termResultFromString(termText1)    
+    println(termResult1)
+    assertTrue(termResult1.successful)
+    assertEquals(expected1, termResult1.get)
+    println
   }
   
   @Test def simpleCaseExpression(): Unit = {
@@ -39,7 +45,7 @@ class HParsersTest {
   }
   
   @Test def simpleConstructor1(): Unit = {
-    val expected = C("Data1", C("Data2", V("x") :: V("y") :: V("z") :: Nil) :: Nil)
+    val expected = C("Data1", C("Data2", Nil) :: V("x") :: V("y") :: V("z") :: Nil)
     val termText ="""Data1 Data2 x y z"""    
     val termResult = TestUtils.termResultFromString(termText)    
     println(termResult)

@@ -1,57 +1,53 @@
 package hosc
 
 import scala.util.parsing.input.{Positional, Reader}
+import scala.util.parsing.combinator.ImplicitConversions
 import HLanguage._
 
-object HParsers extends HTokenParsers with StrongParsers {
+object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "->", "::", "|")
   lexical.reserved += ("case", "of")
-
-  def term = chainl1(aterm, success(Application(_: Term, _: Term)))
   
-  private def aterm: Parser[Term] = p(variable | constructor | lambdaAbstraction | caseExpression |  ("(" ~> term <~ ")"))  
+  def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
   
-  private def variable = p(lident ^^ Variable)
-  
-  private def lambdaAbstraction =
-    p("%" ~> variable ~ ("{" ~> term <~ "}") ^^ {case v ~ t => LambdaAbstraction(v, t)})
+  def term: Parser[Term] = p(tr2 | appl)
+  def appl = chainl1(tr0, tr1, success(Application(_: Term, _: Term)))
     
-  private def caseExpression = 
-    p("case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ {case s ~ bs => CaseExpression(s, bs)})
+  // head of application
+  private def tr0: Parser[Term] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")"))
+  // argument of or application constructor
+  private def tr1 = p(tr0 | uident ^^ {x => Constructor(x, Nil)} | ("(" ~> term <~ ")"))
+  // top constructor; cannot be head of application
+  private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
-  private def branch = 
-    p(pattern ~ (":" ~> term <~ ";") ^^ {case p ~ t => Branch(p, t)})
-  
-  private def pattern =
-    p(uident ~ (variable*) ^^ {case name ~ args => Pattern(name, args)})
-
-  private def constructor =
-    p(uident ~ (aterm*) ^^ {case name ~ args => Constructor(name, args)})
+  private def variable = p(lident ^^ Variable)  
+  private def lambdaAbstraction = p("%" ~> variable ~ ("{" ~> term <~ "}") ^^ LambdaAbstraction)    
+  private def caseExpression = p("case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ CaseExpression)
+  private def branch = p(pattern ~ (":" ~> term <~ ";") ^^ Branch)  
+  private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
   def parseTerm(r: Reader[Char]) = strong(term, "term or <eof> expected") (new lexical.Scanner(r))
   
-  def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ {case n ~ l => Function(n, l)})
   
-  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition | arrowDefinition)
-  
+  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition | arrowDefinition)  
   private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
-    {case n ~ a ~ dc => TypeConstructorDefinition(n, a, dc)})
+    TypeConstructorDefinition)
     
-  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
+  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ ArrowDefinition)
   
-  private def t1: Parser[Type] = lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")
-  private def t2: Parser[Type] = typeVariable | lident ~ (t1*) ^^ {case i ~ args => TypeConstructor(i, args)}
-  private def t3: Parser[Type] = t2 |  ("(" ~> `type` <~ ")")
+  private def tp1: Parser[Type] = p(lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")"))
+  private def tp2: Parser[Type] = p(typeVariable | lident ~ (tp1*) ^^ TypeConstructor)
+  private def tp3: Parser[Type] = p(tp2 |  ("(" ~> `type` <~ ")"))
   private def `type` = {
     val c = {(x: Type, y: Type) => if (y == null) x else Arrow(x, y)}
-    chainr1(t3, "->" ^^^ c, c, null)  
+    chainr1(tp3, "->" ^^^ c, c, null)
   }
-  private def arrow = p(t2 ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})  
+  private def arrow: Parser[Arrow] = p(tp2 ~ ("->" ~> `type`) ^^ Arrow) | ("(" ~> arrow <~ ")") 
   private def typeVariable = p(sident ^^ TypeVariable)  
-  private def dataConstructor = p(uident ~ (`type`*) ^^ {case n ~ a => DataConstructor(n, a)})
+  private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
-  def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
+  def program = (typeDefinition*) ~ (function+) ^^ Program
   def parseType(r: Reader[Char]) = strong(`type`, "typeExpr or <eof> expected") (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = validate(strong(program, "definition or <eof> expected") (new lexical.Scanner(r)))
   

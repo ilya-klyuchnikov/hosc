@@ -1,5 +1,7 @@
-list $a :: Nil | Cons $a list $a;
+list $a :: Nil | Cons $a (list $a);
 boolean :: True | False;
+
+app :: ((list $a -> list $a));
 
 app = %xs {
   %ys {
@@ -11,6 +13,6 @@ app = %xs {
 }
 
 rev = %xs {
-  app (rev xs) (Cons (True) Nil)
+  app (rev xs) xs
 }
 
