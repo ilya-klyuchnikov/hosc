@@ -7,59 +7,142 @@ import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch 
   TypeConstructorDefinition => TCD, DataConstructor => DC, _}
 
 class HParsersTest {
-  @Test def simpleApplication(): Unit = {
-    val expected = A(A(V("x"), V("y")), V("z"))
-    val termText ="""x y z""" 
-    val termResult = TestUtils.termResultFromString(termText)    
-    println(termResult)
-    val a =termResult.get.asInstanceOf[A].arg
-    println(a.pos.longString)
-    assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)
+  @Test def application(): Unit = {
+    testSTerm(
+        "a", 
+        V("a"));
     
-    val expected1 = A(A(A(V("a"), C("Cons", Nil)), V("b")), V("c"))
-    val termText1 ="""a Cons b c"""    
-    val termResult1 = TestUtils.termResultFromString(termText1)    
-    println(termResult1)
-    assertTrue(termResult1.successful)
-    assertEquals(expected1, termResult1.get)
-    println
+    testSTerm(
+        "a b", 
+        A(V("a"), V("b")));
+    
+    testSTerm(
+        "x y z", 
+        A(A(V("x"), V("y")), V("z")));
+    
+    testSTerm(
+        "(x y) z", 
+        A(A(V("x"), V("y")), V("z")));
+    
+    testSTerm(
+        "x (y z)", 
+        A(V("x"), A(V("y"), V("z"))));
+    
   }
   
-  @Test def simpleCaseExpression(): Unit = {
-    val expected = CE(V("x"), List(B(P("Nil", Nil), C("Nil", Nil))))
-    val termText ="""case x of {Nil : Nil;}"""    
-    val termResult = TestUtils.termResultFromString(termText)    
-    println(termResult)
-    assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)  
+  @Test def constructor(): Unit = {
+    testSTerm(
+        "A", 
+        C("A", Nil));
+    
+    testSTerm(
+        "A b", 
+        C("A", V("b") :: Nil));
+    
+    testSTerm(
+        "(A b)", 
+        C("A", V("b") :: Nil));
+    
+    testSTerm(
+        "A (b)", 
+        C("A", V("b") :: Nil));
+    
+    testETerm("(A) b");
+    
+    testSTerm(
+        "A B C", 
+        C("A", C("B", Nil) :: C("C", Nil) :: Nil));
+    
+    testSTerm(
+        "A (B C)", 
+        C("A", C("B", C("C", Nil) :: Nil) :: Nil));
+    
+    testETerm("(A B) C")
+    
+    testSTerm(
+        "Data1 Data2 x y z", 
+        C("Data1", C("Data2", Nil) :: V("x") :: V("y") :: V("z") :: Nil));
+    
+    testSTerm(
+        "Data1 (Data2 x y) z", 
+        C("Data1", C("Data2", V("x") :: V("y") :: Nil) :: V("z") :: Nil));
+    
   }
   
-  @Test def simpleLambdaAbstraction(): Unit = {
-    val expected = L(V("x"), C("Cons", List(V("x"), C("Nil", Nil))))
-    val termText ="""%x {Cons x Nil}"""    
-    val termResult = TestUtils.termResultFromString(termText)    
-    println(termResult)
-    assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)  
+  @Test def termAssociativity(): Unit = {
+    testSTerm(
+        "a Cons b c", 
+        A(A(A(V("a"), C("Cons", Nil)), V("b")), V("c")));
+    
+    testETerm("(A V) e");
+    
+    testSTerm(
+        "x A y", 
+        A(A(V("x"), C("A", Nil)), V("y")));
+    
+    testSTerm(
+        "x y z v", 
+        A(A(A(V("x"), V("y")), V("z")), V("v")) );
+    
+    testSTerm(
+        "(x y) z v", 
+        A(A(A(V("x"), V("y")), V("z")), V("v")) );
+    
+    testSTerm(
+        "(x y) (z v)", 
+        A(A(V("x"), V("y")), A(V("z"), V("v")))) ;
+    
+    testSTerm(
+        "x Y z V", 
+        A(A(A(V("x"), C("Y", Nil)), V("z")), C("V", Nil)) );
+    
+    testSTerm(
+        "(x Y) z V", 
+        A(A(A(V("x"), C("Y", Nil)), V("z")), C("V", Nil)) );
+    
+    testSTerm(
+        "(x Y) (z V)", 
+        A(A(V("x"), C("Y", Nil)), A(V("z"), C("V", Nil)))) ;
+    
+    testSTerm(
+        "x (A y)", 
+        A(V("x"), C("A", V("y") :: Nil)));
+    
   }
   
-  @Test def simpleConstructor1(): Unit = {
-    val expected = C("Data1", C("Data2", Nil) :: V("x") :: V("y") :: V("z") :: Nil)
-    val termText ="""Data1 Data2 x y z"""    
-    val termResult = TestUtils.termResultFromString(termText)    
-    println(termResult)
-    assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)  
+  @Test def caseExpression(): Unit = {
+    testSTerm(
+        "case x of {Nil : Nil;}", 
+        CE(V("x"), List(B(P("Nil", Nil), C("Nil", Nil))))) ; 
   }
   
-  @Test def simpleConstructor2(): Unit = {
-    val expected = C("Data1", C("Data2", V("x") :: V("y") :: Nil) :: V("z") :: Nil)
-    val termText ="""Data1 (Data2 x y) z"""    
-    val termResult = TestUtils.termResultFromString(termText)    
-    println(termResult)
-    assertTrue(termResult.successful)
-    assertEquals(expected, termResult.get)  
+  @Test def lambdaAbstraction(): Unit = {
+    testSTerm(
+        "%x {%y {Cons x y}}", 
+        L(V("x"), L(V("y"), C("Cons", List(V("x"), V("y")))))) ; 
+  }
+  
+  @Test def arrow(): Unit = {
+    testSType(
+        "$a -> $b -> $c", 
+        Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
+    
+    testSType(
+        "$a -> ($b -> $c)", 
+        Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
+    
+    testSType(
+        "($a -> $b) -> $c", 
+        Arr(Arr(TV("$a"), TV("$b")), TV("$c")));
+  }
+  
+  @Test def typeConstructor(): Unit = {
+      // tc1 tc2 $a tc2 $a = tc1 (tc2) $a (tc2) $a
+      testSType(
+          "tc1 tc2 $a tc2 $a", 
+          TC("tc1", TC("tc2", Nil) :: TV("$a") :: TC("tc2", Nil) :: TV("$a") :: Nil ));
+      testEType("(tc1 tc2) $a tc2 $a")
+      
   }
   
   @Test def simpleProgram(): Unit = {
@@ -126,60 +209,30 @@ class HParsersTest {
     assertFalse("useless type type var $b should be reported", termResult9.successful)
   }
   
-  @Test def rAssocArrow(): Unit = {
-    {
-      // $a -> $b -> $c = $a -> ($b -> $c)
-      val expected = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
-      val typeText ="""$a -> $b -> $c"""    
-      val typeResult = TestUtils.typeExprResultFromString(typeText)    
-      println(typeResult)
-      assertTrue(typeResult.successful)
-      assertEquals(expected, typeResult.get)
-    }
-    {
-      val expected1 = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
-      val typeText1 ="""$a -> ($b -> $c)"""    
-      val typeResult1 = TestUtils.typeExprResultFromString(typeText1)    
-      println(typeResult1)
-      assertTrue(typeResult1.successful)
-      assertEquals(expected1, typeResult1.get)
-    }
-    {
-      val expected2 = Arr(Arr(TV("$a"), TV("$b")), TV("$c"))
-      val typeText2 ="""($a -> $b) -> $c"""    
-      val typeResult2 = TestUtils.typeExprResultFromString(typeText2)    
-      println(typeResult2)
-      assertTrue(typeResult2.successful)
-      assertEquals(expected2, typeResult2.get)
-    }
+  def testSTerm(input: String, expected: Term): Unit = {
+    val r = TestUtils.termResultFromString(input)
+    println(r)
+    assertTrue(r.successful)
+    assertEquals(expected, r.get)
   }
   
-  @Test def lAssocTypeCon(): Unit = {
-    {
-      // tc1 tc2 $a tc2 $a = tc1 (tc2) $a (tc2) $a
-      val expected = TC("tc1", TC("tc2", Nil) :: TV("$a") :: TC("tc2", Nil) :: TV("$a") :: Nil )
-      val typeText ="""tc1 tc2 $a tc2 $a"""    
-      val typeResult = TestUtils.typeExprResultFromString(typeText)    
-      println(typeResult)
-      assertTrue(typeResult.successful)
-      assertEquals(expected, typeResult.get)
-    }
-    {
-      val expected1 = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
-      val typeText1 ="""$a -> ($b -> $c)"""    
-      val typeResult1 = TestUtils.typeExprResultFromString(typeText1)    
-      println(typeResult1)
-      assertTrue(typeResult1.successful)
-      assertEquals(expected1, typeResult1.get)
-    }
-    {
-      val expected2 = Arr(Arr(TV("$a"), TV("$b")), TV("$c"))
-      val typeText2 ="""($a -> $b) -> $c"""    
-      val typeResult2 = TestUtils.typeExprResultFromString(typeText2)    
-      println(typeResult2)
-      assertTrue(typeResult2.successful)
-      assertEquals(expected2, typeResult2.get)
-    }
+  def testETerm(input: String): Unit = {
+    val r = TestUtils.termResultFromString(input)
+    println(r)
+    assertFalse(r.successful)
+  }
+  
+  def testSType(input: String, expected: Type): Unit = {
+    val r = TestUtils.typeExprResultFromString(input)
+    println(r)
+    assertTrue(r.successful)
+    assertEquals(expected, r.get)
+  }
+  
+  def testEType(input: String): Unit = {
+    val r = TestUtils.typeExprResultFromString(input)
+    println(r)
+    assertFalse(r.successful)
   }
   
 }

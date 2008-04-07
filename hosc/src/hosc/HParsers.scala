@@ -27,7 +27,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def branch = p(pattern ~ (":" ~> term <~ ";") ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
-  def parseTerm(r: Reader[Char]) = strong(term, "term or <eof> expected") (new lexical.Scanner(r))
+  def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
   
   
   def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition | arrowDefinition)  
@@ -48,8 +48,8 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
   def program = (typeDefinition*) ~ (function+) ^^ Program
-  def parseType(r: Reader[Char]) = strong(`type`, "typeExpr or <eof> expected") (new lexical.Scanner(r))
-  def parseProgram(r: Reader[Char]) = validate(strong(program, "definition or <eof> expected") (new lexical.Scanner(r)))
+  def parseType(r: Reader[Char]) = strong(`type`, "<eof> expected") (new lexical.Scanner(r))
+  def parseProgram(r: Reader[Char]) = validate(strong(program, "<eof> expected") (new lexical.Scanner(r)))
   
   def validate(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;

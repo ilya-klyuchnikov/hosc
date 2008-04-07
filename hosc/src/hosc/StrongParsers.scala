@@ -29,7 +29,7 @@ trait StrongParsers extends Parsers {
       res match {
         case Success(out, in1) if res.next.atEnd  => res
         case Success(_, _) => Failure(msg, res.next)
-        case f : NoSuccess => res.asInstanceOf[NoSuccess]
+        case f : NoSuccess => f
       }
     }
   }
