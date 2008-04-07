@@ -23,7 +23,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   private def variable = p(lident ^^ Variable)  
   private def lambdaAbstraction = p("%" ~> variable ~ ("{" ~> term <~ "}") ^^ LambdaAbstraction)    
-  private def caseExpression = p("case" ~> term ~ ("of" ~> "{"~> (branch*) <~ "}") ^^ CaseExpression)
+  private def caseExpression = p("case" ~> term ~ ("of" ~> "{"~> (branch+) <~ "}") ^^ CaseExpression)
   private def branch = p(pattern ~ (":" ~> term <~ ";") ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
