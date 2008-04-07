@@ -40,16 +40,11 @@ object HParsers extends HTokenParsers with StrongParsers {
     
   private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
   
-  private def atype: Parser[Type] = p(typeConstructor | typeVariable | ("(" ~> `type` <~")"))
-  
-  private def `type` = chainl1(atype, ("->" ~> atype), success(Arrow(_: Type, _: Type)))
-  
-  private def arrow = p(atype ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})
-  
-  private def typeConstructor = p(lident ~ (atype*) ^^ {case n ~ a => TypeConstructor(n, a)})
-  
-  private def typeVariable = p(sident ^^ TypeVariable)
-  
+  private def t1: Parser[Type] = lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")
+  private def t2: Parser[Type] = typeVariable | lident ~ (t1*) ^^ {case i ~ args => TypeConstructor(i, args)}  
+  private def `type` = chainl1(t2, ("->" ~> t2), success(Arrow(_: Type, _: Type)))  
+  private def arrow = p(t2 ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})  
+  private def typeVariable = p(sident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (`type`*) ^^ {case n ~ a => DataConstructor(n, a)})
   
   def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
