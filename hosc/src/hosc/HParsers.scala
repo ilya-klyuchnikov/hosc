@@ -41,14 +41,18 @@ object HParsers extends HTokenParsers with StrongParsers {
   private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ {case n ~ a => ArrowDefinition(n, a)})
   
   private def t1: Parser[Type] = lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")
-  private def t2: Parser[Type] = typeVariable | lident ~ (t1*) ^^ {case i ~ args => TypeConstructor(i, args)}  
-  private def `type` = chainl1(t2, ("->" ~> t2), success(Arrow(_: Type, _: Type)))  
+  private def t2: Parser[Type] = typeVariable | lident ~ (t1*) ^^ {case i ~ args => TypeConstructor(i, args)}
+  private def t3: Parser[Type] = t2 |  ("(" ~> `type` <~ ")")
+  private def `type` = {
+    val c = {(x: Type, y: Type) => if (y == null) x else Arrow(x, y)}
+    chainr1(t3, "->" ^^^ c, c, null)  
+  }
   private def arrow = p(t2 ~ ("->" ~> `type`) ^^ {case t1 ~ t2 => Arrow(t1, t2)})  
   private def typeVariable = p(sident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (`type`*) ^^ {case n ~ a => DataConstructor(n, a)})
   
   def program = (typeDefinition*) ~ (function+) ^^ {case ts ~ fs => Program(ts, fs)}
-  
+  def parseType(r: Reader[Char]) = strong(`type`, "typeExpr or <eof> expected") (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = validate(strong(program, "definition or <eof> expected") (new lexical.Scanner(r)))
   
   def validate(pr: ParseResult[Program]) = pr match {

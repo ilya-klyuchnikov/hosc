@@ -120,4 +120,60 @@ class HParsersTest {
     assertFalse("useless type type var $b should be reported", termResult9.successful)
   }
   
+  @Test def rAssocArrow(): Unit = {
+    {
+      // $a -> $b -> $c = $a -> ($b -> $c)
+      val expected = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
+      val typeText ="""$a -> $b -> $c"""    
+      val typeResult = TestUtils.typeExprResultFromString(typeText)    
+      println(typeResult)
+      assertTrue(typeResult.successful)
+      assertEquals(expected, typeResult.get)
+    }
+    {
+      val expected1 = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
+      val typeText1 ="""$a -> ($b -> $c)"""    
+      val typeResult1 = TestUtils.typeExprResultFromString(typeText1)    
+      println(typeResult1)
+      assertTrue(typeResult1.successful)
+      assertEquals(expected1, typeResult1.get)
+    }
+    {
+      val expected2 = Arr(Arr(TV("$a"), TV("$b")), TV("$c"))
+      val typeText2 ="""($a -> $b) -> $c"""    
+      val typeResult2 = TestUtils.typeExprResultFromString(typeText2)    
+      println(typeResult2)
+      assertTrue(typeResult2.successful)
+      assertEquals(expected2, typeResult2.get)
+    }
+  }
+  
+  @Test def lAssocTypeCon(): Unit = {
+    {
+      // tc1 tc2 $a tc2 $a = tc1 (tc2) $a (tc2) $a
+      val expected = TC("tc1", TC("tc2", Nil) :: TV("$a") :: TC("tc2", Nil) :: TV("$a") :: Nil )
+      val typeText ="""tc1 tc2 $a tc2 $a"""    
+      val typeResult = TestUtils.typeExprResultFromString(typeText)    
+      println(typeResult)
+      assertTrue(typeResult.successful)
+      assertEquals(expected, typeResult.get)
+    }
+    {
+      val expected1 = Arr(TV("$a"), Arr(TV("$b"), TV("$c")))
+      val typeText1 ="""$a -> ($b -> $c)"""    
+      val typeResult1 = TestUtils.typeExprResultFromString(typeText1)    
+      println(typeResult1)
+      assertTrue(typeResult1.successful)
+      assertEquals(expected1, typeResult1.get)
+    }
+    {
+      val expected2 = Arr(Arr(TV("$a"), TV("$b")), TV("$c"))
+      val typeText2 ="""($a -> $b) -> $c"""    
+      val typeResult2 = TestUtils.typeExprResultFromString(typeText2)    
+      println(typeResult2)
+      assertTrue(typeResult2.successful)
+      assertEquals(expected2, typeResult2.get)
+    }
+  }
+  
 }
