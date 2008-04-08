@@ -11,6 +11,7 @@ public class AllTests {
 		
 		suite.addTest(new JUnit4TestAdapter(hosc.HParsersTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.TypeInferrerTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.GraphAnalysisTest.class));
 		
 		return suite;
 	}
