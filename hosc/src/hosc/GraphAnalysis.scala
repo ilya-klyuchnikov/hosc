@@ -12,7 +12,7 @@ object GraphAnalysis {
   }
   case class Graph(v: List[Vertex], e: List[Arc])
   
-  case class SCC(var vs: Set[Vertex], resursive: Boolean)
+  case class SCC(var vs: Set[Vertex], recursive: Boolean)
   
   private def dfs1(g: Graph) = {
     var n = 0
