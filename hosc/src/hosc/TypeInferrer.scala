@@ -1,6 +1,7 @@
 package hosc
 
 import HLanguage._
+import GraphAnalysis._
 
 object TypeInferrer {
   private var n: Int = 0
@@ -328,6 +329,37 @@ class TypeInferrer(p: Program) {
     def tcl2(phi: Subst, t: Type, r: ResultL) = ResultL(r.s compose phi, r.s(t) :: r.ts)
     
     tcl0(tes,tss)
+  }
+  
+  def getFreeVars(t: Term): Set[Variable] = t match {
+    case v: Variable => Set(v)
+    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
+    case LambdaAbstraction(x, term) => getFreeVars(term) - x
+    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case CaseExpression(sel, bs) => 
+      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => getFreeVars(b.term) -- b.pattern.args}
+  }
+  
+  def tcProgram() = {
+    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
+    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
+    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
+    val g = Graph(vxs.values.toList, arcs)
+    val sccs = analizeDependencies(g)
+    for (f <- p.fs) {
+      var expr: Expression = Variable(f.name)
+      for (scc <- sccs){
+        val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
+        if (scc.recursive){
+          expr = LetRecExpression(bs, expr)
+        } else {
+          expr = LetExpression(bs, expr)
+        }
+      }       
+      f.`type` = tc(TypeEnv(Nil), expr).t
+    }
+    
+    null
   }
   
 }

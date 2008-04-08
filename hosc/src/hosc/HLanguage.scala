@@ -20,7 +20,9 @@ object HLanguage {
    case class Branch(pattern: Pattern, term: Term) extends Positional
    case class Pattern(name: String, args: List[Variable]) extends Positional
    
-   case class Function(name: String, lam: LambdaAbstraction) extends Positional
+   case class Function(name: String, lam: LambdaAbstraction) extends Positional {
+     var `type` : Type = null
+   }
    
    sealed abstract class Type extends Positional
    case class TypeVariable(name: String) extends Type

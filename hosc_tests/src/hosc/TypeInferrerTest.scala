@@ -30,6 +30,13 @@ class TypeInferrerTest {
     println(r3)
   }
   
+  @Test def simpleLambda(): Unit = {
+    val ti = new TypeInferrer(null)
+    val v = L(V("x"), L(V("x"), V("x")))
+    val r = ti.tc(TypeEnv(Nil), v)
+    println(r)
+  }
+  
   //@Ignore
   @Test def simpleConstructors(): Unit = {
     val programResult = TestUtils.programResultFromFile("input/rev1.hl")
@@ -68,6 +75,9 @@ class TypeInferrerTest {
     
     val r3 = ti.tcBranch(TypeEnv(Nil), B(P("True", Nil), C("False", Nil)))
     println(r3)
+    
+    val r4 = ti.tcBranch(TypeEnv(Nil), B(P("Cons", List(V("x"), V("xs"))), L(V("x"), V("x"))))
+    println(r4)
     
     //val r4 = ti.tcBranch(TypeEnv(Nil), B(P("Z", List(V("x"))), C("False", Nil)))
     //println(r4)
@@ -164,13 +174,37 @@ class TypeInferrerTest {
     val program = programResult.get
     val ti = new TypeInferrer(program)
   
+    ti.tcProgram()
+  
+    println
+  
+  }
+  
+  @Test def simpleProgram02a(): Unit = {
+    val programResult = TestUtils.programResultFromFile("input/tc02.hl")
+    println(programResult)
+    assertTrue(programResult.successful)
+    val program = programResult.get
+    val ti1 = new TypeInferrer(program)
+    println(">>>>>>>>>>>>>>>>tc02a");
     {
       val pairs = program.fs map {f => (V(f.name), f.lam)}
-      //val l = LetExpression(pairs, V("f"))
-      val l = LetRecExpression(pairs, V("f"))
-      val r0 = ti.tc(TypeEnv(Nil), l)
+      val l = LetRecExpression(pairs, V("app"))
+      val r0 = ti1.tc(TypeEnv(Nil), l)
       println(r0)
     }
+  
+    println
+  }
+  
+  @Test def simpleProgram02b(): Unit = {
+    val programResult = TestUtils.programResultFromFile("input/tc02.hl")
+    println(programResult)
+    assertTrue(programResult.successful)
+    val program = programResult.get
+    val ti = new TypeInferrer(program);
+    
+    ti.tcProgram()
   
     println
   
