@@ -9,7 +9,7 @@ object HLanguage {
    sealed abstract class Expression extends Positional
    
    sealed abstract class Term extends Expression
-   case class Variable(name: String) extends Term
+   case class Variable(name: String) extends Term {var global = false } // global var is call
    case class Constructor(name: String, args: List[Term]) extends Term
    case class LambdaAbstraction(v: Variable, t: Term) extends Term
    case class Application(head: Term, arg: Term) extends Term {pos = head.pos}

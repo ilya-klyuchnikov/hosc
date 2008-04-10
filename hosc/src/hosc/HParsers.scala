@@ -49,11 +49,16 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def program = (typeDefinition*) ~ (function+) ^^ Program
   def parseType(r: Reader[Char]) = strong(`type`, "<eof> expected") (new lexical.Scanner(r))
-  def parseProgram(r: Reader[Char]) = validate(strong(program, "<eof> expected") (new lexical.Scanner(r)))
+  def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program, "<eof> expected") (new lexical.Scanner(r))))
   
   def validate(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
     case s @ Success(_, _) => Validator.validate(s)
+  }
+  
+  def postprocess(pr: ParseResult[Program]) = pr match {
+    case n: NoSuccess => n;
+    case s @ Success(_, _) => Postprocessor.postprocess(s.get); s
   }
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
