@@ -8,9 +8,9 @@ import TermAlgebra._
 class Interpreter(program: Program) {
   def this(fileName: String) = this(Util.programFromFile(fileName))
   
-  def eval(t: Term): Term = {
-    val lazyResult = lazyEval(t) 
-    Constructor(lazyResult.name, lazyResult.args.map(eval))
+  def eval(t: Term): Term = lazyEval(t) match {
+    case c: Constructor => Constructor(c.name, c.args.map(eval))
+    case v => v
   }
   
   def eval(input: String): Term = {
@@ -22,7 +22,7 @@ class Interpreter(program: Program) {
     eval(term)
   }
   
-  // TODO
-  private def lazyEval(t: Term): Constructor = null
+  // Constructor or lambda as result
+  private def lazyEval(t: Term): Term = null
   
 }
