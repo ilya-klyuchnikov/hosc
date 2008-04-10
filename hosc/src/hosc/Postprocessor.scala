@@ -9,7 +9,7 @@ object Postprocessor {
     for (f <- program.fs) process(f.lam, Set.empty[Variable])
   }
   
-  private def process(t: Term, locals: Set[Variable]): Unit = t match {
+  def process(t: Term, locals: Set[Variable]): Unit = t match {
     case v: Variable => v.global = !(locals contains v)
     case Constructor(_, args) => for (a <- args) process(a, locals)
     case LambdaAbstraction(v, t) => process(t, locals + v)

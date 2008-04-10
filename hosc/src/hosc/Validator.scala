@@ -58,61 +58,11 @@ object Validator {
         }
         case ad: ArrowDefinition => valTypeUsage(ad.ac, true)  
       }
-    }
-    
-    def valCase(boundedVars: Set[String], c: CaseExpression): Unit = {
-      valTerm(boundedVars, c.selector);
-      val pat = c.branches.head.pattern
-      val dcn = pat.name
-      p.getTypeDefinitionForDC(dcn) match {
-        case None => err("undefined constructor " + dcn, pat)
-        case Some(td) => {
-          val consNames = Set.empty[String] ++ (td.cons map (_.name))
-          var usedNames = Set.empty[String]
-          for (b <- c.branches){
-            val pt = b.pattern
-            if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
-            val dc = p.getDataConstructor(pt.name).get
-            if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
-            if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
-            usedNames += pt.name
-            var pVars = Set.empty[String]
-            for (v <- pt.args){
-              if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
-              if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
-              pVars += v.name
-            }
-            valTerm(boundedVars ++ pVars, b.term)
-          }
-          val unused = consNames -- usedNames
-          if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
-        }
-      }
-    }
-    
-    def valTerm(boundedVars: Set[String], term: Term): Unit = term match{
-      case v: Variable => 
-        if (!(boundedVars contains v.name)) err("unbounded variable " + v.name, v)
-      case c: Constructor => {
-        p.getDataConstructor(c.name) match {
-          case Some(dc) => {
-            if (dc.args.length != c.args.length) err("wrong number of parameters for constructor " + c.name, c)
-            for (arg <- c.args) valTerm(boundedVars, arg)
-          }
-          case None => err("undefined constructor " + c.name, c)
-        }
-      }
-      case l: LambdaAbstraction => {
-        if (boundedVars contains l.v.name) err("variable " + l.v.name + " is already bound", l.v)
-        valTerm(boundedVars + l.v.name, l.t)
-      }
-      case a: Application => {valTerm(boundedVars, a.head); valTerm(boundedVars, a.arg);}
-      case c: CaseExpression => valCase(boundedVars, c)
-    }    
+    }      
     
     def valFD(f: Function) = {
       if (fNames contains f.name) err("duplicate function " + f.name, f)
-      valTerm(allFNames, f.lam)
+      valTerm(allFNames, f.lam, p)
     }
     
     try {     
@@ -126,6 +76,56 @@ object Validator {
   
   def err(msg: String, pos: Positional) = {
     throw ValidatorError(error(msg, pos))
+  }
+  
+  def valTerm(boundedVars: Set[String], term: Term, p: Program): Unit = term match{
+    case v: Variable => 
+      if (!(boundedVars contains v.name)) err("unbounded variable " + v.name, v)
+    case c: Constructor => {
+      p.getDataConstructor(c.name) match {
+        case Some(dc) => {
+          if (dc.args.length != c.args.length) err("wrong number of parameters for constructor " + c.name, c)
+          for (arg <- c.args) valTerm(boundedVars, arg, p)
+        }
+        case None => err("undefined constructor " + c.name, c)
+      }
+    }
+    case l: LambdaAbstraction => {
+      if (boundedVars contains l.v.name) err("variable " + l.v.name + " is already bound", l.v)
+      valTerm(boundedVars + l.v.name, l.t, p)
+    }
+    case a: Application => {valTerm(boundedVars, a.head, p); valTerm(boundedVars, a.arg, p);}
+    case c: CaseExpression => valCase(boundedVars, c, p)
+  }
+  
+  def valCase(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
+    valTerm(boundedVars, c.selector, p);
+    val pat = c.branches.head.pattern
+    val dcn = pat.name
+    p.getTypeDefinitionForDC(dcn) match {
+      case None => err("undefined constructor " + dcn, pat)
+      case Some(td) => {
+        val consNames = Set.empty[String] ++ (td.cons map (_.name))
+        var usedNames = Set.empty[String]
+        for (b <- c.branches){
+          val pt = b.pattern
+          if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
+          val dc = p.getDataConstructor(pt.name).get
+          if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
+          if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
+          usedNames += pt.name
+          var pVars = Set.empty[String]
+          for (v <- pt.args){
+            if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
+            if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
+            pVars += v.name
+          }
+          valTerm(boundedVars ++ pVars, b.term, p)
+        }
+        val unused = consNames -- usedNames
+        if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+      }
+    }
   }
   
 }
