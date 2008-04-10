@@ -74,10 +74,11 @@ object Validator {
             if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
             val dc = p.getDataConstructor(pt.name).get
             if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
-            if (usedNames contains dc.name) err("duplicate " + pt.name, pt)
+            if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
             usedNames += pt.name
             var pVars = Set.empty[String]
             for (v <- pt.args){
+              if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
               if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
               pVars += v.name
             }
@@ -101,7 +102,10 @@ object Validator {
           case None => err("undefined constructor " + c.name, c)
         }
       }
-      case l: LambdaAbstraction => valTerm(boundedVars + l.v.name, l.t)
+      case l: LambdaAbstraction => {
+        if (boundedVars contains l.v.name) err("variable " + l.v.name + " is already bound", l.v)
+        valTerm(boundedVars + l.v.name, l.t)
+      }
       case a: Application => {valTerm(boundedVars, a.head); valTerm(boundedVars, a.arg);}
       case c: CaseExpression => valCase(boundedVars, c)
     }    
