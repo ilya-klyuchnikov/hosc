@@ -1,0 +1,30 @@
+list $a :: Nil | Cons $a (list $a);
+number :: Z | S number | Unknown;
+
+from = %n {
+  Cons n (from (S n))
+}
+
+take = %n {
+  %xs {
+    case n of {
+      Z : Nil;
+      Unknown : Nil;
+      S x : Cons (head xs) (take x (tail xs));
+    }
+  }
+}
+
+head = %list {
+  case list of {
+    Nil : Unknown;
+    Cons x xs : x;
+  }
+}
+
+tail = %list {
+  case list of {
+    Nil : Nil;
+    Cons x xs : xs;
+  }
+}

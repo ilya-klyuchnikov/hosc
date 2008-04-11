@@ -209,4 +209,17 @@ class TypeInferrerTest {
     println
   
   }
+  
+  @Test def simpleProgram03b(): Unit = {
+    val programResult = TestUtils.programResultFromFile("input/lazy.hl")
+    println(programResult)
+    assertTrue(programResult.successful)
+    val program = programResult.get
+    val ti = new TypeInferrer(program);
+    
+    ti.tcProgram()
+  
+    println
+  
+  }
 }

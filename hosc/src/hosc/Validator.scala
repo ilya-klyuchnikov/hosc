@@ -6,7 +6,7 @@ import HLanguage._
 import HParsers._
 
 object Validator {
-  case class ValidatorError(error: HError) extends Exception {}
+  case class ValidatorError(error: HError) extends Exception(error.toString) {}
   def validate(s: Success[Program]) =  {
     val p = s.get
     var typeNames = Set.empty[String]
