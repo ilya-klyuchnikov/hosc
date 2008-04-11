@@ -9,16 +9,32 @@ object HLanguage {
    sealed abstract class Expression extends Positional
    
    sealed abstract class Term extends Expression
-   case class Variable(name: String) extends Term {var global = false } // global var is call
-   case class Constructor(name: String, args: List[Term]) extends Term
-   case class LambdaAbstraction(v: Variable, t: Term) extends Term
-   case class Application(head: Term, arg: Term) extends Term {pos = head.pos}
-   case class CaseExpression(selector: Term, branches: List[Branch]) extends Term
+   case class Variable(name: String) extends Term {
+     var global = false // global var is call
+     override def toString = name 
+   } 
+   case class Constructor(name: String, args: List[Term]) extends Term {
+     override def toString = "(" + name + " " + args.mkString("") + ")"
+   }
+   case class LambdaAbstraction(v: Variable, t: Term) extends Term {
+     override def toString = "%" + v.name + " {" + t + "}" 
+   }
+   case class Application(head: Term, arg: Term) extends Term {
+     pos = head.pos
+     override def toString = "(" + head + " " + arg + ")"
+   } 
+   case class CaseExpression(selector: Term, branches: List[Branch]) extends Term {
+     override def toString = "case (" + selector + ") of {\n" + branches.mkString("\n")+"}\n"  
+   }
    case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression
    case class LetRecExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression
    
-   case class Branch(pattern: Pattern, term: Term) extends Positional
-   case class Pattern(name: String, args: List[Variable]) extends Positional
+   case class Branch(pattern: Pattern, term: Term) extends Positional {
+     override def toString = pattern + " : " + term + ";"
+   }
+   case class Pattern(name: String, args: List[Variable]) extends Positional {
+     override def toString = name + " " + args.mkString(" ")  
+   }
    
    case class Function(name: String, lam: LambdaAbstraction) extends Positional {
      var `type` : Type = null

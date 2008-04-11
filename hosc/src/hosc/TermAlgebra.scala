@@ -50,17 +50,22 @@ object TermAlgebra {
   }
   
   sealed abstract class Context extends TermDecomposition {
+    def replaceHole(t: Term): Term
     def redex: Redex
   }
   
-  case class ContextHole(redex: Redex) extends Context
+  case class ContextHole(redex: Redex) extends Context {
+    def replaceHole(t: Term) = t
+  }
   // app = con e 
   case class ContextApp(head: Context, app: Application) extends Context {
     def redex = head.redex
+    def replaceHole(t: Term) = Application(head.replaceHole(t), app.arg)
   }
   // ce = case selector of ....
   case class ContextCase(selector: Context, ce: CaseExpression) extends Context {
     def redex = selector.redex
+    def replaceHole(t: Term) = CaseExpression(selector.replaceHole(t), ce.branches)
   }  
   
   def decompose(t: Term): TermDecomposition = t match {
@@ -78,6 +83,7 @@ object TermAlgebra {
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
     case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => 
       ContextHole(RedexCaseVarApp(a, ce))
+    case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
     case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
     case _ => throw new IllegalArgumentException(t.toString)
@@ -87,6 +93,15 @@ object TermAlgebra {
     case v: Variable if (!v.global)=> v
     case a: Application => getCoreLocalVar(a)
     case _ => null
+  }
+  
+  def applySubstitution(term: Term, s: Map[Variable, Term]): Term = term match {
+    case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
+    case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
+    case LambdaAbstraction(v, t) => LambdaAbstraction(v, applySubstitution(t, s))
+    case Application(h, a) => Application(applySubstitution(h, s), applySubstitution(a, s))
+    case CaseExpression(sel, bs) => 
+      CaseExpression(applySubstitution(sel, s), bs map {b => Branch(b.pattern, applySubstitution(b.term, s))})
   }
   
 }
