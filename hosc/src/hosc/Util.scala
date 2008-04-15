@@ -46,7 +46,8 @@ object Util {
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
     val term = pr.get
     //Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
-    Postprocessor.process(term, Set.empty[Variable])
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    Postprocessor.process(term, globals)
     val ti = new TypeInferrer(program)
     ti.tcTerm(term)
     term
