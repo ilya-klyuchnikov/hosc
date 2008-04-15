@@ -4,13 +4,9 @@ import scala.util.parsing.input.{CharArrayReader, Reader}
 
 import HLanguage._
 import TermAlgebra._
+import Util._
 
 class Interpreter(program: Program) {
-  var i = 0
-  def newVar() = {
-    i += 1
-    Variable("$" + i) 
-  }
   
   def this(fileName: String) = this(Util.programFromFile(fileName))
   
@@ -21,11 +17,7 @@ class Interpreter(program: Program) {
   }
   
   def eval(input: String): Term = {
-    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
-    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
-    val term = pr.get
-    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
-    Postprocessor.process(term, Set.empty[Variable])
+    val term = termFromString(input, program)
     eval(term)
   }
   

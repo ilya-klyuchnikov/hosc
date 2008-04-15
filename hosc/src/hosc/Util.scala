@@ -19,6 +19,34 @@ object Util {
     } while (str != null)
     in.close();
     val pr = HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
-    if (pr.successful) pr.get else throw new IllegalArgumentException(pr.toString)
+    if (pr.successful) {
+      val program = pr.get
+      val ti = new TypeInferrer(program)
+      ti.tcProgram()
+      program
+    } else { 
+      throw new IllegalArgumentException(pr.toString)
+    }
+  }
+  
+  def termFromString(input: String, program: Program) = {
+    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
+    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
+    val term = pr.get
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    Postprocessor.process(term, Set.empty[Variable])
+    val ti = new TypeInferrer(program)
+    ti.tcTerm(term)
+    term
+  }
+  
+  def typeForTerm(input: String, program: Program) = {
+    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
+    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
+    val term = pr.get
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    Postprocessor.process(term, Set.empty[Variable])
+    val ti = new TypeInferrer(program)
+    ti.tcTerm(term)
   }
 }
