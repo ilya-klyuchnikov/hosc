@@ -13,6 +13,7 @@ public class AllTests {
 		suite.addTest(new JUnit4TestAdapter(hosc.TypeInferrerTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.GraphAnalysisTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.InterpreterTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.TermAlgebraTest.class));
 		
 		return suite;
 	}

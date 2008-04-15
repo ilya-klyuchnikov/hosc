@@ -1,0 +1,46 @@
+// all binders are different here
+list $a :: Nil | Cons $a (list $a);
+boolean :: True | False;
+app :: ((list $a -> list $a));
+
+f = % x {x}
+g = % y {
+  case y of {
+    True : True;
+    False : f y;
+  }
+}
+
+app = %xs {
+  %ys {
+    case xs of {
+      Nil : ys;
+      Cons z zs : Cons z (app zs xs);
+    }
+  }
+}
+
+rev = %l {
+  case l of {
+    Nil : Nil;
+    Cons e l1  : app (rev l1) (Cons e Nil);
+  }
+}
+
+f1 = %x1 {
+  %y1 {
+    case x1 of {
+      Nil : y1;
+      Cons z1 zs1 : Cons z1 (app zs1 x1);
+    }
+  }
+}
+
+f2 = %x2 {
+  %y2 {
+    case x2 of {
+      Nil : y2;
+      Cons z2 zs2 : Cons z2 (app zs2 x2);
+    }
+  }
+}
