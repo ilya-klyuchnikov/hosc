@@ -138,7 +138,7 @@ object TermAlgebra {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2))
     case (LambdaAbstraction(_, t1), LambdaAbstraction(_, t2)) => he(t1, t2)
-    case (Application(h1, a1), Application(h2, a2)) => he(h1, h1) && he(a1, a2)
+    case (Application(h1, a1), Application(h2, a2)) => he(h1, h2) && he(a1, a2)
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB
       val bs2_ = bs2 sort compareB
