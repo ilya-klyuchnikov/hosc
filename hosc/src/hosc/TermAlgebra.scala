@@ -158,8 +158,9 @@ object TermAlgebra {
     }
     val g = msg_(term1, term2)
     def sameCall(t1: Term, t2: Term) = (t1, t2) match {
-      case (v1: Variable, v2: Variable) => v1.global == true && v2.global == true && v1.name == v2.name
-      case _ => true
+      case (v1: Variable, v2: Variable) => 
+        v1.global == true && v2.global == true && v1.name == v2.name
+      case _ => false
     }
     val evidentSub = g.dSub filter (tr => sameCall(tr._2, tr._3))
     val residualSub = g.dSub remove (tr => sameCall(tr._2, tr._3))
@@ -167,7 +168,7 @@ object TermAlgebra {
     val term = applySubstitution(g.term, evidentMap)
     val s1 = residualSub.map(triple => (triple._1, triple._2))
     val s2 = residualSub.map(triple => (triple._1, triple._3))
-    Generalization(g.term, s1, s2)
+    Generalization(term, s1, s2)
   }
   
   def compareB(b1: Branch, b2: Branch) = b1.pattern.name.compareTo(b2.pattern.name) < 0
