@@ -340,7 +340,7 @@ class TypeInferrer(p: Program) {
       getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => getFreeVars(b.term) -- b.pattern.args}
   }
   
-  def tcProgram() = {
+  def tcProgram(): Unit = {
     val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
@@ -358,8 +358,24 @@ class TypeInferrer(p: Program) {
       }       
       f.`type` = tc(TypeEnv(Nil), expr).t
     }
-    
-    null
+  }
+  
+  def tcTerm(term: Term) = {
+    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
+    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
+    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
+    val g = Graph(vxs.values.toList, arcs)
+    val sccs = analizeDependencies(g)
+    var expr: Expression = term
+    for (scc <- sccs){
+      val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
+      if (scc.recursive){
+        expr = LetRecExpression(bs, expr)
+      } else {
+        expr = LetExpression(bs, expr)
+      }
+    }       
+    tc(TypeEnv(Nil), expr).t
   }
   
 }
