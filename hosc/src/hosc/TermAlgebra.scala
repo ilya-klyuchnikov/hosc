@@ -107,10 +107,14 @@ object TermAlgebra {
   def applySubstitution(term: Term, s: Map[Variable, Term]): Term = term match {
     case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
     case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
-    case LambdaAbstraction(v, t) => LambdaAbstraction(v, applySubstitution(t, s))
+    case LambdaAbstraction(v, t) => 
+      LambdaAbstraction(applySubstitution(v, s).asInstanceOf[Variable], applySubstitution(t, s))
     case Application(h, a) => Application(applySubstitution(h, s), applySubstitution(a, s))
     case CaseExpression(sel, bs) => 
-      CaseExpression(applySubstitution(sel, s), bs map {b => Branch(b.pattern, applySubstitution(b.term, s))})
+      CaseExpression(applySubstitution(sel, s), 
+          bs map {b => Branch(Pattern(b.pattern.name, 
+              b.pattern.args map {applySubstitution(_, s).asInstanceOf[Variable]}), 
+              applySubstitution(b.term, s))})
   }
   
   def he(term1: Term, term2: Term): Boolean = 
@@ -271,5 +275,24 @@ object TermAlgebra {
     }    
     eq1(term1, term2)
   }
+  
+  def freshBinders(term: Term): Term = term match {
+    case Constructor(name, args) => Constructor(name, args map (freshBinders(_)))
+    case Application(h, a) => Application(freshBinders(h), freshBinders(a))
+    case LambdaAbstraction(v, t) => {
+      val freshV = newVar()
+      LambdaAbstraction(freshV, applySubstitution(freshBinders(t), Map(v -> freshV)))
+    }
+    case CaseExpression(sel, bs) => CaseExpression(freshBinders(sel), bs map {freshBinders(_)})
+    case v: Variable => v
+  }
+  
+  def freshBinders(b: Branch): Branch = {
+    val args = b.pattern.args
+    val newVars = args map {x => newVar()}
+    Branch(Pattern(b.pattern.name, newVars), 
+        applySubstitution(freshBinders(b.term), Map[Variable, Term]() ++ (args zip newVars)))
+  }
+
   
 }

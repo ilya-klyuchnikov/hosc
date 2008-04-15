@@ -36,9 +36,7 @@ class Interpreter(program: Program) {
     case context: Context => context.redex match {
       case RedexCall(v) => {
         val lam = program.getFunction(v.name).get.lam
-        val nv = newVar()
-        val nl = LambdaAbstraction(nv, applySubstitution(lam.t, Map(lam.v -> nv)))
-        context.replaceHole(nl) 
+        context.replaceHole(freshBinders(lam)) 
       }
       case RedexLamApp(lam, app) => context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))
       case RedexCaseCon(c, ce) => {
