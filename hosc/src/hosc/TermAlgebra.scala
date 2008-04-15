@@ -294,5 +294,43 @@ object TermAlgebra {
         applySubstitution(freshBinders(b.term), Map[Variable, Term]() ++ (args zip newVars)))
   }
 
+  // replace all occurrences of t1 in term by t2 
+  def replaceTerm(term: Term, t1: Term, t2: Term): Term = if (term == t1) t2 else term match {
+    case v: Variable => v
+    case Constructor(n, args) => Constructor(n, args map {a => replaceTerm(a, t1, t2)})
+    case Application(h, a) => Application(replaceTerm(h, t1, t2), replaceTerm(a, t1, t2))
+    case LambdaAbstraction(v, t) => LambdaAbstraction(v, replaceTerm(t, t1, t2))
+    case CaseExpression(sel, bs) => 
+      CaseExpression(replaceTerm(sel, t1, t2), bs map {b => Branch(b.pattern, replaceTerm(b.term, t1, t2))})
+  }
+  
+  def instanceOf(t1: Term, t2: Term): Boolean = equivalent(msg(t1, t2).term, t1)
+  
+  def isConV(term: Term) = { 
+    def isConV_(t: Term): Boolean = t match {
+      case v: Variable => true
+      case Application(h, _) => isConV_(h)
+      case CaseExpression(sel, _) => isConV_(sel)
+      case _ => false
+    }
+    term match {
+      case Application(h, _) => isConV_(h)
+      case CaseExpression(sel, _) => isConV_(sel)
+      case _ => false
+    }
+  }
+  
+  def isConF(t: Term) = decompose(t) match {
+    case c: Context => c.redex match { 
+      case r: RedexCall => true
+      case _ => false
+    }
+    case _ => false
+  }
+  
+  def extractAppArgs(term: Term): List[Term] = term match {
+    case Application(h, a) => extractAppArgs(h) ::: List(a)
+    case _ => Nil
+  }
   
 }

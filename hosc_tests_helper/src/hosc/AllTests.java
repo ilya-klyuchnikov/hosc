@@ -14,6 +14,7 @@ public class AllTests {
 		suite.addTest(new JUnit4TestAdapter(hosc.GraphAnalysisTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.InterpreterTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.TermAlgebraTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompilerTest.class));
 		
 		return suite;
 	}
