@@ -157,13 +157,8 @@ object TermAlgebra {
       g
     }
     val g = msg_(term1, term2)
-    def sameCall(t1: Term, t2: Term) = (t1, t2) match {
-      case (v1: Variable, v2: Variable) => 
-        v1.global == true && v2.global == true && v1.name == v2.name
-      case _ => false
-    }
-    val evidentSub = g.dSub filter (tr => sameCall(tr._2, tr._3))
-    val residualSub = g.dSub remove (tr => sameCall(tr._2, tr._3))
+    val evidentSub = g.dSub filter (tr => tr._2 == tr._3)
+    val residualSub = g.dSub remove (tr => tr._2 == tr._3)
     val evidentMap = Map[Variable, Term]() ++ (evidentSub map (tr => (tr._1, tr._2)))
     val term = applySubstitution(g.term, evidentMap)
     val s1 = residualSub.map(triple => (triple._1, triple._2))
