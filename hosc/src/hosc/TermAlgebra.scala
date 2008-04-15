@@ -236,7 +236,7 @@ object TermAlgebra {
     }
   }
   
-  // When we do unfold we always rename functions 
+  // During unfolding we always rename functions 
   // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
   // This method assumes that binders always have different names.
   def equivalent(term1: Term, term2: Term): Boolean = {
