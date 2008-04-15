@@ -6,15 +6,16 @@ import HLanguage._
 object Postprocessor {
   
   def postprocess(program: Program) = {
-    for (f <- program.fs) process(f.lam, Set.empty[Variable])
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    for (f <- program.fs) process(f.lam,  globals)
   }
   
-  def process(t: Term, locals: Set[Variable]): Unit = t match {
-    case v: Variable => v.global = !(locals contains v)
-    case Constructor(_, args) => for (a <- args) process(a, locals)
-    case LambdaAbstraction(v, t) => process(t, locals + v)
-    case Application(h, a) => process(h, locals); process(a, locals)
-    case CaseExpression(s, bs) => process(s, locals); for (b <- bs) process(b.term, locals ++ b.pattern.args)
+  def process(t: Term, globals: Set[Variable]): Unit = t match {
+    case v: Variable => v.global = (globals contains v)
+    case Constructor(_, args) => for (a <- args) process(a, globals)
+    case LambdaAbstraction(v, t) => process(t, globals)
+    case Application(h, a) => process(h, globals); process(a, globals)
+    case CaseExpression(s, bs) => process(s, globals); for (b <- bs) process(b.term, globals)
   }
   
 }

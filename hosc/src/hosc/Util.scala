@@ -29,15 +29,37 @@ object Util {
     }
   }
   
+  def groundTermFromString(input: String, program: Program) = {
+    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
+    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
+    val term = pr.get
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    Postprocessor.process(term, globals)
+    val ti = new TypeInferrer(program)
+    ti.tcGroundTerm(term)
+    term
+  }
+  
   def termFromString(input: String, program: Program) = {
+    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
+    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
+    val term = pr.get
+    //Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    Postprocessor.process(term, Set.empty[Variable])
+    val ti = new TypeInferrer(program)
+    ti.tcTerm(term)
+    term
+  }
+  
+  def typeForGroundTerm(input: String, program: Program) = {
     val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
     val term = pr.get
     Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
     Postprocessor.process(term, Set.empty[Variable])
     val ti = new TypeInferrer(program)
-    ti.tcTerm(term)
-    term
+    ti.tcGroundTerm(term)
   }
   
   def typeForTerm(input: String, program: Program) = {

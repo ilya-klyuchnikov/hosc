@@ -360,7 +360,7 @@ class TypeInferrer(p: Program) {
     }
   }
   
-  def tcTerm(term: Term) = {
+  def tcGroundTerm(term: Term) = {
     val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
@@ -376,6 +376,31 @@ class TypeInferrer(p: Program) {
       }
     }       
     tc(TypeEnv(Nil), expr).t
+  }
+  
+  def tcTerm(term: Term) = {
+    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
+    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
+    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
+    val g = Graph(vxs.values.toList, arcs)
+    val sccs = analizeDependencies(g)
+    var expr: Expression = term
+    for (scc <- sccs){
+      val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
+      if (scc.recursive){
+        expr = LetRecExpression(bs, expr)
+      } else {
+        expr = LetExpression(bs, expr)
+      }
+    }
+    var te = TypeEnv(Nil)
+    for (v <- getFreeVars(term)){
+      val nv = newTyvar()
+      val ts = TypeScheme(Nil, nv)
+      val lv = TypeVariable(v.name)
+      te = te.install(lv, ts)
+    }
+    tc(te, expr).t
   }
   
 }

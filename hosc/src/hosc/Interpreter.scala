@@ -17,7 +17,7 @@ class Interpreter(program: Program) {
   }
   
   def eval(input: String): Term = {
-    val term = termFromString(input, program)
+    val term = groundTermFromString(input, program)
     eval(term)
   }
   
