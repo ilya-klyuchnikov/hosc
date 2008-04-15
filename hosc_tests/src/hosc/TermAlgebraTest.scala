@@ -118,4 +118,61 @@ class TermAlgebraTest {
     assertTrue(he(f7.lam, f8.lam))
   }
   
+  @Test def he12(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val appCall = termFromString("app x", program)
+    assertTrue(he(appCall, appCall))
+  }
+  
+  @Test def mgu01(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val term = termFromString("app x", program)
+    val msg_ = msg(term, term)
+    println(msg_)
+    assertTrue(equivalent(msg_.term, term))
+  }
+  
+  @Test def mgu02(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val term1 = termFromString("app x", program)
+    val term2 = termFromString("app y", program)
+    val term = termFromString("app z", program)
+    val msg_ = msg(term1, term2)
+    println(msg_)
+    assertTrue(equivalent(msg_.term, term))
+  }
+  
+  @Test def mgu03(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val input1 = 
+      """
+        |case rev x of {
+        |  Nil : Nil;
+        |  Cons a1 b1 : app (rev b1) (Cons a1 Nil);
+        |}
+      """.stripMargin;
+      
+    val input2 = 
+      """
+        |case x of {
+        |  Nil : Nil;
+        |  Cons a1 b1 : app (rev (rev b1)) (Cons a1 Nil);
+        |}
+      """.stripMargin;     
+    
+    val expectedMsgInput = 
+      """
+        |case y of {
+        |  Nil : Nil;
+        |  Cons a1 b1 : app (rev z) (Cons a1 Nil);
+        |}
+      """.stripMargin;
+    val term1 = termFromString(input1, program)
+    val term2 = termFromString(input2, program)
+    val term = termFromString(expectedMsgInput, program)
+    val actualMsg = msg(term1, term2)
+    println(actualMsg)
+    assertTrue(equivalent(actualMsg.term, term))
+  }
+  
 }
