@@ -30,8 +30,7 @@ class Interpreter(program: Program) {
   }
   
   // Constructor or lambda as result
-  private def baseLazyEval(t: Term): Term = {    
-    decompose(t) match {
+  private def baseLazyEval(t: Term): Term = decompose(t) match {
     case o: Observable => o.term
     case context: Context => context.redex match {
       case RedexCall(v) => {
@@ -46,7 +45,6 @@ class Interpreter(program: Program) {
       }
       case _ => throw new Exception("Unexpexted redex is encoutered " + context.redex)
     }
-  }
   }
   
 }
