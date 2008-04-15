@@ -124,6 +124,16 @@ class TermAlgebraTest {
     assertTrue(he(appCall, appCall))
   }
   
+  @Test def he13(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val t01 = termFromString("app x y", program)
+    val t02 = termFromString("app x", program)
+    assertFalse(he(t01, t02))
+    val t1 = termFromString("((app ((app x) y)) z)", program)
+    val t2 = termFromString("((app x) y)", program)
+    assertFalse(he(t1, t2))
+  }
+  
   @Test def mgu01(): Unit = {
     val program = programFromFile("input/ta.hl")
     val term = termFromString("app x", program)
