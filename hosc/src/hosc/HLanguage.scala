@@ -7,8 +7,9 @@ import scala.util.parsing.input.Positional
  */
 object HLanguage {
    sealed abstract class Expression extends Positional
+   sealed abstract class BaseExpression extends Expression
    
-   sealed abstract class Term extends Expression
+   sealed abstract class Term extends BaseExpression
    case class Variable(name: String) extends Term {
      var global = false // global var is call
      override def toString = name 
@@ -26,7 +27,7 @@ object HLanguage {
    case class CaseExpression(selector: Term, branches: List[Branch]) extends Term {
      override def toString = "case (" + selector + ") of {\n" + branches.mkString("\n")+"}\n"  
    }
-   case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression
+   case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends BaseExpression
    case class LetRecExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression
    
    case class Branch(pattern: Pattern, term: Term) extends Positional {
