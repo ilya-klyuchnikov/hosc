@@ -44,3 +44,46 @@ f2 = %x2 {
     }
   }
 }
+
+f3 = %x3 {
+  %y3 {
+    case x3 of {
+      Nil : y3;
+      Cons z3 zs3 : Cons z3 zs3;
+    }
+  }
+}
+
+f4 = %xs4 {rev xs4}
+f5 = %xs5 {app (rev xs5) Nil}
+
+f6 = %x6 {
+  %y6 {
+    case (rev x6) of {
+      Nil : y6;
+      Cons z6 zs6 : Cons z6 (app zs6 x6);
+    }
+  }
+}
+
+f7 = %x7 {
+  %y7 {
+    case rev x7 of {
+      Nil : y7;
+      Cons z7 zs7 : Cons z7 (app zs7 x7);
+    }
+  }
+}
+
+f8 = %x8 {
+  %y8 {
+    case (case rev x8 of {
+        Nil : y8;
+        Cons z9 zs9 : Cons z9 (app zs9 x8);
+      }) of {
+      Nil : y8;
+      Cons z8 zs8 : Cons z8 (app zs8 x8);
+    }
+  }
+}
+

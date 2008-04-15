@@ -83,4 +83,39 @@ class TermAlgebraTest {
     assertTrue(he(f1.lam, f2.lam))
   }
   
+  @Test def he07(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val f4 = program.getFunction("f4").get
+    val f5 = program.getFunction("f5").get
+    assertTrue(he(f4.lam, f5.lam))
+  }
+  
+  @Test def he08(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val f1 = program.getFunction("f1").get
+    val f6 = program.getFunction("f6").get
+    assertTrue(he(f1.lam, f6.lam))
+  }
+  
+  @Test def he09(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val f3 = program.getFunction("f3").get
+    val f2 = program.getFunction("f2").get
+    assertTrue(he(f3.lam, f2.lam))
+  }
+  
+  @Test def he10(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val f3 = program.getFunction("f3").get
+    val f2 = program.getFunction("f2").get
+    assertFalse(he(f2.lam, f3.lam))
+  }
+  
+  @Test def he11(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val f7 = program.getFunction("f7").get
+    val f8 = program.getFunction("f8").get
+    assertTrue(he(f7.lam, f8.lam))
+  }
+  
 }
