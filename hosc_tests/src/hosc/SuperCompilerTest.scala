@@ -10,6 +10,8 @@ class SuperCompilerTest {
   
   @Test def simple(): Unit = {
     testSC("input/revInt.hl", "app (app x y) z")
+    testSC("input/revInt.hl", "app (app x y) x")
+    testSC("input/revInt.hl", "app x x")
   }  
   
   def testSC(fileName: String, input: String): Unit = {

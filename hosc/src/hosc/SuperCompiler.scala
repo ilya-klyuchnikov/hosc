@@ -54,9 +54,9 @@ class SuperCompiler(program: Program){
               val aTerm = alpha.expr.asInstanceOf[Term]
               val msg_ = msg(aTerm, bTerm)
               if (isConV(msg_.term)) 
-                makeAbstraction(p, beta, alpha)
-              else 
                 makeAbstraction(p, alpha, beta)
+              else 
+                makeAbstraction(p, beta, alpha)
             }
           }        
         case _ => drive(p, beta)
