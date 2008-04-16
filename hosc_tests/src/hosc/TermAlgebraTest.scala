@@ -46,6 +46,13 @@ class TermAlgebraTest {
     assertTrue(equivalent(f1.lam, f2.lam))
   }
   
+  @Test def equivalency07(): Unit = {
+    val program = programFromFile("input/ta.hl")
+    val term1 = termFromString("app (app x y) z", program)
+    val term2 = termFromString("app (app x y) x", program)
+    assertFalse(equivalent(term1, term2))
+  }
+  
   @Test def he01(): Unit = {
     val appCall = Variable("app")
     appCall.global = true
@@ -158,7 +165,7 @@ class TermAlgebraTest {
       """
         |case rev x of {
         |  Nil : Nil;
-        |  Cons a1 b1 : app (rev b1) (Cons a1 Nil);
+        |  Cons a1 b1 : app (rev b1) (Cons aa1 Nil);
         |}
       """.stripMargin;
       
@@ -174,7 +181,7 @@ class TermAlgebraTest {
       """
         |case y of {
         |  Nil : Nil;
-        |  Cons a1 b1 : app (rev z) (Cons a1 Nil);
+        |  Cons a1 b1 : app (rev z) (Cons aa1 Nil);
         |}
       """.stripMargin;
     val term1 = termFromString(input1, program)

@@ -160,9 +160,13 @@ object TermAlgebra {
       } while (exp != g.term)    
       g
     }
+    def f(t1: Term, t2: Term): Boolean = (t1, t2) match {
+      case (v1: Variable, v2: Variable) => v1.global == true && v2.global == true && v1.name == v2.name
+      case _ => false
+    }
     val g = msg_(term1, term2)
-    val evidentSub = g.dSub filter (tr => tr._2 == tr._3)
-    val residualSub = g.dSub remove (tr => tr._2 == tr._3)
+    val evidentSub = g.dSub filter (tr => f(tr._2, tr._3))
+    val residualSub = g.dSub remove (tr => f(tr._2, tr._3))
     val evidentMap = Map[Variable, Term]() ++ (evidentSub map (tr => (tr._1, tr._2)))
     val term = applySubstitution(g.term, evidentMap)
     val s1 = residualSub.map(triple => (triple._1, triple._2))
@@ -255,7 +259,7 @@ object TermAlgebra {
       case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 =>
         ((args1 zip args2) forall (args => eq1(args._1, args._2)))
       case (Application(h1, a1), Application(h2, a2)) => 
-        eq1(h1, h2) && eq1(h1, h2)
+        eq1(h1, h2) && eq1(a1, a2)
       case (LambdaAbstraction(b1, v1), LambdaAbstraction(b2, v2)) =>
         eq1(b1, b2) && eq1(v1, v2)
       case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
@@ -306,18 +310,11 @@ object TermAlgebra {
   
   def instanceOf(t1: Term, t2: Term): Boolean = equivalent(msg(t1, t2).term, t1)
   
-  def isConV(term: Term) = { 
-    def isConV_(t: Term): Boolean = t match {
-      case v: Variable => true
-      case Application(h, _) => isConV_(h)
-      case CaseExpression(sel, _) => isConV_(sel)
-      case _ => false
-    }
-    term match {
-      case Application(h, _) => isConV_(h)
-      case CaseExpression(sel, _) => isConV_(sel)
-      case _ => false
-    }
+  def isConV(t: Term): Boolean = t match {
+    case v: Variable => true
+    case Application(h, _) => isConV(h)
+    case CaseExpression(sel, _) => isConV(sel)
+    case _ => false
   }
   
   def isConF(t: Term) = decompose(t) match {
