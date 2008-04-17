@@ -55,6 +55,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
               case Some(repeatNode) => {
                 val betaT = repeatNode.expr.asInstanceOf[Term]
                 val msg = strongMsg(t, betaT)
+                val args = msg.sub2 map {p => convert(p._1)}
                 val newVars = msg.sub2 map {p => Variable1(newVar().name)}
                 val sub = Map[Variable1, Expression1]() ++ 
                   ((msg.sub2 zip newVars) map {p => (Variable1(p._1._1.name), p._2)})
@@ -62,7 +63,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                 val expr = applySubstitution1(construct(node.children.head), sub)
                 val lam = constructLambda(newVars, expr)
                 val appHead = Variable1(node.newFName)
-                LetRecExpression1(List((appHead, lam)), constructApplication1(appHead, newVars))
+                LetRecExpression1(List((appHead, lam)), constructApplication1(appHead, args))
               }
             }
             
