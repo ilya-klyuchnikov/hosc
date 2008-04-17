@@ -42,6 +42,19 @@ class SuperCompilerTest {
         "-e", "rev x", 
         "-t", "output/rev_1.svg",
         "-p", "output/rev.hl"));
-
+    
+    SuperCompilerApp.main(Array("-i", "input/z01.hl",
+        "-e", "takenm n m", 
+        "-t", "output/z01.svg",
+        "-p", "output/z01.hl"));
+    SuperCompilerApp.main(Array("-i", "input/z02.hl",
+        "-e", "app x y", 
+        "-t", "output/z02.svg",
+        "-p", "output/z02.hl"));
+        
+   SuperCompilerApp.main(Array("-i", "input/z03.hl",
+            "-e", "f1 (f x)", 
+            "-t", "output/z03.svg",
+            "-p", "output/z03.hl"));        
   }
 }

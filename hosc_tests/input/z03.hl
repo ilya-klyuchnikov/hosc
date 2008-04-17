@@ -1,0 +1,14 @@
+boolean :: True | False;
+
+f1 = %x {
+  f1 (f3 x)
+}
+
+f = % x {x}
+f3 = % x {x}
+g = % y {
+  case y of {
+    True : True;
+    False : f y;
+  }
+}
