@@ -192,11 +192,22 @@ object TermAlgebra {
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
         l2 ++= List((arg, a1, a2), (rs, t1, t2))
       }
+      /*
       case (v, Application(h1, a1), Application(h2, a2)) => {
         val head = newVar()
         val arg = newVar()
         t = applySubstitution(t, Map(v -> Application(head, arg)))
         l2 ++= List((head, h1, h2), (arg, a1, a2))
+      }*/
+      case (v, app1: Application, app2: Application) 
+      if getAppLevel(app1) == getAppLevel(app2) && getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
+        val head = getCoreLocalHead(app1)
+        val args1 = extractAppArgs(app1)
+        val args2 = extractAppArgs(app2)
+        val newVars = args1.map(arg => newVar())
+        val addDSubs = ((newVars zip args1) zip (newVars zip args2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
+        t = applySubstitution(t, Map(v -> constructApplication(head, newVars)))
+        l2 ++= addDSubs
       }
       case (v, CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
         val bs1s = bs1 sort compareB
@@ -222,6 +233,26 @@ object TermAlgebra {
       case d => l2 += d
     }
     Generalization2(t, l2.toList)
+  }
+  
+  private def getCoreLocalHead(app: Application): Term = app.head match {
+    case a: Application => getCoreLocalHead(a)
+    case h => h
+  }
+
+  private def getAppLevel(app: Application): Int = app.head match {
+    case a: Application => 1 + getAppLevel(a);
+    case h => 1;
+  }
+  
+  private def constructApplication(head: Term, args: List[Term]): Application = {
+    var app = Application(head, args.head)
+    var list = args.tail
+    while (!list.isEmpty) {
+      app = Application(app, list.head)
+      list = list.tail
+    }
+    app
   }
   
   private def f1(ds: DoubleSubstitution, p: Pair[List[DoubleSubstitution], List[DoubleSubstitution]]) = p match {
@@ -311,9 +342,9 @@ object TermAlgebra {
   def instanceOf(t1: Term, t2: Term): Boolean = equivalent(msg(t1, t2).term, t1)
   
   def isConV(t: Term): Boolean = t match {
-    case v: Variable => true
-    case Application(h, _) => isConV(h)
-    case CaseExpression(sel, _) => isConV(sel)
+    case v: Variable => true //v.global 
+    //case Application(h, _) => isConV(h)
+    //case CaseExpression(sel, _) => isConV(sel)
     case _ => false
   }
   

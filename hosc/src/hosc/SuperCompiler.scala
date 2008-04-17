@@ -42,6 +42,8 @@ class SuperCompiler(program: Program){
   def buildProcessTree(e: BaseExpression): ProcessTree = {
     val p = ProcessTree(e)
     while (!p.isClosed) {
+      println(p)
+      println("===========================")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -53,10 +55,16 @@ class SuperCompiler(program: Program){
             case Some(alpha) => {
               val aTerm = alpha.expr.asInstanceOf[Term]
               val msg_ = msg(aTerm, bTerm)
-              if (isConV(msg_.term)) 
+              if (isConV(msg_.term)){
+                println("con<v>=true")
+                println("**************")
+                //makeAbstraction(p, beta, alpha)
+                extract(p, alpha, beta)
+              } else { 
+                println("con<v>=false")
+                println("**************")
                 makeAbstraction(p, alpha, beta)
-              else 
-                makeAbstraction(p, beta, alpha)
+              }
             }
           }        
         case _ => drive(p, beta)
@@ -77,6 +85,32 @@ class SuperCompiler(program: Program){
     } else {
       t.replace(alpha, LetExpression(g.sub1, g.term))
     }    
+  }
+  
+  // a < b
+  def extract(t: ProcessTree, alpha: Node, beta: Node): Unit = {
+    val (aTerm, bTerm) = (alpha.expr.asInstanceOf[Term], beta.expr.asInstanceOf[Term])
+    val nv = newVar()
+    var extractedTerm: Term  = null
+    def extract1(t: Term): Term = {
+       if (extractedTerm != null || !he(aTerm, t)) return t
+       var t1: Term = null
+       t match {
+         case Constructor(name, args) => t1 = Constructor(name, args map extract1);
+         case Application(h, a) => t1 = Application(extract1(h), extract1(a));
+         case LambdaAbstraction(v, lt) => t1 = LambdaAbstraction(v, extract1(lt));
+         case CaseExpression(sel, bs) => t1 = CaseExpression(extract1(sel), bs)
+         case x => t1 = x
+       }
+       if (extractedTerm == null) {
+         extractedTerm = t1
+         return nv
+       } else {
+         return t1
+       }
+    }
+    val nt = extract1(bTerm)
+    t.replace(beta, LetExpression(List((nv, extractedTerm)), nt))
   }
   
 }
