@@ -1,6 +1,7 @@
 package hosc;
 
 import HLanguage._
+import HLanguage1._
 
 object TermAlgebra {
   var i = 0
@@ -82,6 +83,7 @@ object TermAlgebra {
     case c: Constructor => ObservableCon(c)
     case l: LambdaAbstraction => ObservableLam(l)
     case app: Application if getCoreLocalVar(app)!=null => ObservableVarApp(getCoreLocalVar(app), app)
+    case v: Variable if !v.global => ObservableVar(v)
     // context
     case t => createContext(t)
   }
@@ -255,6 +257,16 @@ object TermAlgebra {
     app
   }
   
+  def constructApplication1(head: Expression1, args: List[Expression1]): Application1 = {
+    var app = Application1(head, args.head)
+    var list = args.tail
+    while (!list.isEmpty) {
+      app = Application1(app, list.head)
+      list = list.tail
+    }
+    app
+  }
+  
   private def f1(ds: DoubleSubstitution, p: Pair[List[DoubleSubstitution], List[DoubleSubstitution]]) = p match {
     case (Nil, l) => l.partition(triple => triple._2 == ds._2 && triple._3 == ds._3) match {
       case (Nil, _) => (Nil, ds :: l) 
@@ -359,6 +371,62 @@ object TermAlgebra {
   def extractAppArgs(term: Term): List[Term] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
+  }
+  
+  def applySubstitution1(term: Expression1, s: Map[Variable1, Expression1]): Expression1 = term match {
+    case v: Variable1 => s.get(v) match {case Some(t) => t; case None => v}
+    case Constructor1(n, args) => Constructor1(n, args map {applySubstitution1(_, s)})
+    case LambdaAbstraction1(v, t) => {
+      val v_ = applySubstitution1(v, s)
+      if (!v_.isInstanceOf[Variable1]) {
+        println(v)
+      }
+      LambdaAbstraction1(v_.asInstanceOf[Variable1], applySubstitution1(t, s))
+      
+    }      
+    case Application1(h, a) => Application1(applySubstitution1(h, s), applySubstitution1(a, s))
+    case CaseExpression1(sel, bs) => 
+      CaseExpression1(applySubstitution1(sel, s), 
+          bs map {b => Branch1(Pattern1(b.pattern.name, 
+              b.pattern.args map {applySubstitution1(_, s).asInstanceOf[Variable1]}), 
+              applySubstitution1(b.term, s))});
+    case LetExpression1(bs, e) => 
+      LetExpression1(bs map {b => (b._1, applySubstitution1(b._2, s))}, applySubstitution1(e, s));
+    case LetRecExpression1(bs, e) => 
+      LetRecExpression1(bs map {b => (b._1, applySubstitution1(b._2, s))}, applySubstitution1(e, s));
+  }
+  
+  
+  // term1 is equivalent with msg
+  def strongMsg(term1: Term, term2: Term): Generalization = {
+    val g = msg(term1, term2)
+    var term = g.term
+    for (s <- g.sub1) term = applySubstitution(term, Map(s))
+    
+    val newS = (g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}
+    Generalization(term, Nil, newS)    
+  }
+  
+  def convertPattern(p: Pattern): Pattern1 = {
+    Pattern1(p.name, p.args map {v => Variable1(v.name)})
+  }
+  
+  def constructLambda(vs: List[Variable1], e: Expression1): Expression1 = {
+    def constructLambda_(vs_ : List[Variable1]) : Expression1 = vs_ match {
+      case Nil => e;
+      case v :: vv => LambdaAbstraction1(v, constructLambda_(vv))
+    }
+    constructLambda_(vs)
+  }
+  
+  // converts hlanguage to hlanguage1
+  def convert(term: Term): Expression1 = term match {
+    case Variable(n) => Variable1(n)
+    case Constructor(n, args) => Constructor1(n, args map convert)
+    case LambdaAbstraction(v, e) => LambdaAbstraction1(Variable1(v.name), convert(e))
+    case Application(h, a) => Application1(convert(h), convert(a))
+    case CaseExpression(sel, bs) => 
+      CaseExpression1(convert(sel), bs map {b => Branch1(convertPattern(b.pattern), convert(b.term))})
   }
   
 }

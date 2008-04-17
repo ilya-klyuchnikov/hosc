@@ -66,5 +66,20 @@ class SuperCompilerTest {
        "-e", "not (not y)", 
        "-t", "output/notNot.svg",
        "-p", "output/notNot.hl"));
+   
+   SuperCompilerApp.main(Array("-i", "input/mapNotNot.hl",
+       "-e", "map not y", 
+       "-t", "output/mapNot.svg",
+       "-p", "output/mapNot.hl"));
+   
+   SuperCompilerApp.main(Array("-i", "input/mapNotNot.hl",
+       "-e", "map x (Cons True (Cons False Nil)) ", 
+       "-t", "output/mapx.svg",
+       "-p", "output/mapx.hl"));
+   
+   SuperCompilerApp.main(Array("-i", "input/mapNotNot.hl",
+       "-e", "id y", 
+       "-t", "output/id.svg",
+       "-p", "output/id.hl"));
   }
 }

@@ -16,3 +16,20 @@ mapNot = %list {
 }
 
 mapNotNot = %list {mapNot (mapNot list)}
+
+map = %f {
+  %list {
+    case list of {
+      Nil : Nil;
+      Cons x xs : Cons (f x) (map f xs);
+    }
+  } 
+  
+}
+
+id = %list {
+  case list of {
+    Nil : Nil;
+    Cons x xs : Cons x xs;
+  }
+} 

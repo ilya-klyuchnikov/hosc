@@ -9,6 +9,7 @@ object ProcessTree {
   
   class Node(val expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
+    var newFName: String = null
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
@@ -17,7 +18,9 @@ object ProcessTree {
         sb.append("\n" + edge.child.toString(indent + "  "))
       }
       sb.toString
-    }    
+    }
+    
+    def children(): List[Node] = outs map {edge => edge.child}
 
     def ancestors(): List[Node] = if (in == null) Nil else in.parent :: in.parent.ancestors
 
