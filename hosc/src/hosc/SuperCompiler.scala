@@ -70,7 +70,9 @@ class SuperCompiler(program: Program){
         case _ => drive(p, beta)
       }
       
-    }    
+    }
+    println(p)
+    println("===========================")
     p
   }  
   
