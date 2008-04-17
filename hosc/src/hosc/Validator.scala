@@ -128,4 +128,53 @@ object Validator {
     }
   }
   
+  def valTermWithFreeVars(boundedVars: Set[String], term: Term, p: Program): Unit = term match{
+    case v: Variable => 
+    case c: Constructor => {
+      p.getDataConstructor(c.name) match {
+        case Some(dc) => {
+          if (dc.args.length != c.args.length) err("wrong number of parameters for constructor " + c.name, c)
+          for (arg <- c.args) valTermWithFreeVars(boundedVars, arg, p)
+        }
+        case None => err("undefined constructor " + c.name, c)
+      }
+    }
+    case l: LambdaAbstraction => {
+      if (boundedVars contains l.v.name) err("variable " + l.v.name + " is already bound", l.v)
+      valTermWithFreeVars(boundedVars + l.v.name, l.t, p)
+    }
+    case a: Application => {valTermWithFreeVars(boundedVars, a.head, p); valTermWithFreeVars(boundedVars, a.arg, p);}
+    case c: CaseExpression => valCaseWithFreeVars(boundedVars, c, p)
+  }
+  
+  def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
+    valTermWithFreeVars(boundedVars, c.selector, p);
+    val pat = c.branches.head.pattern
+    val dcn = pat.name
+    p.getTypeDefinitionForDC(dcn) match {
+      case None => err("undefined constructor " + dcn, pat)
+      case Some(td) => {
+        val consNames = Set.empty[String] ++ (td.cons map (_.name))
+        var usedNames = Set.empty[String]
+        for (b <- c.branches){
+          val pt = b.pattern
+          if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
+          val dc = p.getDataConstructor(pt.name).get
+          if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
+          if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
+          usedNames += pt.name
+          var pVars = Set.empty[String]
+          for (v <- pt.args){
+            if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
+            if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
+            pVars += v.name
+          }
+          valTermWithFreeVars(boundedVars ++ pVars, b.term, p)
+        }
+        val unused = consNames -- usedNames
+        if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+      }
+    }
+  }
+  
 }
