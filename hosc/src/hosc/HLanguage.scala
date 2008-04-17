@@ -15,7 +15,7 @@ object HLanguage {
      override def toString = name 
    } 
    case class Constructor(name: String, args: List[Term]) extends Term {
-     override def toString = "(" + name + " " + args.mkString("") + ")"
+     override def toString = "(" + name + " " + args.mkString(" ") + ")"
    }
    case class LambdaAbstraction(v: Variable, t: Term) extends Term {
      override def toString = "%" + v.name + " {" + t + "}" 
