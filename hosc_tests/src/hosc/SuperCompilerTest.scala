@@ -55,6 +55,16 @@ class SuperCompilerTest {
    SuperCompilerApp.main(Array("-i", "input/z03.hl",
             "-e", "f1 (f x)", 
             "-t", "output/z03.svg",
-            "-p", "output/z03.hl"));        
+            "-p", "output/z03.hl"));   
+   
+   SuperCompilerApp.main(Array("-i", "input/mapNotNot.hl",
+       "-e", "mapNotNot y", 
+       "-t", "output/mapNotNot.svg",
+       "-p", "output/mapNotNot.hl"));
+   
+   SuperCompilerApp.main(Array("-i", "input/mapNotNot.hl",
+       "-e", "not (not y)", 
+       "-t", "output/notNot.svg",
+       "-p", "output/notNot.hl"));
   }
 }
