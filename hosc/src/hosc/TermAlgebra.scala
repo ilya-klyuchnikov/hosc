@@ -403,7 +403,7 @@ object TermAlgebra {
     var term = g.term
     for (s <- g.sub1) term = applySubstitution(term, Map(s))
     
-    val newS = (g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}
+    var newS = ((g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}) remove (p => p._1 == p._2)
     Generalization(term, Nil, newS)    
   }
   
