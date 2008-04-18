@@ -50,14 +50,15 @@ object SuperCompilerApp {
       svgFile.createNewFile()
     } 
     scala.xml.XML.save(outFileName, svg)
+    
     val g = new ResidualProgramGenerator(pt)
-    val text = g.generateProgram().toString
+    val doc = g.generateProgram().toDoc
     val slFile = new java.io.File(outProgramFileName)
     if (!slFile.exists){
       slFile.createNewFile()
     }
     val fw = new FileWriter(slFile);
-    fw.write(text);
+    doc.format(80, fw)
     fw.flush();
     fw.close();
     
