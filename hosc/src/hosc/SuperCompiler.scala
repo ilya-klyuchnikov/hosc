@@ -73,7 +73,7 @@ class SuperCompiler(program: Program){
     }
     println(p)
     println("===========================")
-    p
+    renameVars(p)
   }  
   
   def drive(t: ProcessTree, n: Node): Unit = {
@@ -114,5 +114,37 @@ class SuperCompiler(program: Program){
     val nt = extract1(bTerm)
     t.replace(beta, LetExpression(List((nv, extractedTerm)), nt))
   }
+  
+  def renameVars(p: ProcessTree): ProcessTree = {
+    val vars = p.rootNode.getAllVars()
+    var i = 0
+    def createVar(): Variable = {      
+      var nv: Variable = null
+      do {
+        nv = varFor(i)
+        i += 1
+      } while (vars contains nv)
+      nv
+    }
+    var map = Map[Variable, Term]()
+    for (v <- vars.toList) {
+      if (isSynthetic(v)) {
+        map = map + (v -> createVar)
+      }
+    }
+    p.rootNode sub map
+    p
+  }
+  
+  private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
+  
+  private def varFor(j: Int) = {
+    if (j <= 9) 
+      Variable("" + vNames(j))
+    else 
+      Variable("" + vNames(j % 10) + Integer.toString(j / 10))   
+  }
+  
+  private def isSynthetic(v: Variable) = v.name startsWith "$" 
   
 }

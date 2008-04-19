@@ -7,7 +7,7 @@ object ProcessTree {
   def apply(expr: BaseExpression) = 
     new ProcessTree(new Node(expr, null, Nil))
   
-  class Node(val expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
+  class Node(var expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
     var newFName: String = null
       
@@ -49,10 +49,33 @@ object ProcessTree {
       }
       case _ => false
     }
+    
+    def getAllVars(): Set[Variable] = {
+      var vars = TermAlgebra.getAllVars(expr)
+      for (e <- outs) {
+        vars = vars ++ e.child.getAllVars()
+      }
+      vars
+    }
+    
+    def sub(map: Map[Variable, Term]): Unit = {
+      expr match {    
+        case t: Term => expr = applySubstitution(t, map)
+        case le: LetExpression => expr = applySubForLet(le, map) 
+      }
+      for (e <- outs) {
+        e.child.sub(map)
+      }
+    }
   }
   
   class Edge(val parent: Node, var child: Node, val substitution: Map[Variable, Term]) {
     override def toString = "Edge("+ substitution + ", " + child + ")"
+  }
+  
+  def applySubForLet(le: LetExpression, s: Map[Variable, Term]): LetExpression = {
+    LetExpression(le.bs map {b => (b._1, applySubstitution(b._2.asInstanceOf[Term], s))}, 
+        applySubstitution(le.expr.asInstanceOf[Term], s));
   }
 }
 
