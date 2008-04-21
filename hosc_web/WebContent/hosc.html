@@ -1,0 +1,15 @@
+<lift:surround with="default" at="content">
+    <script src="samples.js" type="text/javascript"/>
+	<h1>SPSC online</h1>
+	<div id="samples"/>
+    <script type="text/javascript">
+    document.getElementById('samples').innerHTML = samplesHTML();</script>
+	<form method="post" action="hosc_result">
+	<div><textarea name="program" rows="20" cols="80" id="programText"/><br />        
+    <label for="expression">Expression to be supercompiled:</label>
+        <input type="text" name="expression" id="expression"/>
+        <br />
+        <input type="submit" value="supercompile" />
+        </div>
+    </form>
+</lift:surround>
