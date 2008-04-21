@@ -1,0 +1,20 @@
+number :: Z | S number;
+boolean :: True | False;
+
+add = %x {
+  %y {
+    case x of {
+      Z   : y;
+      S n : S (add n y);
+    }
+  }
+}
+
+eqnum = %x {
+  %y {
+    case x of {
+      Z : case y of { Z : True; S z : False;};
+      S n : case y of { Z : False; S z : eqnum n z; };
+    }
+  }
+}

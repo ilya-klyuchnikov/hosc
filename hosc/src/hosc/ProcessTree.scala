@@ -50,6 +50,32 @@ object ProcessTree {
       case _ => false
     }
     
+    def getRepParent(): Node = expr match {
+      case Constructor(_, Nil) => null
+      case v : Variable => null
+      case t: Term => {
+        decompose(t) match {
+          case o: Observable => null
+          case c: Context => c.redex match {
+            case r: RedexCall => {
+              var edge = in
+              while (edge != null) {
+                val node1 = edge.parent
+                node1.expr match {
+                  case pt: Term => if (instanceOf(pt, t)) return node1
+                  case _ => 
+                }
+                edge = node1.in
+              }
+              null
+            }
+            case _ => null
+          }
+        }
+      }
+      case _ => null
+    }
+    
     def getAllVars(): Set[Variable] = {
       var vars = TermAlgebra.getAllVars(expr)
       for (e <- outs) {

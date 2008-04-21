@@ -43,7 +43,7 @@ object SuperCompilerApp {
     val sc = new SuperCompiler(program)
     val term = termFromString(termString, program)
     val pt = sc.buildProcessTree(term)    
-    val svg = ProcessTreeSVG.treeToSVG(pt)
+    val svg = new ProcessTreeSVG(pt).treeToSVG
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){

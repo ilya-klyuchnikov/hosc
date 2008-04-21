@@ -81,5 +81,10 @@ class SuperCompilerTest {
        "-e", "id y", 
        "-t", "output/id.svg",
        "-p", "output/id.hl"));
+   
+   SuperCompilerApp.main(Array("-i", "input/eqnum.hl",
+       "-e", "eqnum c c", 
+       "-t", "output/eqnum.svg",
+       "-p", "output/eqnum.hl"));
   }
 }
