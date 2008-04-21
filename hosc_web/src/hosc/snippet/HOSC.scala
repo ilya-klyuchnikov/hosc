@@ -8,7 +8,8 @@ import hosc.SuperCompiler
 import scala.util.parsing.input.CharArrayReader
 
 class HOSC {
-  def input = <pre>{S.param("program").openOr("")}</pre>
+  def program = <pre>{S.param("program").openOr("")}</pre>
+  def expression = <pre>{S.param("expression").openOr("")}</pre>
   def output = 
   try
   {
@@ -26,7 +27,7 @@ class HOSC {
     val writer = new java.io.StringWriter()
     doc.format(80, writer)
     <div>
-    <h2>Supercompiled expression</h2>
+    <h2>Supercompiled Expression</h2>
     <div><pre>{writer.toString}</pre></div>
     <h2>Partial Process Tree</h2>
     <div>{svg}</div>
