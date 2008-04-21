@@ -32,16 +32,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
         }
         case RedexCall(f) => {
           if (node.outs.isEmpty) {
-            var edge = node.in
-            var alphaNode: Node = null
-            while (alphaNode == null) {
-              val node1 = edge.parent
-              node1.expr match {
-                case pt: Term => if (instanceOf(pt, t)) alphaNode = node1
-                case _ => 
-              }
-              edge = node1.in
-            }
+            val alphaNode: Node = node.getRepParent()
             val alphaT = alphaNode.expr.asInstanceOf[Term]
             val msg = strongMsg(alphaT, t)
             val appHead = Variable1(alphaNode.newFName)
@@ -65,8 +56,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                 val appHead = Variable1(node.newFName)
                 LetRecExpression1(List((appHead, lam)), constructApplication1(appHead, args))
               }
-            }
-            
+            }            
           }
         }
       }

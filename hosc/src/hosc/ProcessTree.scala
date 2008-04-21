@@ -26,7 +26,7 @@ object ProcessTree {
 
     def isProcessed: Boolean = expr match {
       case Constructor(_, Nil) => true
-      case v : Variable => true
+      case v : Variable if v.global == false => true
       case t: Term => {
         decompose(t) match {
           case o: Observable => false
@@ -52,7 +52,7 @@ object ProcessTree {
     
     def getRepParent(): Node = expr match {
       case Constructor(_, Nil) => null
-      case v : Variable => null
+      case v : Variable if v.global == false => null
       case t: Term => {
         decompose(t) match {
           case o: Observable => null

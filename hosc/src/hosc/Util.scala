@@ -29,6 +29,18 @@ object Util {
     }
   }
   
+  def programFromString(input: String): Program = {
+    val pr = HParsers.parseProgram(new CharArrayReader(input.toCharArray))
+    if (pr.successful) {
+      val program = pr.get
+      val ti = new TypeInferrer(program)
+      ti.tcProgram()
+      program
+    } else { 
+      throw new IllegalArgumentException(pr.toString)
+    }
+  }
+  
   def groundTermFromString(input: String, program: Program) = {
     val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)

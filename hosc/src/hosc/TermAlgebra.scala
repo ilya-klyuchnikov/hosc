@@ -257,14 +257,14 @@ object TermAlgebra {
     app
   }
   
-  def constructApplication1(head: Expression1, args: List[Expression1]): Application1 = {
-    var app = Application1(head, args.head)
-    var list = args.tail
+  def constructApplication1(head: Expression1, args: List[Expression1]): Expression1 = {
+    var res = head
+    var list = args
     while (!list.isEmpty) {
-      app = Application1(app, list.head)
+      res = Application1(res, list.head)
       list = list.tail
     }
-    app
+    res
   }
   
   private def f1(ds: DoubleSubstitution, p: Pair[List[DoubleSubstitution], List[DoubleSubstitution]]) = p match {
