@@ -56,10 +56,10 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                 val betaT = repeatNode.expr.asInstanceOf[Term]
                 val msg = strongMsg(t, betaT)
                 val args = msg.sub2 map {p => convert(p._1)}
-                val newVars = msg.sub2 map {p => Variable1(newVar().name)}
+                val newVars = msg.sub2 map {p => Variable1(createVar().name)}
                 val sub = Map[Variable1, Expression1]() ++ 
                   ((msg.sub2 zip newVars) map {p => (Variable1(p._1._1.name), p._2)})
-                node.newFName = newVar().name
+                node.newFName = createFName()
                 val expr = applySubstitution1(construct(node.children.head), sub)
                 val lam = constructLambda(newVars, expr)
                 val appHead = Variable1(node.newFName)
@@ -80,5 +80,49 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
       applySubstitution1(construct(node0), subs)
     }
   }
+  
+  var i = 0;
+  val treeVars = tree.rootNode.getAllVars()
+  def createVar(): Variable = {      
+    var nv: Variable = null
+    do {
+      nv = varFor(i)
+      i += 1
+    } while (treeVars contains nv)
+    nv
+  }
+  
+  var fi = 0;
+  def createFName(): String = {      
+    var name: String = null
+    do {
+      name = fName(fi)
+      fi += 1
+    } while (fUsed contains name)
+    fUsed = fUsed + name
+    name
+  }
+  
+  private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
+  private val fNames = Array('f', 'g', 'h');
+  private var fUsed = Set[String]()
+  
+  private def varFor(j: Int) = {
+    if (j < 10) 
+      Variable("" + vNames(j))
+    else 
+      Variable("" + vNames(j % 10) + Integer.toString(j / 10))   
+  }
+  
+  private def fName(j: Int): String = {
+    if (j < 3) 
+      "" + fNames(j)
+    else 
+      fNames(j % 3) + Integer.toString(j / 3)   
+  }
+  
+  private def isSynthetic(v: Variable) = v.name startsWith "$";
+    
+    
   
 }

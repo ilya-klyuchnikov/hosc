@@ -58,7 +58,6 @@ class SuperCompiler(program: Program){
               if (isConV(msg_.term)){
                 println("con<v>=true")
                 println("**************")
-                //makeAbstraction(p, beta, alpha)
                 extract(p, alpha, beta)
               } else { 
                 println("con<v>=false")

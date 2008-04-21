@@ -74,7 +74,8 @@ object ProcessTree {
   }
   
   def applySubForLet(le: LetExpression, s: Map[Variable, Term]): LetExpression = {
-    LetExpression(le.bs map {b => (b._1, applySubstitution(b._2.asInstanceOf[Term], s))}, 
+    LetExpression(le.bs map {b => (applySubstitution(b._1, s).asInstanceOf[Variable], 
+                                   applySubstitution(b._2.asInstanceOf[Term], s))}, 
         applySubstitution(le.expr.asInstanceOf[Term], s));
   }
 }
