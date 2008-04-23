@@ -28,9 +28,11 @@ object HLanguage {
      override def toString = "case (" + selector + ") of " + branches.mkString("{", " ", "}")  
    }
    case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends BaseExpression {
-     override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + " in " + expr  
+     override def toString = "(let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr + ")"  
    }
-   case class LetRecExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression
+   case class LetRecExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression {
+     override def toString = "(letrec " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr + ")" 
+   }
    
    case class Branch(pattern: Pattern, term: Term) extends Positional {
      override def toString = pattern + " : " + term + ";"
