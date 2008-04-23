@@ -337,7 +337,7 @@ class TypeInferrer(p: Program) {
     case LambdaAbstraction(x, term) => getFreeVars(term) - x
     case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression(sel, bs) => 
-      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => getFreeVars(b.term) -- b.pattern.args}
+      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
   }
   
   def tcProgram(): Unit = {
