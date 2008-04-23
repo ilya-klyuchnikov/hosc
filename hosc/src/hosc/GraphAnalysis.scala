@@ -74,11 +74,20 @@ object GraphAnalysis {
     sccs
   }
   
-  private def topSort(sccs: List[SCC], g: Graph) = {
-    def less(scc1: SCC, scc2: SCC) = {
-      g.e exists {a => (scc1.vs contains a.from) && (scc2.vs contains a.to)}
+  private def topSort(sccs: List[SCC], g: Graph): List[SCC] = {
+    def findIndependentSCC(ss: List[SCC]): SCC = {
+      (ss find 
+       {s1 => ss forall { s2 => s1 == s2 || !(g.e exists {a => (s2.vs contains a.from) && (s1.vs contains a.to)})} }).get
     }
-    sccs sort less
+    
+    sccs match {
+      case Nil => Nil;
+      case _ => {
+        val ind = findIndependentSCC(sccs)
+        val others = sccs remove {_ == ind}
+        ind :: topSort(others, g)
+      }
+    }
   }
   
   def analizeDependencies(g: Graph) = {
