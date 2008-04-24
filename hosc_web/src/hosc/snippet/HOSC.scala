@@ -25,7 +25,7 @@ class HOSC {
     val g = new ResidualProgramGenerator(pt)
     val doc = g.generateProgram().toDoc
     val writer = new java.io.StringWriter()
-    doc.format(80, writer)
+    doc.format(120, writer)
     <div>
     <h2>Supercompiled Expression</h2>
     <div><pre>{writer.toString}</pre></div>
