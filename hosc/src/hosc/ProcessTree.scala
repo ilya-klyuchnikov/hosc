@@ -36,7 +36,10 @@ object ProcessTree {
               while (edge != null) {
                 val node1 = edge.parent
                 node1.expr match {
-                  case pt: Term => if (instanceOf(pt, t)) return true
+                  case pt: Term => 
+                    if 
+                      (equivalent(pt, t))//(instanceOf(pt, t)) 
+                    return true
                   case _ => 
                 }
                 edge = node1.in
@@ -62,7 +65,11 @@ object ProcessTree {
               while (edge != null) {
                 val node1 = edge.parent
                 node1.expr match {
-                  case pt: Term => if (instanceOf(pt, t)) return node1
+                  case pt: Term => {
+                    if 
+                    (equivalent(pt, t)) //(instanceOf(pt, t)) 
+                    return node1
+                  }
                   case _ => 
                 }
                 edge = node1.in
@@ -75,6 +82,36 @@ object ProcessTree {
       }
       case _ => null
     }
+    
+    def getInstanceParent(): Node = expr match {
+    case Constructor(_, Nil) => null
+    case v : Variable if v.global == false => null
+    case t: Term => {
+      decompose(t) match {
+        case o: Observable => null
+        case c: Context => c.redex match {
+          case r: RedexCall => {
+            var edge = in
+            while (edge != null) {
+              val node1 = edge.parent
+              node1.expr match {
+                case pt: Term => {
+                  if 
+                    (instanceOf(pt, t)) 
+                  return node1
+                }
+                case _ => 
+              }
+              edge = node1.in
+            }
+            null
+          }
+          case _ => null
+        }
+      }
+    }
+    case _ => null
+  }
     
     def getAllVars(): Set[Variable] = {
       var vars = TermAlgebra.getAllVars(expr)

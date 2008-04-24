@@ -42,8 +42,8 @@ class SuperCompiler(program: Program){
   def buildProcessTree(e: BaseExpression): ProcessTree = {
     val p = ProcessTree(e)
     while (!p.isClosed) {
-      println(p)
-      println("===========================")
+      //println(p)
+      //println("===========================")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -56,13 +56,16 @@ class SuperCompiler(program: Program){
               val aTerm = alpha.expr.asInstanceOf[Term]
               val msg_ = msg(aTerm, bTerm)
               if (isConV(msg_.term)){
-                println("con<v>=true")
-                println("**************")
+                //println("con<v>=true")
+                //println("**************")
                 extract(p, alpha, beta)
               } else { 
-                println("con<v>=false")
-                println("**************")
-                makeAbstraction(p, alpha, beta)
+                //println("con<v>=false")
+                //println("**************")
+                if (instanceOf(aTerm, bTerm))
+                  makeAbstraction(p, beta, alpha)
+                else
+                  makeAbstraction(p, alpha, beta)
               }
             }
           }        
@@ -70,8 +73,8 @@ class SuperCompiler(program: Program){
       }
       
     }
-    println(p)
-    println("===========================")
+    //println(p)
+    //println("===========================")
     renameVars(p)
   }  
   

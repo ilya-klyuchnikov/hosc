@@ -59,7 +59,7 @@ object SuperCompilerApp {
       slFile.createNewFile()
     }
     val fw = new FileWriter(slFile);
-    doc.format(80, fw)
+    doc.format(100, fw)
     fw.flush();
     fw.close();
     
