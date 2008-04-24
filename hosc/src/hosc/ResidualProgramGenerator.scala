@@ -40,7 +40,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
             constructApplication1(appHead, args)
           } else {
             tree.leafs.find(n => n.ancestors.contains(node) && 
-              (n.expr match {case ct: Term => instanceOf(t, ct); case _=> false})) match {
+              (n.expr match {case ct: Term => equivalent(t, ct); case _=> false})) match {
               case None => 
                 construct(node.children.head);
               case Some(repeatNode) => {
