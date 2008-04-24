@@ -402,11 +402,11 @@ object TermAlgebra {
     case LambdaAbstraction(x, term) => getAllVars(term) + x
     case Application(head, arg) => getAllVars(head) ++ getAllVars(arg)
     case CaseExpression(sel, bs) => 
-      getAllVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => getAllVars(b.term) ++ b.pattern.args}
+      getAllVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b.term) ++ b.pattern.args}
     case LetExpression(bs, expr) =>
-      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => getAllVars(b._2) + b._1}
+      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
     case LetRecExpression(bs, expr) =>
-      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => getAllVars(b._2) + b._1}
+      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
   }
   
   def getAllVars1(expr: Expression1): Set[Variable1] = expr match {
@@ -415,11 +415,11 @@ object TermAlgebra {
     case LambdaAbstraction1(x, term) => getAllVars1(term) + x
     case Application1(head, arg) => getAllVars1(head) ++ getAllVars1(arg)
     case CaseExpression1(sel, bs) => 
-      getAllVars1(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => getAllVars1(b.term) ++ b.pattern.args}
+      getAllVars1(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b.term) ++ b.pattern.args}
     case LetExpression1(bs, expr) =>
-      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => getAllVars1(b._2) + b._1}
+      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b._2) + b._1}
     case LetRecExpression1(bs, expr) =>
-      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => getAllVars1(b._2) + b._1}
+      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b._2) + b._1}
   }
   
   // term1 is equivalent with msg
