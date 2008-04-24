@@ -1,10 +1,9 @@
 package bootstrap.liftweb
 
-import net.liftweb.util._
-import net.liftweb.http._
-import net.liftweb.sitemap._
-import net.liftweb.sitemap.Loc._
-import Helpers._
+import net.liftweb.util.Full
+import net.liftweb.http.{ResponseInfo, LiftServlet, S}
+import net.liftweb.sitemap.{Menu, SiteMap, Loc}
+import net.liftweb.sitemap.Loc.{strToLink, strToLinkText, Hidden}
  
 /**
   * A class that's instantiated early and run.  It allows the application
