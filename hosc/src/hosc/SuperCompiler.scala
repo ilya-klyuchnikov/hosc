@@ -103,7 +103,7 @@ class SuperCompiler(program: Program){
          case Constructor(name, args) => t1 = Constructor(name, args map extract1);
          case Application(h, a) => t1 = Application(extract1(h), extract1(a));
          case LambdaAbstraction(v, lt) => t1 = LambdaAbstraction(v, extract1(lt));
-         case CaseExpression(sel, bs) => t1 = CaseExpression(extract1(sel), bs)
+         case CaseExpression(sel, bs) => t1 = CaseExpression(extract1(sel), bs map {b => Branch(b.pattern, extract1(b.term))})
          case x => t1 = x
        }
        if (extractedTerm == null) {
