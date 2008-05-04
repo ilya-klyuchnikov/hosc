@@ -1,7 +1,7 @@
 package bootstrap.liftweb
 
 import net.liftweb.util.Full
-import net.liftweb.http.{ResponseInfo, LiftServlet, S}
+import net.liftweb.http.{ResponseInfo, LiftRules, S}
 import net.liftweb.sitemap.{Menu, SiteMap, Loc}
 import net.liftweb.sitemap.Loc.{strToLink, strToLinkText, Hidden}
  
@@ -23,14 +23,14 @@ class Boot {
     }
     
     // where to search snippet
-    LiftServlet.addToPackages("hosc")     
+    LiftRules.addToPackages("hosc")     
 
     // Build SiteMap
     val entries = Menu(Loc("Home", "/", "Home")) :: 
                   Menu(Loc("hosc1", "/hosc", "HOSC online")) ::
                   Menu(Loc("hosc2", "/hosc_result", "HOSC result", Hidden)) ::
                   Nil 
-    LiftServlet.setSiteMap(SiteMap(entries:_*))
+    LiftRules.setSiteMap(SiteMap(entries:_*))
   }
 }
 

@@ -1,0 +1,19 @@
+This project is developed under Eclipse using Web Tools Platform (http://www.eclipse.org/webtools/).
+
+This small web demonstration is powered by lift framework (http://liftweb.net).
+
+Because this project is open source one and of small size it seems to be illogical
+to place third-party libraries inside this project.
+
+Since lift is changed dramatically from release to release you should use the lift version mentioned in this file.
+
+You need to register Apache Tomcat 5.5 Server under name "tomcat5.5" (Window>Preferences>Server>Installed Runtimes)
+
+In order to build/develop this project using Eclipse you need to place following libraries (jar-files)
+into /hosc_web/WebContent/WEB-INF/lib:
+
+scala-library.jar                  (http://scala-lang.org)
+lift-webkit-0.7.jar                (http://scala-tools.org/repo-releases/net/liftweb/lift-webkit/0.7/lift-webkit-0.7.jar)
+log4j-{version}.jar                (http://logging.apache.org/log4j/)
+hosc_{version}.jar                 (http://code.google.com/p/spsc/downloads/list)
+commons-fileupload-{version}.jar   (http://commons.apache.org/fileupload/)
