@@ -15,5 +15,5 @@ into /hosc_web/WebContent/WEB-INF/lib:
 scala-library.jar                  (http://scala-lang.org)
 lift-webkit-0.7.jar                (http://scala-tools.org/repo-releases/net/liftweb/lift-webkit/0.7/lift-webkit-0.7.jar)
 log4j-{version}.jar                (http://logging.apache.org/log4j/)
-hosc_{version}.jar                 (http://code.google.com/p/spsc/downloads/list)
+hosc_{version}.jar                 (http://code.google.com/p/hosc/downloads/list)
 commons-fileupload-{version}.jar   (http://commons.apache.org/fileupload/)
