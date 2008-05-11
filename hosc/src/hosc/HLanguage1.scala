@@ -5,6 +5,7 @@ import scala.text.Document._
 
 /** 
  * used by residual program generator
+ * deprecated when full syntax is complete
  */
 object HLanguage1 {
    val ED: scala.text.Document = empty
