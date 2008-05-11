@@ -6,7 +6,7 @@ import HLanguage._
 
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
-  lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "->", "::", "|")
+  lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "::", "|")
   lexical.reserved += ("case", "of")
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
@@ -30,11 +30,9 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
   
   
-  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition | arrowDefinition)  
+  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition)  
   private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
     TypeConstructorDefinition)
-    
-  private def arrowDefinition = p(lident ~ ("::" ~> arrow <~ ";") ^^ ArrowDefinition)
   
   private def tp1: Parser[Type] = p(lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")"))
   private def tp2: Parser[Type] = p(typeVariable | lident ~ (tp1*) ^^ TypeConstructor)
