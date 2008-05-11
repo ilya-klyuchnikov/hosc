@@ -18,7 +18,7 @@ trait StrongParsers extends Parsers {
       } while (res.successful && !res.next.atEnd)
       res match {
         case s @ Success(out, in1) => Success(xs.toList, res.next)
-        case f : NoSuccess => res.asInstanceOf[NoSuccess]
+        case f : NoSuccess => f
       }
     }
   }
@@ -28,7 +28,7 @@ trait StrongParsers extends Parsers {
       val res = p(in)
       res match {
         case Success(out, in1) if res.next.atEnd  => res
-        case Success(_, _) => Failure(msg, res.next)
+        case Success(_, _) => if (lastNoSuccess == null) Failure(msg, res.next) else lastNoSuccess
         case f : NoSuccess => f
       }
     }

@@ -11,7 +11,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
   
-  def term: Parser[Term] = p(tr2 | appl)
+  def term: Parser[Term] = p(tr2 | appl) | failure("term is expected")
   def appl = chainl1(tr0, tr1, success(Application(_: Term, _: Term)))
     
   // head of application
@@ -45,7 +45,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def typeVariable = p(sident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
-  def program = (typeDefinition*) ~ (function+) ^^ Program
+  def program = (typeDefinition*) ~ (strongRep1(function)) ^^ Program
   def parseType(r: Reader[Char]) = strong(`type`, "<eof> expected") (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program, "<eof> expected") (new lexical.Scanner(r))))
   
