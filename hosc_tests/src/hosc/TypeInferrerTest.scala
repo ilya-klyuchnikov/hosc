@@ -222,4 +222,17 @@ class TypeInferrerTest {
     println
   
   }
+  
+  @Test def simpleProgram04(): Unit = {
+    val programResult = TestUtils.programResultFromFile("input/a_synapse_e.hl")
+    println(programResult)
+    assertTrue(programResult.successful)
+    val program = programResult.get
+    val ti = new TypeInferrer(program);
+    
+    ti.tcProgram()
+  
+    println
+  
+  }
 }

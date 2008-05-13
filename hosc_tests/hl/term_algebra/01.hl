@@ -1,7 +1,8 @@
 // all binders are different here
 list $a :: Nil | Cons $a (list $a);
 boolean :: True | False;
-app :: ((list $a -> list $a));
+
+zzzz where
 
 f = % x {x}
 g = % y {
