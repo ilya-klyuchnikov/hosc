@@ -1,0 +1,13 @@
+boolean :: True | False;
+
+g y
+
+where
+
+f = % x {x}
+g = % x {
+  case x of {
+    True : True;
+    False : f x;
+  }
+}

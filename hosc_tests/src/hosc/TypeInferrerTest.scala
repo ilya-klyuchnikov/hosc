@@ -168,7 +168,7 @@ class TypeInferrerTest {
   }
   
   @Test def simpleProgram01(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/tc01.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/01.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -181,7 +181,7 @@ class TypeInferrerTest {
   }
   
   @Test def simpleProgram02a(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/tc02.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/02.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -198,7 +198,7 @@ class TypeInferrerTest {
   }
   
   @Test def simpleProgram02b(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/tc02.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/02.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -210,8 +210,8 @@ class TypeInferrerTest {
   
   }
   
-  @Test def simpleProgram03b(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/lazy.hl")
+  @Test def simpleProgram03(): Unit = {
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/03.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -224,7 +224,7 @@ class TypeInferrerTest {
   }
   
   @Test def simpleProgram04(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/a_synapse_e.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/04.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get

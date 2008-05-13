@@ -358,6 +358,7 @@ class TypeInferrer(p: Program) {
       }       
       f.`type` = tc(TypeEnv(Nil), expr).t
     }
+    tcTerm(p.goal)
   }
   
   def tcGroundTerm(term: Term) = {
