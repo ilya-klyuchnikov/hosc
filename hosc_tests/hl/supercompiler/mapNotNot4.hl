@@ -1,0 +1,39 @@
+list $a :: Nil | Cons $a (list $a);
+boolean :: True | False;
+
+map x (Cons True (Cons False Nil))
+
+where
+
+not = %x {
+  case x of {
+    True : False;
+    False : True;
+  }
+}
+
+mapNot = %list {
+  case list of {
+    Nil : Nil;
+    Cons x xs : Cons (not x) (mapNot xs);
+  }
+}
+
+mapNotNot = %list {mapNot (mapNot list)}
+
+map = %f {
+  %list {
+    case list of {
+      Nil : Nil;
+      Cons x xs : Cons (f x) (map f xs);
+    }
+  } 
+  
+}
+
+id = %list {
+  case list of {
+    Nil : Nil;
+    Cons x xs : Cons x xs;
+  }
+} 
