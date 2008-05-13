@@ -68,6 +68,7 @@ object Validator {
     try {     
       for(td <- p.ts) valTD(td)
       for(f <- p.fs) valFD(f)
+      valTermWithFreeVars(allFNames, p.goal, p)
       s
     } catch {
       case ValidatorError(he) => he

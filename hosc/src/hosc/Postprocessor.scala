@@ -8,6 +8,7 @@ object Postprocessor {
   def postprocess(program: Program) = {
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
     for (f <- program.fs) process(f.lam,  globals)
+    process(program.goal, globals)
   }
   
   def process(t: Term, globals: Set[Variable]): Unit = t match {

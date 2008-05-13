@@ -16,9 +16,10 @@ class Interpreter(program: Program) {
     case x => throw new Exception("Internal Error: lazy eval returns " + x)
   }
   
-  def eval(input: String): Term = {
-    val term = groundTermFromString(input, program)
-    eval(term)
+  def eval(): Term = {
+    // validate that term is ground
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
+    eval(program.goal)
   }
   
   private def lazyEval(term: Term): Term = {
