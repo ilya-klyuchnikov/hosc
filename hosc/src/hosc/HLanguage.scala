@@ -58,7 +58,7 @@ object HLanguage {
    case class ArrowDefinition(name: String, ac: Arrow) extends TypeDefinition
    case class DataConstructor(name: String, args: List[Type]) extends Positional
    
-   case class Program(ts: List[TypeDefinition], fs: List[Function]) {
+   case class Program(ts: List[TypeDefinition], goal: Term, fs: List[Function]) {
      def getTypeConstructorDefinition(tcName: String): Option[TypeConstructorDefinition] = {
        for (td <- ts) td match {case tcd: TypeConstructorDefinition if tcName == tcd.name => return Some(tcd); case _ => } 
        None

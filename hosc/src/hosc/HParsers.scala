@@ -7,7 +7,7 @@ import HLanguage._
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "::", "|")
-  lexical.reserved += ("case", "of")
+  lexical.reserved += ("case", "of", "where")
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
   
@@ -27,8 +27,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def branch = p(pattern ~ (":" ~> term <~ ";") ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
-  def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
-  
+  def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))  
   
   def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition)  
   private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
@@ -45,7 +44,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def typeVariable = p(sident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
-  def program = (typeDefinition*) ~ (strongRep1(function)) ^^ Program
+  def program = (typeDefinition*) ~ (term <~ "where") ~ (strongRep1(function)) ^^ Program
   def parseType(r: Reader[Char]) = strong(`type`, "<eof> expected") (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program, "<eof> expected") (new lexical.Scanner(r))))
   
