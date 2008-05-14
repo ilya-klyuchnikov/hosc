@@ -31,10 +31,10 @@ class SuperCompiler(program: Program){
         }
         case RedexCaseVar(v, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
-            {b => (context.replaceHole(replaceTerm(b.term, v, Constructor(b.pattern.name, b.pattern.args))), emptyMap)})
+            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})  
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
-            {b => (context.replaceHole(replaceTerm(b.term, a, Constructor(b.pattern.name, b.pattern.args))), emptyMap)})
+            {b => (replaceTerm(context.replaceHole(b.term), a, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})
       }
     }
   }  
