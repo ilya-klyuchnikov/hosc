@@ -119,36 +119,52 @@ object TermAlgebra {
               applySubstitution(b.term, s))})
   }
   
-  def he(term1: Term, term2: Term): Boolean = 
-    heByVar(term1, term2) || heByDiving(term1, term2) || heByCoupling(term1, term2)
+  def he(term1: Term, term2: Term): Boolean = he(term1, term2, Nil)
   
-  private def heByVar(term1: Term, term2: Term): Boolean = (term1, term2) match {
-    case (v1: Variable, v2: Variable) => v1.global == true && v2.global == true && v1.name == v2.name ||
-      v1.global == false && v2.global == false  
+  private def he(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+    heByVar(term1, term2, binders) || heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
+  
+  private def heByVar(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+    (term1, term2) match {
+    case (v1: Variable, v2: Variable) => (v1.global == true && v2.global == true && v1.name == v2.name) ||
+      (v1.global == false && v2.global == false) && 
+        ((binders exists {p => p._1 == v1 && p._2 == v2}) || (binders forall {p => p._1 != v1 && p._2 != v2}))
     case _ => false
   }
   
-  private def heByDiving(term1: Term, term2: Term): Boolean = term2 match {
-    case Constructor(_, args) => args exists (he(term1, _))
-    case LambdaAbstraction(_, t) => he(term1, t)
-    case Application(h, a) => he(term1, h) || he(term1, a)
-    case CaseExpression(sel, bs) => he(term1, sel) || (bs exists (b => he(term1, b.term)))
+  private def heByDiving(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = term2 match {
+    case Constructor(_, args) => args exists (he(term1, _, binders))
+    case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
+    case Application(h, a) => he(term1, h, binders) || he(term1, a, binders)
+    case CaseExpression(sel, bs) => he(term1, sel, binders) || 
+      (bs exists (b => he(term1, b.term, (b.pattern.args map {(null, _)}):::binders)))
     case _ => false
   }
   
-  private def heByCoupling(term1: Term, term2: Term): Boolean = (term1, term2) match {
+  private def heByCoupling(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+    (term1, term2) match {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
-      (args1 zip args2) forall (args => he(args._1, args._2))
-    case (LambdaAbstraction(_, t1), LambdaAbstraction(_, t2)) => he(t1, t2)
-    case (Application(h1, a1), Application(h2, a2)) => he(h1, h2) && he(a1, a2)
+      (args1 zip args2) forall (args => he(args._1, args._2, binders))
+    case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders)
+    case (Application(h1, a1), Application(h2, a2)) => he(h1, h2, binders) && he(a1, a2, binders)
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB
       val bs2_ = bs2 sort compareB
-      he(sel1, sel2) && 
-        ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && he(bs._1.term, bs._2.term)))
+      he(sel1, sel2, binders) && 
+        ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
+          he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders)))
     }
     case _ => false
-  }  
+  }
+  
+  private def getBoundedVars(t: Term): Set[Variable] = t match {
+    case v: Variable => Set()
+    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getBoundedVars(term)}
+    case LambdaAbstraction(x, term) => getBoundedVars(term) + x
+    case Application(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
+    case CaseExpression(sel, bs) => 
+      getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
+}
   
   def msg(term1: Term, term2: Term): Generalization = {
     def msg_(term1: Term, term2: Term): Generalization2 = {
@@ -162,11 +178,14 @@ object TermAlgebra {
       } while (exp != g.term)    
       g
     }
+    val g = msg_(term1, term2)
+    val bv = getBoundedVars(g.term)
     def f(t1: Term, t2: Term): Boolean = (t1, t2) match {
-      case (v1: Variable, v2: Variable) => v1.global == true && v2.global == true && v1.name == v2.name
+      case (v1: Variable, v2: Variable) =>
+        v1.name == v2.name  && (v1.global == true && v2.global == true || bv.contains(v1) && bv.contains(v2)) 
       case _ => false
     }
-    val g = msg_(term1, term2)
+    
     val evidentSub = g.dSub filter (tr => f(tr._2, tr._3))
     val residualSub = g.dSub remove (tr => f(tr._2, tr._3))
     val evidentMap = Map[Variable, Term]() ++ (evidentSub map (tr => (tr._1, tr._2)))
@@ -189,10 +208,12 @@ object TermAlgebra {
         l2 ++= addDSubs
       }
       case (v, LambdaAbstraction(a1, t1), LambdaAbstraction(a2, t2)) => {
-        val arg = newVar()
+        val arg = newVar() // binder!!
         val rs = newVar()
+        val t1r = applySubstitution(t1, Map(a1 -> arg))
+        val t12 = applySubstitution(t2, Map(a2 -> arg))        
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
-        l2 ++= List((arg, a1, a2), (rs, t1, t2))
+        l2 ++= List((rs, t1, t2))
       }
       /*
       case (v, Application(h1, a1), Application(h2, a2)) => {
@@ -215,8 +236,9 @@ object TermAlgebra {
         val bs1s = bs1 sort compareB
         val bs2s = bs2 sort compareB
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){
+          // binders are refreshed and the same
           val bsR = for(bs <- bs1s zip bs2s) yield {
-            val newPVars = bs._1.pattern.args map (arg => newVar)
+            val newPVars = bs._1.pattern.args map (arg => newVar)//binders!!
             val rp = Pattern(bs._1.pattern.name, newPVars)
             val rt1 = applySubstitution(bs._1.term, Map[Variable, Term]() ++ (bs._1.pattern.args zip newPVars))            
             val rt2 = applySubstitution(bs._2.term, Map[Variable, Term]() ++ (bs._2.pattern.args zip newPVars))
@@ -247,14 +269,14 @@ object TermAlgebra {
     case h => 1;
   }
   
-  private def constructApplication(head: Term, args: List[Term]): Application = {
-    var app = Application(head, args.head)
-    var list = args.tail
+  def constructApplication(head: Term, args: List[Term]): Term = {
+    var res = head
+    var list = args
     while (!list.isEmpty) {
-      app = Application(app, list.head)
+      res = Application(res, list.head)
       list = list.tail
     }
-    app
+    res
   }
   
   def constructApplication1(head: Expression1, args: List[Expression1]): Expression1 = {
@@ -360,7 +382,7 @@ object TermAlgebra {
     case _ => false
   }
   
-  def isConF(t: Term) = decompose(t) match {
+  def callInRedex_?(t: Term) = decompose(t) match {
     case c: Context => c.redex match { 
       case r: RedexCall => true
       case _ => false
@@ -426,15 +448,13 @@ object TermAlgebra {
   def strongMsg(term1: Term, term2: Term): Generalization = {
     val g = msg(term1, term2)
     var term = g.term
-    for (s <- g.sub1) term = applySubstitution(term, Map(s))
+    //for (s <- g.sub1) term = applySubstitution(term, Map(s))
     
     var newS = ((g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}) remove (p => p._1 == p._2)
     Generalization(term, Nil, newS)    
   }
   
-  def convertPattern(p: Pattern): Pattern1 = {
-    Pattern1(p.name, p.args map {v => Variable1(v.name)})
-  }
+  
   
   def constructLambda(vs: List[Variable1], e: Expression1): Expression1 = {
     def constructLambda_(vs_ : List[Variable1]) : Expression1 = vs_ match {
@@ -445,13 +465,17 @@ object TermAlgebra {
   }
   
   // converts hlanguage to hlanguage1
-  def convert(term: Term): Expression1 = term match {
+  def hlToHl1(term: Term): Expression1 = term match {
     case Variable(n) => Variable1(n)
-    case Constructor(n, args) => Constructor1(n, args map convert)
-    case LambdaAbstraction(v, e) => LambdaAbstraction1(Variable1(v.name), convert(e))
-    case Application(h, a) => Application1(convert(h), convert(a))
+    case Constructor(n, args) => Constructor1(n, args map hlToHl1)
+    case LambdaAbstraction(v, e) => LambdaAbstraction1(Variable1(v.name), hlToHl1(e))
+    case Application(h, a) => Application1(hlToHl1(h), hlToHl1(a))
     case CaseExpression(sel, bs) => 
-      CaseExpression1(convert(sel), bs map {b => Branch1(convertPattern(b.pattern), convert(b.term))})
+      CaseExpression1(hlToHl1(sel), bs map {b => Branch1(hlToHl1(b.pattern), hlToHl1(b.term))})
+  }
+  
+  def hlToHl1(p: Pattern): Pattern1 = {
+    Pattern1(p.name, p.args map {v => Variable1(v.name)})
   }
   
 }

@@ -47,10 +47,8 @@ class SuperCompiler(program: Program){
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term => 
-          if (!isConF(bTerm)) {
-            drive(p, beta) 
-          } else beta.ancestors.find {n1: Node => n1.expr match {case c: Term => he(c, bTerm); case _ => false}} match {
+        case bTerm: Term if callInRedex_?(bTerm) => 
+          beta.ancestors.find {n1: Node => n1.expr match {case c: Term => he(c, bTerm); case _ => false}} match {
             case None => drive(p, beta)
             case Some(alpha) => {
               val aTerm = alpha.expr.asInstanceOf[Term]

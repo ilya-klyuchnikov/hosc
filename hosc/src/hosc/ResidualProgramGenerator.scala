@@ -20,41 +20,76 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
         case RedexCaseCon(c, ce) => construct(node.children.head)
         case RedexCaseVar(v, CaseExpression(sel, bs)) => {
           val newBs = (bs zip node.children.tail) map 
-            {p => Branch1(convertPattern(p._1.pattern), construct(p._2))}
+            {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
           val newSel = construct(node.children.head)
-          CaseExpression1(newSel, newBs)
+          val z = CaseExpression1(newSel, newBs)
+           println("_________________")
+           println(node.expr)
+           println(z)
+           z
         }
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
           val newBs = (bs zip node.children.tail) map 
-            {p => Branch1(convertPattern(p._1.pattern), construct(p._2))}
+            {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
           val newSel = construct(node.children.head)
-          CaseExpression1(newSel, newBs)
+          val z = CaseExpression1(newSel, newBs)
+           println("_________________")
+      println(node.expr)
+          println(z)
+          z
         }
         case RedexCall(f) => {
           if (node.outs.isEmpty) {
             val alphaNode: Node = node.getRepParent()
             val alphaT = alphaNode.expr.asInstanceOf[Term]
+            
+            val (appHead, args) = alphaNode.signature
+            val z = constructApplication(Variable(appHead), args)
+            
             val msg = strongMsg(alphaT, t)
-            val appHead = Variable1(alphaNode.newFName)
-            val args = msg.sub2 map {p => convert(p._2)}
-            constructApplication1(appHead, args)
+            // after substitution:
+            val sub = Map[Variable, Term]() ++ msg.sub2
+            val z1 = applySubstitution(z, sub)
+            val z2 = hlToHl1(z1)
+            println("_________________")
+            println(node.expr)
+            println(z2)
+            z2
           } else {
-            tree.leafs.find(n => n.ancestors.contains(node) && 
+            // TODO: find all occurences (for choosing an appropriate arity for residual function)
+            tree.leafs.filter(n => n.ancestors.contains(node) && 
               (n.expr match {case ct: Term => equivalent(t, ct); case _=> false})) match {
-              case None => 
-                construct(node.children.head);
-              case Some(repeatNode) => {
-                val betaT = repeatNode.expr.asInstanceOf[Term]
-                val msg = strongMsg(t, betaT)
-                val args = msg.sub2 map {p => convert(p._1)}
-                val newVars = msg.sub2 map {p => Variable1(createVar().name)}
+              // call to this function does't result in recursive definition
+              case Nil => 
+                val z = construct(node.children.head);
+                println("_________________")
+                println(node.expr)
+                println(z)
+                z
+              // call to this function results in recursive definition
+              case repeatNodes => {
+                var vars = Set[Variable]()
+                // getting all arguments for recursive definition
+                for (n <- repeatNodes) {
+                  val betaT = repeatNodes.head.expr.asInstanceOf[Term]
+                  val msg = strongMsg(t, betaT)
+                  val args0 = msg.sub2 map {p => p._1}
+                  vars = vars ++ args0
+                }
+                val args0 = vars.toList 
+                val args = args0 map {hlToHl1(_)}
+                val newVars = args map {p => Variable1(createVar().name)}
                 val sub = Map[Variable1, Expression1]() ++ 
-                  ((msg.sub2 zip newVars) map {p => (Variable1(p._1._1.name), p._2)})
-                node.newFName = createFName()
+                  ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
+                node.signature = (createFName(), args0)
                 val expr = applySubstitution1(construct(node.children.head), sub)
                 val lam = constructLambda(newVars, expr)
-                val appHead = Variable1(node.newFName)
-                LetRecExpression1(List((appHead, lam)), constructApplication1(appHead, args))
+                val appHead = Variable1(node.signature._1)
+                val z = LetRecExpression1(List((appHead, lam)), constructApplication1(appHead, args))
+                println("_________________")
+                println(node.expr)
+                println(z)
+                z
               }
             }            
           }
@@ -67,7 +102,11 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
       val ts = nodes map construct
       val subs = Map[Variable1, Expression1]() ++ ((bs zip ts) map 
           {pair => (Variable1(pair._1._1.name), pair._2)})
-      applySubstitution1(construct(node0), subs)
+      val z = applySubstitution1(construct(node0), subs)
+      println("_________________")
+      println(node.expr)
+      println(z)
+      z
     }
   }
   
@@ -111,8 +150,6 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
       fNames(j % 3) + Integer.toString(j / 3)   
   }
   
-  private def isSynthetic(v: Variable) = v.name startsWith "$";
-    
-    
+  private def isSynthetic(v: Variable) = v.name startsWith "$";    
   
 }

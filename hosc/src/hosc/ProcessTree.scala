@@ -9,7 +9,7 @@ object ProcessTree {
   
   class Node(var expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
-    var newFName: String = null
+    var signature: (String, List[Variable]) = null
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
