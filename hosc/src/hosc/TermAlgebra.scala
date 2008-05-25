@@ -412,10 +412,8 @@ object TermAlgebra {
           bs map {b => Branch1(Pattern1(b.pattern.name, 
               b.pattern.args map {applySubstitution1(_, s).asInstanceOf[Variable1]}), 
               applySubstitution1(b.term, s))});
-    case LetExpression1(bs, e) => 
-      LetExpression1(bs map {b => (b._1, applySubstitution1(b._2, s))}, applySubstitution1(e, s));
-    case LetRecExpression1(bs, e) => 
-      LetRecExpression1(bs map {b => (b._1, applySubstitution1(b._2, s))}, applySubstitution1(e, s));
+    case LetRecExpression1(b, e) => 
+      LetRecExpression1((b._1, applySubstitution1(b._2, s)), applySubstitution1(e, s));
   }
   
   def getAllVars(expr: Expression): Set[Variable] = expr match {
@@ -438,10 +436,8 @@ object TermAlgebra {
     case Application1(head, arg) => getAllVars1(head) ++ getAllVars1(arg)
     case CaseExpression1(sel, bs) => 
       getAllVars1(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b.term) ++ b.pattern.args}
-    case LetExpression1(bs, expr) =>
-      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b._2) + b._1}
-    case LetRecExpression1(bs, expr) =>
-      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b._2) + b._1}
+    case LetRecExpression1(b, expr) =>
+      getAllVars1(expr) ++ getAllVars1(b._2) + b._1
   }
   
   // term1 is equivalent with msg

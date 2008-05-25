@@ -44,17 +44,10 @@ object HLanguage1 {
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
    }
    
-   case class LetExpression1(bs: List[Pair[Variable1, Expression1]], expr: Expression1) extends Expression1 {
-     override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + " in " + expr;
-     def toDoc = group("let" :: 
-         nest(2, ED :/: bs.foldRight(ED){(b, y) => group (b._1.toDoc :: " = " :: b._2.toDoc) :/: y})
-         :/: "in " :: nest(2, ED :/: expr.toDoc))
-   }
-   
-   case class LetRecExpression1(bs: List[Pair[Variable1, Expression1]], expr: Expression1) extends Expression1 {
-     override def toString = "letrec " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + " in " + expr;
+   case class LetRecExpression1(binding: Pair[Variable1, Expression1], expr: Expression1) extends Expression1 {
+     override def toString = "letrec " + (binding._1 + "=" + binding._2) + " in " + expr;
      def toDoc = group("letrec" :: 
-         nest(2, bs.foldRight(ED){(b, y) => group (ED :/: b._1.toDoc :: " = " :: b._2.toDoc) :: y})
+         nest(2, group (ED :/: binding._1.toDoc :: " = " :: binding._2.toDoc))
          :/: "in " :: nest(2, ED :/: expr.toDoc))
    }
    
