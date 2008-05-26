@@ -71,7 +71,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                 var vars = Set[Variable]()
                 // getting all arguments for recursive definition
                 for (n <- repeatNodes) {
-                  val betaT = repeatNodes.head.expr.asInstanceOf[Term]
+                  val betaT = n.expr.asInstanceOf[Term]
                   val msg = strongMsg(t, betaT)
                   val args0 = msg.sub2 map {p => p._1}
                   vars = vars ++ args0
