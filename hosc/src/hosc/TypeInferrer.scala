@@ -356,7 +356,7 @@ class TypeInferrer(p: Program) {
           expr = LetExpression(bs, expr)
         }
       }       
-      f.`type` = tc(TypeEnv(Nil), expr).t
+      //f.`type` = tc(TypeEnv(Nil), expr).t
     }
     tcTerm(p.goal)
   }

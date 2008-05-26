@@ -3,10 +3,6 @@ package hosc
 import scala.text.Document
 import scala.text.Document._
 
-/** 
- * used by residual program generator
- * deprecated when full syntax is complete
- */
 object HLanguage1 {
    val ED: scala.text.Document = empty
   
@@ -15,7 +11,7 @@ object HLanguage1 {
    }
    
    case class Variable1(name: String) extends Expression1 {
-     var global = false // global var is call
+     var call = false
      override def toString = name
      def toDoc = text(name)
    }
