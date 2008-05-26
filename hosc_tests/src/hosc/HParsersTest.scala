@@ -3,8 +3,10 @@ package hosc;
 import org.junit.Test
 import org.junit.Assert._
 import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch => B, Pattern => P,
-  Constructor => C, LambdaAbstraction => L, TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
-  TypeConstructorDefinition => TCD, DataConstructor => DC, _}
+  Constructor => C, LambdaAbstraction => L, _}
+
+import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
+  TypeConstructorDefinition => TCD, DataConstructor => DC}
 
 class HParsersTest {
   @Test def application(): Unit = {
@@ -122,20 +124,6 @@ class HParsersTest {
         L(V("x"), L(V("y"), C("Cons", List(V("x"), V("y")))))) ; 
   }
   
-  @Test def arrow(): Unit = {
-    testSType(
-        "$a -> $b -> $c", 
-        Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
-    
-    testSType(
-        "$a -> ($b -> $c)", 
-        Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
-    
-    testSType(
-        "($a -> $b) -> $c", 
-        Arr(Arr(TV("$a"), TV("$b")), TV("$c")));
-  }
-  
   @Test def typeConstructor(): Unit = {
       // tc1 tc2 $a tc2 $a = tc1 (tc2) $a (tc2) $a
       testSType(
@@ -146,6 +134,7 @@ class HParsersTest {
   }
   
   @Test def simpleProgram(): Unit = {
+    val goal = A(V("rev"), V("x"))
     val listT = TCD("list", TV("$a") :: Nil, DC("Nil", Nil) :: DC("Cons", TV("$a") :: TC("list", TV("$a") :: Nil) :: Nil) :: Nil)
     val revF = Function("rev", L(V("xs"), 
         CE(V("xs"),
@@ -162,8 +151,7 @@ class HParsersTest {
             Nil
             )
         )))
-    val expected = Program(listT :: Nil, 
-        revF :: appF :: Nil )
+    val expected = Program(listT :: Nil, goal, revF :: appF :: Nil )
     val programResult = TestUtils.programResultFromFile("input/rev.hl")    
     println(programResult)
     assertTrue(programResult.successful)
@@ -206,6 +194,10 @@ class HParsersTest {
         "duplicate var z should be reported");
     testVal("input/err17.hl",
         "non exhaustive should be reported");
+  }
+  
+  @Test def parserErrors(): Unit = {
+    testVal("parser_input/err01.hl", "")
   }
   
   def testVal(fileName: String, msg: String)  = {

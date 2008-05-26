@@ -4,9 +4,10 @@ import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch => B, Pattern => P,
-  Constructor => C, LambdaAbstraction => L, TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
-  TypeDefinition => TCD, DataConstructor => DC, _}
+  Constructor => C, LambdaAbstraction => L, _}
 import TypeInferrer._
+import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
+  TypeDefinition => TCD, DataConstructor => DC}
 
 
 class TypeInferrerTest {
