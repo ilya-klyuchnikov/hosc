@@ -9,7 +9,6 @@ import scala.util.parsing.input.CharArrayReader
 
 class HOSC {
   def program = <pre>{S.param("program").openOr("")}</pre>
-  def expression = <pre>{S.param("expression").openOr("")}</pre>
   def output = 
   try
   {
@@ -17,10 +16,8 @@ class HOSC {
     val ti = new TypeInferrer(program)
     
     ti.tcProgram()
-    val exprString = S.param("expression").openOr("")
     val sc = new SuperCompiler(program)
-    val term = Util.termFromString(exprString, program)
-    val pt = sc.buildProcessTree(term)
+    val pt = sc.buildProcessTree(program.goal)
     val svg = new ProcessTreeSVG(pt).treeToSVG
     val g = new ResidualProgramGenerator(pt)
     val doc = g.generateProgram().toDoc
@@ -36,6 +33,7 @@ class HOSC {
   catch {
     case e => 
     {
+    e.printStackTrace();
     <div>
       <h2>Invalid Input</h2>
       <pre>{e.getMessage}</pre>

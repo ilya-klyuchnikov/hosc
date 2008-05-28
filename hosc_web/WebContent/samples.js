@@ -3,6 +3,9 @@ var programs = new Array();
 programs["app x y"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 \n\
+app x y\n\
+where\n\
+\n\
 app = %xs {\n\
   %ys {\n\
     case xs of {\n\
@@ -14,6 +17,9 @@ app = %xs {\n\
 
 programs["app (app x y) z"]=
 "list $a :: Nil | Cons $a (list $a);\n\
+\n\
+app (app x y) z\n\
+where\n\
 \n\
 app = %xs {\n\
   %ys {\n\
@@ -27,6 +33,9 @@ app = %xs {\n\
 programs["app (app x y) x"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 \n\
+app (app x y) x\n\
+where\n\
+\n\
 app = %xs {\n\
   %ys {\n\
     case xs of {\n\
@@ -39,6 +48,9 @@ app = %xs {\n\
 programs["take n m"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 number :: Z | S number;\n\
+\n\
+take n m\n\
+where\n\
 \n\
 from = %n {\n\
   Cons n (from (S n))\n\
@@ -59,6 +71,9 @@ take = %n {\n\
 programs["map add1 (from x)"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 number :: Z | S number;\n\
+\n\
+map add1 (from x)\n\
+where\n\
 \n\
 from = %n {\n\
   Cons n (from (S n))\n\
@@ -85,6 +100,9 @@ programs["map sub1 (from x)"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 number :: Z | S number;\n\
 \n\
+map sub1 (from x)\n\
+where\n\
+\n\
 from = %n {\n\
   Cons n (from (S n))\n\
 }\n\
@@ -110,6 +128,9 @@ programs["map sub1 (map add1 (from x))"]=
 "list $a :: Nil | Cons $a (list $a);\n\
 number :: Z | S number;\n\
 \n\
+map sub1 (map add1 (from x))\n\
+where\n\
+\n\
 from = %n {\n\
   Cons n (from (S n))\n\
 }\n\
@@ -132,8 +153,6 @@ sub1 = %x {\n\
 }"
 
 var sample = function(sampleName) {
-  var expr = document.getElementById('expression');
-  expr.value = sampleName;
   var programText = document.getElementById('programText');
   programText.value = programs[sampleName];
   return false;	
