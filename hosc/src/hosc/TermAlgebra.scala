@@ -164,7 +164,16 @@ object TermAlgebra {
     case Application(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
     case CaseExpression(sel, bs) => 
       getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
-}
+  }
+  
+  def getFreeVars(t: Term): Set[Variable] = t match {
+    case v: Variable => if (v.global) Set() else Set(v)
+    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
+    case LambdaAbstraction(x, term) => getFreeVars(term) - x
+    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case CaseExpression(sel, bs) => 
+      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
+  }
   
   def msg(term1: Term, term2: Term): Generalization = {
     def msg_(term1: Term, term2: Term): Generalization2 = {
@@ -179,7 +188,7 @@ object TermAlgebra {
       g
     }
     val g = msg_(term1, term2)
-    val bv = getBoundedVars(g.term)
+    val bv = getBoundedVars(g.term) // alpha conversion!!
     def f(t1: Term, t2: Term): Boolean = (t1, t2) match {
       case (v1: Variable, v2: Variable) =>
         v1.name == v2.name  && (v1.global == true && v2.global == true || bv.contains(v1) && bv.contains(v2)) 
@@ -444,9 +453,9 @@ object TermAlgebra {
   def strongMsg(term1: Term, term2: Term): Generalization = {
     val g = msg(term1, term2)
     var term = g.term
-    //for (s <- g.sub1) term = applySubstitution(term, Map(s))
+    for (s <- g.sub1) term = applySubstitution(term, Map(s))
     
-    var newS = ((g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}) remove (p => p._1 == p._2)
+    var newS = ((g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable], p._2._2)}) //remove (p => p._1 == p._2)
     Generalization(term, Nil, newS)    
   }
   
