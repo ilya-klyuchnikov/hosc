@@ -56,7 +56,8 @@ class SuperCompiler(program: Program){
               if (isConV(msg_.term)){
                 //println("con<v>=true")
                 //println("**************")
-                extract(p, alpha, beta)
+                //extract(p, alpha, beta)
+                drive(p, beta)
               } else { 
                 //println("con<v>=false")
                 //println("**************")
