@@ -2,8 +2,10 @@ package hosc;
 
 import HLanguage._
 import HLanguage1._
+import HLUtils._
 import ProcessTree._
 import TermAlgebra._
+import TermAlgebra1._
 
 class ResidualProgramGenerator(val tree: ProcessTree) {
   
@@ -76,7 +78,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                   ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
                 node.signature = (createFName(), args0)
                 val expr = applySubstitution1(construct(node.children.head), sub)
-                val lam = constructLambda(newVars, expr)
+                val lam = constructLambda1(newVars, expr)
                 val appHead = Variable1(node.signature._1)
                 val z = LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
                 //println("_________________")
