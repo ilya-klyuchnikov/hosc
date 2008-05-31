@@ -7,9 +7,9 @@ import ProcessTree._
 import TermAlgebra._
 import TermAlgebra1._
 
-class ResidualProgramGenerator(val tree: ProcessTree) {
+class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree) {
   
-  def generateProgram() = construct(tree.rootNode)
+  def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
   
   private def construct(node: Node): Term1 = node.expr match {
     case t: Term => decompose(t) match {

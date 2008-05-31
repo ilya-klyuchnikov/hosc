@@ -56,7 +56,7 @@ object SuperCompilerApp {
     } 
     scala.xml.XML.save(outFileName, svg)
     
-    val g = new ResidualProgramGenerator(pt)
+    val g = new ResidualProgramGenerator(program, pt)
     val p = g.generateProgram()
     val doc = p.toDoc
     val slFile = new java.io.File(outProgramFileName)

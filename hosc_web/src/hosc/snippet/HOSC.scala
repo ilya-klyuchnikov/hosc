@@ -19,7 +19,7 @@ class HOSC {
     val sc = new SuperCompiler(program)
     val pt = sc.buildProcessTree(program.goal)
     val svg = new ProcessTreeSVG(pt).treeToSVG
-    val g = new ResidualProgramGenerator(pt)
+    val g = new ResidualProgramGenerator(program, pt)
     val doc = g.generateProgram().toDoc
     val writer = new java.io.StringWriter()
     doc.format(120, writer)

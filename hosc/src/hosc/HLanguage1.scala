@@ -68,6 +68,8 @@ object HLanguage1 {
      def toDoc = text(toString)
    }
    
-   case class Program1(ts: List[TypeDefinition], expr: Term1)
+   case class Program1(ts: List[TypeDefinition], expr: Term1) {
+     def toDoc = (ED /: ts) {(doc, td) => doc :/: nest(0, text(td.toString))} :/: nest(0, expr.toDoc)
+   }
    
 }
