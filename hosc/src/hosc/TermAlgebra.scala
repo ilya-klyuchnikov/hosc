@@ -136,8 +136,7 @@ object TermAlgebra {
     case Constructor(_, args) => args exists (he(term1, _, binders))
     case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
     case Application(h, a) => he(term1, h, binders) || he(term1, a, binders)
-    case CaseExpression(sel, bs) => he(term1, sel, binders) || 
-      (bs exists (b => he(term1, b.term, (b.pattern.args map {(null, _)}):::binders)))
+    case CaseExpression(sel, bs) => he(term1, sel, binders)
     case _ => false
   }
   
