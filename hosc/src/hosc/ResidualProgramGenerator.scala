@@ -9,7 +9,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
   
   def generateProgram() = construct(tree.rootNode)
   
-  private def construct(node: Node): Expression1 = node.expr match {
+  private def construct(node: Node): Term1 = node.expr match {
     case t: Term => decompose(t) match {
       case ObservableVar(v) => Variable1(v.name)
       case ObservableCon(c) => Constructor1(c.name, node.children map construct)
@@ -51,9 +51,9 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
             val sub = Map[Variable, Term]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
             val z2 = hlToHl1(z1)
-            println("_________________")
-            println(node.expr)
-            println(z2)
+            //println("_________________")
+            //println(node.expr)
+            //println(z2)
             z2
           } else {
             // TODO: find all occurences (for choosing an appropriate arity for residual function)
@@ -62,9 +62,9 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
               // call to this function does't result in recursive definition
               case Nil => 
                 val z = construct(node.children.head);
-                println("_________________")
-                println(node.expr)
-                println(z)
+                //println("_________________")
+                //println(node.expr)
+                //println(z)
                 z
               // call to this function results in recursive definition
               case repeatNodes => {
@@ -72,16 +72,16 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}
                 val newVars = args map {p => Variable1(createVar().name)}
-                val sub = Map[Variable1, Expression1]() ++ 
+                val sub = Map[Variable1, Term1]() ++ 
                   ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
                 node.signature = (createFName(), args0)
                 val expr = applySubstitution1(construct(node.children.head), sub)
                 val lam = constructLambda(newVars, expr)
                 val appHead = Variable1(node.signature._1)
                 val z = LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
-                println("_________________")
-                println(node.expr)
-                println(z)
+                //println("_________________")
+                //println(node.expr)
+                //println(z)
                 z
               }
             }            
@@ -93,7 +93,7 @@ class ResidualProgramGenerator(val tree: ProcessTree) {
       val node0 = node.outs.head.child
       val nodes = node.outs.tail map {edge => edge.child}
       val ts = nodes map construct
-      val subs = Map[Variable1, Expression1]() ++ ((bs zip ts) map 
+      val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
           {pair => (Variable1(pair._1._1.name), pair._2)})
       val z = applySubstitution1(construct(node0), subs)
       println("_________________")

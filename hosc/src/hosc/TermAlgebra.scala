@@ -287,7 +287,7 @@ object TermAlgebra {
     res
   }
   
-  def constructApplication1(head: Expression1, args: List[Expression1]): Expression1 = {
+  def constructApplication1(head: Term1, args: List[Term1]): Term1 = {
     var res = head
     var list = args
     while (!list.isEmpty) {
@@ -403,7 +403,7 @@ object TermAlgebra {
     case _ => Nil
   }
   
-  def applySubstitution1(term: Expression1, s: Map[Variable1, Expression1]): Expression1 = term match {
+  def applySubstitution1(term: Term1, s: Map[Variable1, Term1]): Term1 = term match {
     case v: Variable1 => s.get(v) match {case Some(t) => t; case None => v}
     case Constructor1(n, args) => Constructor1(n, args map {applySubstitution1(_, s)})
     case LambdaAbstraction1(v, t) => {
@@ -437,7 +437,7 @@ object TermAlgebra {
       getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
   }
   
-  def getAllVars1(expr: Expression1): Set[Variable1] = expr match {
+  def getAllVars1(expr: Term1): Set[Variable1] = expr match {
     case v: Variable1 => Set(v)
     case Constructor1(_, args) => (Set[Variable1]() /: args) {(vs, term) => vs ++ getAllVars1(term)}
     case LambdaAbstraction1(x, term) => getAllVars1(term) + x
@@ -460,8 +460,8 @@ object TermAlgebra {
   
   
   
-  def constructLambda(vs: List[Variable1], e: Expression1): Expression1 = {
-    def constructLambda_(vs_ : List[Variable1]) : Expression1 = vs_ match {
+  def constructLambda(vs: List[Variable1], e: Term1): Term1 = {
+    def constructLambda_(vs_ : List[Variable1]) : Term1 = vs_ match {
       case Nil => e;
       case v :: vv => LambdaAbstraction1(v, constructLambda_(vv))
     }
@@ -469,7 +469,7 @@ object TermAlgebra {
   }
   
   // converts hlanguage to hlanguage1
-  def hlToHl1(term: Term): Expression1 = term match {
+  def hlToHl1(term: Term): Term1 = term match {
     case Variable(n) => Variable1(n)
     case Constructor(n, args) => Constructor1(n, args map hlToHl1)
     case LambdaAbstraction(v, e) => LambdaAbstraction1(Variable1(v.name), hlToHl1(e))
