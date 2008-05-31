@@ -45,7 +45,8 @@
 	</target>
 
 	<target name="compile" depends="prepare" description="compile code">
-		<scalac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="scala.classpath" force="changed">
+		<scalac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="scala.classpath" force="changed" 
+			deprecation="on" unchecked="on">
 			<include name="**/*.scala" />
 		</scalac>
 	</target>
