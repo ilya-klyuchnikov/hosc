@@ -56,7 +56,7 @@ object TypeInferrer {
     def newInstance: Type =
       (emptySubst /: tvars) ((sub, tv) => sub.extend(tv, newTyvar())) (t)
     
-    def unknownVars = tyvars(t) diff tvars
+    def unknownVars = tyvars(t) -- tvars
     
     def sub(s: Subst) = TypeScheme(tvars, (s exclude tvars) (t))
   }
@@ -250,7 +250,7 @@ class TypeInferrer(p: Program) {
   // creates type scheme where schematic vars are freshed 
   def genBar(unknowns: List[TypeVariable], t: Type) = {
     // schematic vars
-    val scvs = tyvars(t).removeDuplicates diff unknowns
+    val scvs = tyvars(t).removeDuplicates -- unknowns
     // map from schematic vars to new vars
     val al = scvs map (tv => (tv, newTyvar))
     // substitution of new vars instead of schematic vars

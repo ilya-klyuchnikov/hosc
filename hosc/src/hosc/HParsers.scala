@@ -50,12 +50,12 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def validate(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s: Success[Program] => Validator.validate(s)
+    case s @ Success(_, _) => Validator.validate(s)
   }
   
   def postprocess(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s : Success[Program] => Postprocessor.postprocess(s.get); s
+    case s @ Success(_, _) => Postprocessor.postprocess(s.get); s
   }
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
