@@ -91,6 +91,22 @@ object TermAlgebra1 {
       LetRecExpression1((b._1, applySubstitution1(b._2, s)), applySubstitution1(e, s));
   }
   
+  // replace all occurrences of t1 in term by t2 
+  def replaceTerm1(term: Term1, t1: Term1, t2: Term1): Term1 = if (term == t1) t2 else term match {
+    case v: Variable1 => v
+    case Constructor1(n, args) => Constructor1(n, args map {a => replaceTerm1(a, t1, t2)})
+    case Application1(h, a) => Application1(replaceTerm1(h, t1, t2), replaceTerm1(a, t1, t2))
+    case LambdaAbstraction1(v, t) => LambdaAbstraction1(v, replaceTerm1(t, t1, t2))
+    case CaseExpression1(sel, bs) => 
+      CaseExpression1(replaceTerm1(sel, t1, t2), bs map {b => Branch1(b.pattern, replaceTerm1(b.term, t1, t2))})
+    case letrec : LetRecExpression1 => letrec
+  }
+  
+  def extractAppArgs1(term: Term1): List[Term1] = term match {
+    case Application1(h, a) => extractAppArgs1(h) ::: List(a)
+    case _ => Nil
+  }
+  
   def getAllVars1(expr: Term1): Set[Variable1] = expr match {
     case v: Variable1 => Set(v)
     case Constructor1(_, args) => (Set[Variable1]() /: args) {(vs, term) => vs ++ getAllVars1(term)}
