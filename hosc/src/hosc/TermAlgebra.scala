@@ -13,67 +13,33 @@ object TermAlgebra {
   case class Generalization(term: Term, sub1: List[Substitution], sub2: List[Substitution])
   case class Generalization2(term: Term, dSub: List[DoubleSubstitution])
   
-  sealed abstract class TermDecomposition 
-  sealed abstract class Observable extends TermDecomposition {
-    val term: Term
-  }
-  //such observable can not be encountered during interpretation
-  case class ObservableVar(v: Variable) extends Observable {
-    val term = v
-  }
-  // such observable can not be encountered during interpretation
-  case class ObservableVarApp(v: Variable, app: Application) extends Observable {
-    val term = app
-  }
-  case class ObservableCon(c: Constructor) extends Observable {
-    val term = c
-  }
-  case class ObservableLam(l: LambdaAbstraction) extends Observable {
-    val term = l
-  }
+  sealed abstract class TermDecomposition
   
-  sealed abstract class Redex {
-    val term : Term
-  }
-  // f - global var
-  case class RedexCall(v: Variable) extends Redex {
-    val term = v
-  }
-  //app = lam arg
-  case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex {
-    val term = app
-  }
-  // ce = case (v e1 e2 e3) of ...
-  // such redex can not be encountered during interpretation
-  case class RedexCaseVarApp(a: Application, ce: CaseExpression) extends Redex {
-    val term = ce;
-  }
-  //ce = case (v) of ...
-  // such redex can not be encountered during interpretation
-  case class RedexCaseVar(v: Variable, ce: CaseExpression) extends Redex {
-    val term = ce;
-  }
+  sealed abstract class Observable(val term: Term) extends TermDecomposition
+  case class ObservableVar(v: Variable) extends Observable(v)
+  case class ObservableVarApp(v: Variable, app: Application) extends Observable(app)
+  case class ObservableCon(c: Constructor) extends Observable(c)
+  case class ObservableLam(l: LambdaAbstraction) extends Observable(l)
   
-  case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex {
-    val term = ce;
-  }
+  sealed abstract class Redex(val term : Term)
+  case class RedexCall(v: Variable) extends Redex(v)
+  case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
+  case class RedexCaseVarApp(a: Application, ce: CaseExpression) extends Redex(ce)
+  case class RedexCaseVar(v: Variable, ce: CaseExpression) extends Redex(ce)  
+  case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
   
-  sealed abstract class Context extends TermDecomposition {
+  sealed abstract class Context(val redex: Redex) extends TermDecomposition {
     def replaceHole(t: Term): Term
-    def redex: Redex
-  }
-  
-  case class ContextHole(redex: Redex) extends Context {
+  }  
+  case class ContextHole(override val redex: Redex) extends Context(redex) {
     def replaceHole(t: Term) = t
   }
   // app = con e 
-  case class ContextApp(head: Context, app: Application) extends Context {
-    def redex = head.redex
+  case class ContextApp(head: Context, app: Application) extends Context(head.redex) {
     def replaceHole(t: Term) = Application(head.replaceHole(t), app.arg)
   }
   // ce = case selector of ....
-  case class ContextCase(selector: Context, ce: CaseExpression) extends Context {
-    def redex = selector.redex
+  case class ContextCase(selector: Context, ce: CaseExpression) extends Context(selector.redex) {
     def replaceHole(t: Term) = CaseExpression(selector.replaceHole(t), ce.branches)
   }  
   
