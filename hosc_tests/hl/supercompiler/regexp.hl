@@ -62,3 +62,4 @@ match = %eq { %r { %c { %input {
 regTrueFalse = %input { reg (Seq (Symb True) (Symb False)) input }
 regTrueAltFalse = %input { reg (Alt (Symb True) (Symb False)) input }
 regRepTrue = %input { reg (Rep (Symb True)) input }
+regTrue = %input { reg (Symb True) input }
