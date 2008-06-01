@@ -22,7 +22,7 @@ object TermAlgebra1 {
   case class ObservableLam1(l: LambdaAbstraction1) extends Observable1(l)
   
   sealed abstract class Redex1(val term : Term1)
-  case class RedexCall1(v: Variable1) extends Redex1(v)
+  case class RedexLetRec1(letrec: LetRecExpression1) extends Redex1(letrec)
   case class RedexLamApp1(lam: LambdaAbstraction1, app: Application1) extends Redex1(app)
   case class RedexCaseVarApp1(a: Application1, ce: CaseExpression1) extends Redex1(ce)
   case class RedexCaseVar1(v: Variable1, ce: CaseExpression1) extends Redex1(ce)  
