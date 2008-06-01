@@ -16,8 +16,8 @@ object TermAlgebra1 {
   sealed abstract class TermDecomposition1
   
   sealed abstract class Observable1(val term: Term1) extends TermDecomposition1
-  case class ObservableVar(v: Variable1) extends Observable1(v)
-  case class ObservableVarApp(v: Variable1, app: Application1) extends Observable1(app)
+  case class ObservableVar1(v: Variable1) extends Observable1(v)
+  case class ObservableVarApp1(v: Variable1, app: Application1) extends Observable1(app)
   case class ObservableCon1(c: Constructor1) extends Observable1(c)
   case class ObservableLam1(l: LambdaAbstraction1) extends Observable1(l)
   
@@ -41,7 +41,35 @@ object TermAlgebra1 {
   // ce = case selector of ....
   case class ContextCase1(selector: Context1, ce: CaseExpression1) extends Context1(selector.redex) {
     def replaceHole(t: Term1) = CaseExpression1(selector.replaceHole(t), ce.branches)
-  } 
+  }
+  
+  def decompose(t: Term1): TermDecomposition1 = t match {
+    case c: Constructor1 => ObservableCon1(c)
+    case l: LambdaAbstraction1 => ObservableLam1(l)
+    // ?? do we need to check that inner head is local var?
+    case app: Application1 if getCoreLocalVar(app) != null => ObservableVarApp1(getCoreLocalVar(app), app)
+    case v: Variable1 => ObservableVar1(v)
+    case contextTerm => createContext(contextTerm)
+  }
+  
+  def createContext(t: Term1): Context1 = t match {
+    case letrec: LetRecExpression1 => ContextHole1(RedexLetRec1(letrec))
+    // suppose that such term is imposssible in distilled form
+    case app @ Application1(l: LambdaAbstraction1, arg) => ContextHole1(RedexLamApp1(l, app))
+    case ce @ CaseExpression1(v: Variable1, _)  => ContextHole1(RedexCaseVar1(v, ce))
+    case ce @ CaseExpression1(a: Application1, _) if (getCoreLocalVar(a) != null) => 
+      ContextHole1(RedexCaseVarApp1(a, ce))
+    case ce @ CaseExpression1(c: Constructor1, _) => ContextHole1(RedexCaseCon1(c, ce))
+    case a @ Application1(h, _) => ContextApp1(createContext(h), a)
+    case ce @ CaseExpression1(s, _) => ContextCase1(createContext(s), ce)
+    case _ => throw new IllegalArgumentException(t.toString)
+  }
+  
+  private def getCoreLocalVar(app: Application1): Variable1 = app.head match {
+    case v: Variable1 => v
+    case a: Application1 => getCoreLocalVar(a)
+    case _ => null
+  }
   
   def applySubstitution1(term: Term1, s: Map[Variable1, Term1]): Term1 = term match {
     case v: Variable1 => s.get(v) match {case Some(t) => t; case None => v}
