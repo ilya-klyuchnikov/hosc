@@ -43,7 +43,7 @@ object TermAlgebra1 {
     def replaceHole(t: Term1) = CaseExpression1(selector.replaceHole(t), ce.branches)
   }
   
-  def decompose(t: Term1): TermDecomposition1 = t match {
+  def decompose1(t: Term1): TermDecomposition1 = t match {
     case c: Constructor1 => ObservableCon1(c)
     case l: LambdaAbstraction1 => ObservableLam1(l)
     // ?? do we need to check that inner head is local var?

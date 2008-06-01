@@ -80,6 +80,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                 val expr = applySubstitution1(construct(node.children.head), sub)
                 val lam = constructLambda1(newVars, expr)
                 val appHead = Variable1(node.signature._1)
+                appHead.call = true
                 val z = LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
                 //println("_________________")
                 //println(node.expr)
