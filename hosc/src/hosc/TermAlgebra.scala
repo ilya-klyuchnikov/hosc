@@ -86,6 +86,8 @@ object TermAlgebra {
   
   def he(term1: Term, term2: Term): Boolean = he(term1, term2, Nil)
   
+  def strictHe(term1: Term, term2: Term) = heByDiving(term1, term2, Nil)
+  
   private def he(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
     heByVar(term1, term2, binders) || heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
   
@@ -232,7 +234,7 @@ object TermAlgebra {
     Generalization2(t, l2.toList)
   }
   
-  private def getCoreLocalHead(app: Application): Term = app.head match {
+  def getCoreLocalHead(app: Application): Term = app.head match {
     case a: Application => getCoreLocalHead(a)
     case h => h
   }
