@@ -23,8 +23,5 @@ case class TypeConstructorDefinition(name: String, args: List[TypeVariable], con
 }
 case class ArrowDefinition(name: String, ac: Arrow) extends TypeDefinition
 case class DataConstructor(name: String, args: List[Type]) extends Positional {
-  override def toString = args match {
-    case Nil => name
-    case _   => "(" + name + " " + args.mkString(" ") + ")";
-  }
+  override def toString = name + " " + args.mkString(" ")
 }
