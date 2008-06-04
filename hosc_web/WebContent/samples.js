@@ -152,6 +152,82 @@ sub1 = %x {\n\
   }\n\
 }"
 
+programs["even (double n Z)"]=
+"number :: Z | S number;\n\
+boolean :: True | False;\n\
+\n\
+even (double n Z)\n\
+\n\
+\n\
+where\n\
+\n\
+even = %x {\n\
+  case x of {\n\
+    Z : True;\n\
+    S y : case y of {\n\
+       Z : False;\n\
+       S z : even z;\n\
+    };\n\
+  }\n\
+}\n\
+\n\
+double = %x { %y {\n\
+  case x of {\n\
+    Z : y;\n\
+    S z : double z (S (S y));\n\
+  }\n\
+}}"
+
+programs["rev x"] = 
+"list $a :: Nil | Cons $a (list $a);\n\
+boolean :: True | False;\n\
+\n\
+rev x\n\
+\n\
+where\n\
+\n\
+rev = %xs {\n\
+  case xs of {\n\
+    Nil : Nil;\n\
+    Cons z  zs : app (rev zs) (Cons z Nil);\n\
+  }\n\
+}\n\
+\n\
+app = %xs {\n\
+  %ys {\n\
+    case xs of {\n\
+      Nil : ys;\n\
+      Cons z zs : Cons z (app zs ys);\n\
+    }\n\
+  }\n\
+}"
+programs["even1"] = 
+"number  :: Z  | S number;\n\
+boolean  :: True  | False ;\n\
+\n\
+f n Z\n\
+\n\
+where\n\
+\n\
+f = %r1 {\n\
+    %s1 {\n\
+      case  r1  of {\n\
+        Z :\n\
+          case  s1  of {\n\
+            S u :\n\
+              case  u  of {\n\
+                S x : (g x);\n\
+                Z : False;\n\
+              };\n\
+            Z : True;\n\
+          };\n\
+        S t : ((f t) (S (S s1)));\n\
+      }\n\
+    }\n\
+  }\n\
+\n\
+g = %t1 {case  t1  of { Z : True; S r : case  r  of { Z : False; S v1 : (g v1); }; }}"
+
 var sample = function(sampleName) {
   var programText = document.getElementById('programText');
   programText.value = programs[sampleName];
