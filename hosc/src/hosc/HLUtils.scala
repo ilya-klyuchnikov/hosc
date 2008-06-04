@@ -17,4 +17,12 @@ object HLUtils {
   def hlToHl1(p: Pattern): Pattern1 = {
     Pattern1(p.name, p.args map {v => Variable1(v.name)})
   }
+  
+  def letrecToHlProgram(p: Program1, letrec: LetRecExpression1): Program = {
+    var fs: List[Function] = Nil
+    //def ()
+    
+    
+    null
+  }
 }
