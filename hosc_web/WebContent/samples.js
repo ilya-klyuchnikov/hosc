@@ -228,6 +228,46 @@ f = %r1 {\n\
 \n\
 g = %t1 {case  t1  of { Z : True; S r : case  r  of { Z : False; S v1 : (g v1); }; }}"
 
+programs["leq (length (map even x)) (length x)"] = 
+"list $a :: Nil | Cons $a (list $a);\n\
+number :: Z | S number;\n\
+boolean :: True | False;\n\
+\n\
+leq (length (map even x)) (length x)\n\
+\n\
+where\n\
+\n\
+length = %l {\n\
+  case l of {Nil : Z; Cons x1 xs: S (length xs);}\n\
+}\n\
+\n\
+even = %x {\n\
+  case x of {\n\
+    Z : True;\n\
+    S y : case y of {\n\
+       Z : False;\n\
+       S z : even z;\n\
+    };\n\
+  }\n\
+}\n\
+\n\
+map = %f {\n\
+  %list {\n\
+    case list of {\n\
+      Nil : Nil;\n\
+      Cons x xs : Cons (f x) (map f xs);\n\
+    }\n\
+  }\n\
+}\n\
+\n\
+leq = %x {%y{\n\
+  case x of {\n\
+    Z: True;\n\
+    S x1: case y of {Z: False; S y1: leq x1 y1;};\n\
+  }\n\
+\n\
+}}"
+
 var sample = function(sampleName) {
   var programText = document.getElementById('programText');
   programText.value = programs[sampleName];
