@@ -20,11 +20,18 @@ class HOSC {
     val pt = sc.buildProcessTree(program.goal)
     val svg = new ProcessTreeSVG(pt).treeToSVG
     val g = new ResidualProgramGenerator(program, pt)
-    val doc = g.generateProgram().toDoc
+    val p1 = g.generateProgram()
+    val doc1 = p1.toDoc    
+    val writer1 = new java.io.StringWriter()
+    doc1.format(120, writer1)
+    val p = HLUtils.hl1ToHl(p1)
+    val doc = p.toDoc
     val writer = new java.io.StringWriter()
-    doc.format(120, writer)
+    doc.format(100, writer)
     <div>
     <h2>Supercompiled Expression</h2>
+    <div><pre>{writer1.toString}</pre></div>
+    <h2>Supercompiled Expression Sugared</h2>
     <div><pre>{writer.toString}</pre></div>
     <h2>Partial Process Tree</h2>
     <div>{svg}</div>
