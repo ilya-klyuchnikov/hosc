@@ -99,13 +99,17 @@ object TermAlgebra {
     case _ => false
   }
   
-  private def heByDiving(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = term2 match {
-    case Constructor(_, args) => args exists (he(term1, _, binders))
-    case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
-    case Application(h, a) => he(term1, h, binders) || he(term1, a, binders)
-    case CaseExpression(sel, bs) => he(term1, sel, binders)
-    case _ => false
+  private def heByDiving(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = term1 match {
+    case v: Variable if binders exists {v1 => v1._1 == v} => false
+    case _ => term2 match {
+      case Constructor(_, args) => args exists (he(term1, _, binders))
+      case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
+      case Application(h, a) => he(term1, h, binders) || he(term1, a, binders)
+      case CaseExpression(sel, bs) => he(term1, sel, binders)
+      case _ => false
+    }
   }
+  
   
   private def heByCoupling(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
     (term1, term2) match {

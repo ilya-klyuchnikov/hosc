@@ -3,7 +3,7 @@ package hosc
 import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
-import HLanguage._
+import HLanguage.{Application => A, _}
 import TermAlgebra._
 import Util._
 
@@ -103,14 +103,14 @@ class TermAlgebraTest {
     val program = programFromFile(inputFile)
     val f1 = program.getFunction("f1").get
     val f6 = program.getFunction("f6").get
-    assertTrue(he(f1.lam, f6.lam))
+    assertFalse(he(f1.lam, f6.lam))
   }
   
   @Test def he09(): Unit = {
     val program = programFromFile(inputFile)
     val f3 = program.getFunction("f3").get
     val f2 = program.getFunction("f2").get
-    assertTrue(he(f3.lam, f2.lam))
+    assertFalse(he(f3.lam, f2.lam))
   }
   
   @Test def he10(): Unit = {
@@ -194,4 +194,20 @@ class TermAlgebraTest {
     assertTrue(equivalent(actualMsg.term, term))
   }
   
+  @Test def msg01(): Unit = {
+    val actualMsg = msg(Variable("a"), Variable("a"))
+    println(actualMsg)
+    
+    val f1 = Variable("f1");   f1.global = true
+    val f2 = Variable("f2");   f2.global = true
+    val f3 = Variable("f3");   f3.global = true
+    val f4 = Variable("f4");   f4.global = true
+    val x = Variable("y");
+    val y = Variable("y");
+    val e1 = A(f1, A(f2, x));
+    val e2 = A(f3, A(f1, A(f4, A (f2, y))));
+    val msg1 = msg(e1, e2);
+    println(msg1);
+    //assertTrue(equivalent(actualMsg.term, term))
+  }
 }
