@@ -268,6 +268,35 @@ leq = %x {%y{\n\
 \n\
 }}"
 
+programs["even (plus x x)"] = 
+"number :: Z | S number;\n\
+boolean :: True | False;\n\
+\n\
+even (plus x x)\n\
+\n\
+where\n\
+\n\
+even = %x {\n\
+  case x of {\n\
+    Z : True;\n\
+    S y : case y of {\n\
+       Z : False;\n\
+       S z : even z;\n\
+    };\n\
+  }\n\
+}\n\
+\n\
+double = %x { %y {\n\
+  case x of {\n\
+    Z : y;\n\
+    S z : double z (S (S y));\n\
+  }\n\
+}}\n\
+\n\
+plus = %x{ %y {\n\
+case x of {Z: y; S x1: S (plus x1 y);}\n\
+}}"
+
 var sample = function(sampleName) {
   var programText = document.getElementById('programText');
   programText.value = programs[sampleName];
