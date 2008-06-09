@@ -11,6 +11,7 @@ object ProcessTree1 {
   class Node1(var expr: Expression1, val in: Edge1, var outs: List[Edge1]) {
     override def toString = toString("")
     var signature: (String, List[Variable1]) = null
+    var repeatedOf: Node1 = null
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
@@ -19,6 +20,11 @@ object ProcessTree1 {
         sb.append("\n" + edge.child.toString(indent + "  "))
       }
       sb.toString
+    }
+    
+    def allRepeatedOf():Set[Node1] = {
+      val set: Set[Node1] = if (repeatedOf == null) Set[Node1]() else Set[Node1](repeatedOf) 
+      (set /: children()) {(s, n)=> s ++ n.allRepeatedOf()}
     }
     
     def children(): List[Node1] = outs map {edge => edge.child}
@@ -72,8 +78,6 @@ class ProcessTree1 {
     }
     leafs_ = childNode :: leafs
   }
-  
-  //def isClosed = leafs_.forall(_.isProcessed)
   
   override def toString = rootNode.toString
 }
