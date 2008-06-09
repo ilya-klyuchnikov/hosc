@@ -121,7 +121,7 @@ object ProcessTree {
       vars
     }
     
-    def sub(map: Map[Variable, Term]): Unit = {
+    def sub(map: Map[Variable, Variable]): Unit = {
       expr match {    
         case t: Term => expr = applySubstitution(t, map)
         case le: LetExpression => expr = applySubForLet(le, map) 

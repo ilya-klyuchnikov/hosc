@@ -118,7 +118,7 @@ class SuperCompiler(program: Program){
       } while (vars contains nv)
       nv
     }
-    var map = Map[Variable, Term]()
+    var map = Map[Variable, Variable]()
     for (v <- vars.toList) {
       if (isSynthetic(v)) {
         map = map + (v -> createVar)
