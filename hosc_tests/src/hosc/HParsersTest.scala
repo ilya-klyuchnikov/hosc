@@ -147,12 +147,12 @@ class HParsersTest {
     val appF = Function("app", L(V("xs"), L(V("ys"), 
         CE(V("xs"),
             B(P("Nil", Nil), V("ys")) :: 
-            B(P("Cons", V("z") :: V("zs") :: Nil), C("Cons", V("z") :: A(A(V("app"), V("zs")), V("xs")) :: Nil)) ::
+            B(P("Cons", V("z") :: V("zs") :: Nil), C("Cons", V("z") :: A(A(V("app"), V("zs")), V("ys")) :: Nil)) ::
             Nil
             )
         )))
     val expected = Program(listT :: Nil, goal, revF :: appF :: Nil )
-    val programResult = TestUtils.programResultFromFile("input/rev.hl")    
+    val programResult = TestUtils.programResultFromFile("hl/parser/rev.hl")    
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -160,39 +160,39 @@ class HParsersTest {
   }
   
   @Test def validator(): Unit = {
-    testVal("input/err01.hl",
+    testVal("hl/validator/err01.hl",
         "duplicate type definition should be reported")
-    testVal("input/err02.hl",
+    testVal("hl/validator/err02.hl",
         "undefined var should be reported")
-    testVal("input/err03.hl",
+    testVal("hl/validator/err03.hl",
         "wrong numbers of type parameters should be reported")
-    testVal("input/err04.hl",
+    testVal("hl/validator/err04.hl",
         "wrong numbers of type parameters should be reported")
-    testVal("input/err05.hl",
+    testVal("hl/validator/err05.hl",
         "undefined var should be reported")
-    testVal("input/err06.hl",
+    testVal("hl/validator/err06.hl",
         "unknown type list2 should be reported")
-    testVal("input/err07.hl",
+    testVal("hl/validator/err07.hl",
         "duplicate data constructor Cons should be reported")
-    testVal("input/err08.hl",
+    testVal("hl/validator/err08.hl",
         "duplicate type var $a should be reported")
-    testVal("input/err09.hl",
+    testVal("hl/validator/err09.hl",
         "useless type type var $b should be reported");
-    testVal("input/err10.hl",
+    testVal("hl/validator/err10.hl",
         "unbound var x should be reported");
-    testVal("input/err11.hl",
+    testVal("hl/validator/err11.hl",
         "wrong number of parameters for constructor Cons should be reported");
-    testVal("input/err12.hl",
+    testVal("hl/validator/err12.hl",
         "undefined constructor Cons2 should be reported");
-    testVal("input/err13.hl",
+    testVal("hl/validator/err13.hl",
         "undefined constructor Nil2 should be reported");
-    testVal("input/err14.hl",
+    testVal("hl/validator/err14.hl",
         "undefined (for type list) constructor Cons2 should be reported");
-    testVal("input/err15.hl",
+    testVal("hl/validator/err15.hl",
         "wrong number of parameters for constructor Cons should be reported");
-    testVal("input/err16.hl",
+    testVal("hl/validator/err16.hl",
         "duplicate var z should be reported");
-    testVal("input/err17.hl",
+    testVal("hl/validator/err17.hl",
         "non exhaustive should be reported");
   }
   

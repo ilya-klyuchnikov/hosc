@@ -24,9 +24,7 @@ class SuperCompilerTest {
   @Test def processSamples(): Unit =
   {
     
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev.hl",
-        "-t", "output/rev_1.svg",
-        "-p", "output/rev.hl"));
+    
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev1.hl",
         "-t", "output/app1_1.svg",
         "-p", "output/app1.hl"));
@@ -86,6 +84,7 @@ class SuperCompilerTest {
         "-p", "output/eqnum.hl"));
   }
   
+  
   @Test def synapse(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse.hl",
         "-t", "output/synapse.svg",
@@ -98,4 +97,79 @@ class SuperCompilerTest {
         "-p", "output/regexp.hl"));
   }
   
+  @Test def even(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even.hl",
+        "-t", "output/even.svg",
+        "-p", "output/even.hl"));
+    
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even2.hl",
+        "-t", "output/even2.svg",
+        "-p", "output/even2.hl"));
+  }
+  
+  @Test def caze(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/case.hl",
+        "-t", "output/case.svg",
+        "-p", "output/case.hl"));
+  }
+  
+  @Test def `var`(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/var.hl",
+        "-t", "output/var.svg",
+        "-p", "output/var.hl"));
+  }
+  
+  @Test def rev(): Unit = {
+  SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev.hl",
+      "-t", "output/rev.svg",
+      "-p", "output/rev.hl"));
+  }
+  
+  @Test def rev_1(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_1.hl",
+        "-t", "output/rev_11.svg",
+        "-p", "output/rev_11.hl"));
+    }
+  
+  @Test def rev_step(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_step.hl",
+        "-t", "output/rev_step.svg",
+        "-p", "output/rev_step.hl"));
+    }
+  
+  @Test def rev_test(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_test.hl",
+        "-t", "output/rev_test.svg",
+        "-p", "output/rev_test.hl"));
+    }
+  
+  @Test def rev_test2(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_test2.hl",
+        "-t", "output/rev_test2.svg",
+        "-p", "output/rev_test2.hl"));
+    }
+  
+  @Test def rev_step2(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_step2.hl",
+        "-t", "output/rev_step2.svg",
+        "-p", "output/rev_step2.hl"));
+    }
+  
+  @Test def rev_step3(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_step3.hl",
+        "-t", "output/rev_step3.svg",
+        "-p", "output/rev_step3.hl"));
+    }
+  
+  @Test def superster(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/superstep.hl",
+        "-t", "output/superstep.svg",
+        "-p", "output/superstep.hl"));
+    }
+  
+  @Test def even1(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even1.hl",
+        "-t", "output/even1.svg",
+        "-p", "output/even1.hl"));
+    }
 }

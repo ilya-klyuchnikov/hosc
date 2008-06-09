@@ -1,13 +1,10 @@
 list $a :: Nil | Cons $a (list $a);
 
-app (app a b) c
-where
-
 app = %xs {
   %ys {
     case xs of {
-      Nil : ys;
-      Cons z zs : Cons z (app zs ys);
+      Nil2 : ys;
+      Cons z zs : Cons z zs;
     }
   }
 }

@@ -1,0 +1,33 @@
+list $a :: Nil | Cons $a (list $a);
+
+
+
+        case  (f t)  of {
+          Cons v z1 :
+            (Cons
+              v
+                ((g z1) z));
+          Nil : (Cons z Nil);
+        }
+  
+
+
+where
+
+
+g = %r1 {
+                  %s1 {
+                    case  r1  of { Nil : (Cons s1 Nil); Cons w1 y : (Cons w1 ((g y) s1)); }
+                  }
+                }
+
+f = %p1 {
+    case  p1  of {
+      Nil : Nil;
+      Cons z t :
+        case  (f t)  of {
+          Cons v z1 : (Cons  v ((g z1) z));
+          Nil : (Cons z Nil);
+        };
+    }
+  }

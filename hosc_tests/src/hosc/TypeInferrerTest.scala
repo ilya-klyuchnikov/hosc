@@ -40,7 +40,7 @@ class TypeInferrerTest {
   
   //@Ignore
   @Test def simpleConstructors(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/rev1.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
     val program = programResult.get
     val ti = new TypeInferrer(program)
@@ -60,7 +60,7 @@ class TypeInferrerTest {
   
   //@Ignore
   @Test def simpleBranches(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/rev1.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
     val program = programResult.get
     val ti = new TypeInferrer(program)
@@ -86,7 +86,7 @@ class TypeInferrerTest {
   
   //@Ignore
   @Test def simpleCaseRaw(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/rev1.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
     val program = programResult.get
     val ti = new TypeInferrer(program)
@@ -115,7 +115,7 @@ class TypeInferrerTest {
   
   //@Ignore
   @Test def simpleCase(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/rev1.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
     val program = programResult.get
     val ti = new TypeInferrer(program)
@@ -144,7 +144,7 @@ class TypeInferrerTest {
   }
   //@Ignore
   @Test def simpleProgram(): Unit = {
-    val programResult = TestUtils.programResultFromFile("input/rev1.hl")
+    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get

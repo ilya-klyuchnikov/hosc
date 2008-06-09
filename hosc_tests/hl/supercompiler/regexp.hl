@@ -42,8 +42,7 @@ match = %eq { %r { %c { %input {
             False : False;
           };
       };
-    Seq e1 e2 :
-      match eq e1 (match eq e2 c) input;
+    Seq e1 e2 : match eq e1 (match eq e2 c) input;
     Alt e1 e2 :
       case match eq e1 c input of {
         True : True;
@@ -59,7 +58,4 @@ match = %eq { %r { %c { %input {
   }
 }}}}
 
-regTrueFalse = %input { reg (Seq (Symb True) (Symb False)) input }
-regTrueAltFalse = %input { reg (Alt (Symb True) (Symb False)) input }
 regRepTrue = %input { reg (Rep (Symb True)) input }
-regTrue = %input { reg (Symb True) input }
