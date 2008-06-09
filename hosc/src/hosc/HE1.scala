@@ -14,6 +14,7 @@ object HE1 {
   
   private def heByVar(term1: Term1, term2: Term1, 
       binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = 
+        if (term1.label != term2.label) false else
     (term1, term2) match {
     case (v1: Variable1, v2: Variable1) => 
       (v1.call == true && v2.call == true && v1.name == v2.name) ||
@@ -38,7 +39,7 @@ object HE1 {
   
   private def heByCoupling(term1: Term1, term2: Term1, 
       binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = 
-    if (term1.labelToString != term2.labelToString) 
+    if (term1.label != term2.label) 
       false 
     else 
       (term1, term2) match {

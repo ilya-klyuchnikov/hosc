@@ -43,7 +43,7 @@ object MSG1 {
     val l2 = new scala.collection.mutable.ListBuffer[DoubleSubstitution]()
     var t = g.term;
     // terms need to have the same label to match:
-    for (dSub <- g.dSub) if (dSub._2.labelToString != dSub._3.labelToString) l2 += dSub else dSub match {
+    for (dSub <- g.dSub) if (dSub._2.label != dSub._3.label) l2 += dSub else dSub match {
       case (v, Constructor1(n1, a1), Constructor1(n2, a2)) if n1 == n2 => {
         val newVars = a1.map(arg => newVar1())
         val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2)) 
