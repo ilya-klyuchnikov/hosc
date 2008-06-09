@@ -9,14 +9,22 @@ object MSG1 {
   case class Generalization(term: Term1, sub1: List[Substitution], sub2: List[Substitution])
   case class Generalization2(term: Term1, dSub: List[DoubleSubstitution])
   
-    // term1 is equivalent with msg
+  // term1 is equivalent with msg
   def strongMsg(term1: Term1, term2: Term1): Generalization = {
     val g = msg(term1, term2)
     var term = g.term
-    for (s <- g.sub1) term = term/Map(s)
+    // rename vars!!
+    val renaming = g.sub1 map {dd => dd match {case (v1, v2:Variable1) => (v1, v2); 
+      case _ => throw new IllegalArgumentException("not msg: " + dd)}}
+    for (s <- renaming) term = term\\Map(s)
     
     var newS = ((g.sub1 zip g.sub2) map {p => (p._1._2.asInstanceOf[Variable1], p._2._2)}) remove (p => p._1 == p._2)
-    Generalization(term, Nil, newS)    
+    
+    // eliminate matching letrecs:    
+    val (toSubstitute, newS1) = newS partition 
+      {ds => ds match {case (v1, v2: Variable1) => v1.call == true && v2.call == true; case _ => false}}
+    //for (s <- toSubstitute) {println(s);term = term/Map(s)}
+    Generalization(term, Nil, newS1)    
   }
   
   def msg(term1: Term1, term2: Term1): Generalization = {
