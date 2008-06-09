@@ -116,5 +116,22 @@ object TermAlgebra1 {
     }
     res
   }
+  
+  def compareB(b1: Branch1, b2: Branch1) = b1.pattern.name.compareTo(b2.pattern.name) < 0
+  
+  def extractAppArgs(term: Term1): List[Term1] = term match {
+    case Application1(h, a) => extractAppArgs(h) ::: List(a)
+    case _ => Nil
+  }
+  
+  def getBoundedVars(t: Term1): Set[Variable1] = t match {
+    case v: Variable1 => Set()
+    case Constructor1(_, args) => (Set[Variable1]() /: args) {(vs, term) => vs ++ getBoundedVars(term)}
+    case LambdaAbstraction1(x, term) => getBoundedVars(term) + x
+    case Application1(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
+    case CaseExpression1(sel, bs) => 
+      getBoundedVars(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
+    case LetRecExpression1(binding, expr) => getBoundedVars(binding._2) ++ getBoundedVars(expr)
+  }
 
 }
