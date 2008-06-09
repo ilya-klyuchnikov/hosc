@@ -170,7 +170,7 @@ class ProcessTree {
     node.outs = edges.toList
   }
   
-  def replace(node: Node, exp: BaseExpression) = {
+  def replace(node: Node, exp: BaseExpression): Node = {
     // the node can be not leaf - but from any part of tree
     leafs_ = leafs_.remove(_ == node)
     leafs_ = leafs_.remove(_.ancestors.contains(node))
@@ -182,6 +182,7 @@ class ProcessTree {
       node.in.child = childNode
     }
     leafs_ = childNode :: leafs
+    childNode
   }
   
   def isClosed = leafs_.forall(_.isProcessed)
