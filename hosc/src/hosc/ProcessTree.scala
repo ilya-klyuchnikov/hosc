@@ -122,10 +122,7 @@ object ProcessTree {
     }
     
     def sub(map: Map[Variable, Variable]): Unit = {
-      expr match {    
-        case t: Term => expr = applySubstitution(t, map)
-        case le: LetExpression => expr = applySubForLet(le, map) 
-      }
+      expr = expr\\map        
       for (e <- outs) {
         e.child.sub(map)
       }
@@ -136,11 +133,6 @@ object ProcessTree {
     override def toString = "Edge("+ substitution + ", " + child + ")"
   }
   
-  def applySubForLet(le: LetExpression, s: Map[Variable, Term]): LetExpression = {
-    LetExpression(le.bs map {b => (applySubstitution(b._1, s).asInstanceOf[Variable], 
-                                   applySubstitution(b._2.asInstanceOf[Term], s))}, 
-        applySubstitution(le.expr.asInstanceOf[Term], s));
-  }
 }
 
 import ProcessTree._

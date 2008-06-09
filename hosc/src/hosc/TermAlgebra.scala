@@ -75,13 +75,11 @@ object TermAlgebra {
     case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
     case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
     case LambdaAbstraction(v, t) => 
-      LambdaAbstraction(applySubstitution(v, s).asInstanceOf[Variable], applySubstitution(t, s))
+      LambdaAbstraction(v, applySubstitution(t, s))
     case Application(h, a) => Application(applySubstitution(h, s), applySubstitution(a, s))
     case CaseExpression(sel, bs) => 
       CaseExpression(applySubstitution(sel, s), 
-          bs map {b => Branch(Pattern(b.pattern.name, 
-              b.pattern.args map {applySubstitution(_, s).asInstanceOf[Variable]}), 
-              applySubstitution(b.term, s))})
+          bs map {b => Branch(b.pattern, applySubstitution(b.term, s))})
   }
   
   def he(term1: Term, term2: Term): Boolean = he(term1, term2, Nil)
