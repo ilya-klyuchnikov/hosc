@@ -1,9 +1,0 @@
-boolean :: True | False;
-
-f = % x {x}
-g = % x {
-  case x of {
-    True : True;
-    False : f x;
-  }
-}
