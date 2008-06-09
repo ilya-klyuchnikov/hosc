@@ -1,6 +1,7 @@
 package hosc;
 
 import HLanguage1._
+import MSG1.msg
 
 object TermAlgebra1 {
   var i = 0
@@ -132,6 +133,57 @@ object TermAlgebra1 {
     case CaseExpression1(sel, bs) => 
       getBoundedVars(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
     case LetRecExpression1(binding, expr) => getBoundedVars(binding._2) ++ getBoundedVars(expr)
+  }
+  
+  def instanceOf(t1: Term1, t2: Term1): Boolean = equivalent(msg(t1, t2).term, t1)
+  
+  // During unfolding we always rename functions 
+  // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
+  // This method assumes that binders always have different names.
+  def equivalent(term1: Term1, term2: Term1): Boolean = {
+    val map1to2 = scala.collection.mutable.Map[Variable1, Variable1]()
+    val map2to1 = scala.collection.mutable.Map[Variable1, Variable1]()
+    def eq1(t1: Term1, t2: Term1): Boolean = if (t1.label != t2.label) false else (t1, t2) match {
+      case (v1: Variable1, v2: Variable1) if v1.call == true && v2.call == true =>
+        if (v1.name == v2.name) 
+          true
+        else (map1to2.get(v1), map2to1.get(v2)) match {
+          case (Some(v3), Some(v4)) => v2 == v3 && v1 == v4
+          case _ => false
+        }
+      case (v1: Variable1, v2: Variable1) if v1.call == false && v2.call == false => 
+      (map1to2.get(v1), map2to1.get(v2)) match {
+        case (Some(v3), Some(v4)) => 
+          v2 == v3 && v1 == v4
+        case (None, None) => map1to2(v1) = v2; map2to1(v2) = v1; true
+        case _ => false
+      }
+      case (Constructor1(name1, args1), Constructor1(name2, args2)) if name1 == name2 =>
+        ((args1 zip args2) forall (args => eq1(args._1, args._2)))
+      case (Application1(h1, a1), Application1(h2, a2)) => 
+        eq1(h1, h2) && eq1(a1, a2)
+      case (LambdaAbstraction1(b1, v1), LambdaAbstraction1(b2, v2)) =>
+        eq1(b1, b2) && eq1(v1, v2)
+      case (CaseExpression1(sel1, bs1), CaseExpression1(sel2, bs2)) => {
+        val bs1s = bs1 sort compareB
+        val bs2s = bs2 sort compareB
+        if (bs1s.head.pattern.name == bs2s.head.pattern.name){
+          eq1(sel1, sel2) && ((bs1s zip bs2s) forall {
+            b => ((b._1.pattern.args zip b._2.pattern.args) forall (args => eq1(args._1, args._2))) &&
+              eq1(b._1.term, b._2.term)
+          })
+        } else {
+          false
+        }
+      }
+      case (LetRecExpression1((f1, a1), e1), LetRecExpression1((f2, a2), e2)) => {
+        map1to2(f1) = f2; map2to1(f2) = f1;
+        eq1(a1, a2) && eq1(e1, e2)
+      }
+      case _ => 
+        false
+    }    
+    eq1(term1, term2)
   }
 
 }
