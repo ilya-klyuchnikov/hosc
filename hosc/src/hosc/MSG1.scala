@@ -82,7 +82,7 @@ object MSG1 {
         val f = newVar1(); f.call = true
         val e = newVar1(); val a = newVar1();
         l2 += (e, e1/Map(f1->f), e2/Map(f2->f))
-        l2 += (f, f1/Map(f1->f), f2/Map(f2->f))
+        l2 += (f, f1, f2)
         l2 += (a, a1/Map(f1->f), a2/Map(f2->f))
         t = t/Map(v -> LetRecExpression1((f, a), e))
       }
