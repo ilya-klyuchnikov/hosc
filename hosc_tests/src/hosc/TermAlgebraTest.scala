@@ -143,7 +143,7 @@ class TermAlgebraTest {
     assertFalse(he(t1, t2))
   }
   
-  @Test def mgu01(): Unit = {
+  @Test def msg1(): Unit = {
     val program = programFromFile(inputFile)
     val term = termFromString("app x", program)
     val msg_ = msg(term, term)
@@ -151,7 +151,7 @@ class TermAlgebraTest {
     assertTrue(equivalent(msg_.term, term))
   }
   
-  @Test def mgu02(): Unit = {
+  @Test def msg2(): Unit = {
     val program = programFromFile(inputFile)
     val term1 = termFromString("app x", program)
     val term2 = termFromString("app y", program)
@@ -161,7 +161,7 @@ class TermAlgebraTest {
     assertTrue(equivalent(msg_.term, term))
   }
   
-  @Test def mgu03(): Unit = {
+  @Test def msg3(): Unit = {
     val program = programFromFile(inputFile)
     val input1 = 
       """
