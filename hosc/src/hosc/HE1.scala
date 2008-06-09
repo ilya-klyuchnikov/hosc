@@ -38,7 +38,7 @@ object HE1 {
   
   private def heByCoupling(term1: Term1, term2: Term1, 
       binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = 
-    if (term1.label != term2.label) 
+    if (term1.labelToString != term2.labelToString) 
       false 
     else 
       (term1, term2) match {
