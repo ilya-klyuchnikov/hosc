@@ -20,16 +20,18 @@ object HLanguage1 {
        case null => ""
      }
      
-     def / (s: Map[Variable1, Term1]) = TermAlgebra1.applySubstitution1(this, s)
+     def / (s: Map[Variable1, Term1]): Term1
    }
    
    case class Variable1(name: String) extends Term1 {
+     def / (s: Map[Variable1, Term1]) = s.get(this) match {case Some(t) => t; case None => this}
      var call = false // variable is defined by letrec construction or is defined in original program
      override def toString = labelToString + name
      def toDoc = text(name)
    }
    
    case class Constructor1(name: String, args: List[Term1]) extends Term1 {
+     def / (s: Map[Variable1, Term1]) =  Constructor1(name, args map {_/s})
      override def toString = labelToString + "(" + name + " " + args.mkString(" ") + ")";     
      def toDoc = args match {
        case Nil => text(name)
@@ -38,22 +40,26 @@ object HLanguage1 {
    }
    
    case class LambdaAbstraction1(v: Variable1, t: Term1) extends Term1 {
+     def / (s: Map[Variable1, Term1]) = LambdaAbstraction1(v, t/s)
      override def toString = labelToString + "%" + v.name + " {" + t + "}";
      def toDoc = "%" :: v.toDoc :: " {" :: nest(2, ED :/: t.toDoc) :/: "}" :: ED 
    }
    
    case class Application1(head: Term1, arg: Term1) extends Term1 {
+     def / (s: Map[Variable1, Term1]) = Application1(head/s, arg/s)
      override def toString = labelToString + "(" + head + " " + arg + ")";
      def toDoc = group("(" :: nest(2, head.toDoc :/: arg.toDoc ) :: ")" :: ED)
    }
    
    case class CaseExpression1(selector: Term1, branches: List[Branch1]) extends Term1 {
+     def / (s: Map[Variable1, Term1]) = CaseExpression1(selector/s, branches map {b => Branch1(b.pattern, b.term / s)})
      override def toString = labelToString + "case (" + selector + ") of " + branches.mkString("{", " ", "}")
      def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
    }
    
    case class LetRecExpression1(binding: Pair[Variable1, Term1], expr: Term1) extends Term1 {
+     def / (s: Map[Variable1, Term1]) = LetRecExpression1((binding._1, binding._2/s), expr/s);
      override def toString = labelToString + "letrec " + (binding._1 + "=" + binding._2) + " in " + expr;
      def toDoc = group("letrec" :: 
          nest(2, group (ED :/: binding._1.toDoc :: " = " :: binding._2.toDoc))

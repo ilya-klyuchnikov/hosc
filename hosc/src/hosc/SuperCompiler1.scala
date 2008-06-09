@@ -17,11 +17,11 @@ abstract class SuperCompiler1(val program: Program1) {
       case ObservableLam1(l) => (l.t, emptyMap) :: Nil
       case context: Context1 => context.redex match {
         case RedexLamApp1(lam, app) => 
-          (context.replaceHole(applySubstitution1(lam.t, Map(lam.v -> app.arg))), emptyMap) :: Nil
+          (context.replaceHole(lam.t/Map(lam.v -> app.arg)), emptyMap) :: Nil
         case RedexCaseCon1(c, ce) => {
           val b = ce.branches.find(_.pattern.name == c.name).get
           val sub = Map[Variable1, Term1]() ++ (b.pattern.args zip c.args)
-          (context.replaceHole(applySubstitution1(b.term, sub)), emptyMap) :: Nil          
+          (context.replaceHole(b.term/sub), emptyMap) :: Nil          
         }
         case RedexCaseVar1(v, CaseExpression1(sel, bs)) =>
           (sel, emptyMap) :: (bs map 

@@ -72,18 +72,6 @@ object TermAlgebra1 {
     case _ => null
   }
   
-  def applySubstitution1(term: Term1, s: Map[Variable1, Term1]): Term1 = term match {
-    case v: Variable1 => s.get(v) match {case Some(t) => t; case None => v}
-    case Constructor1(n, args) => Constructor1(n, args map {_/s})
-    case LambdaAbstraction1(v, t) => LambdaAbstraction1((v/s).asInstanceOf[Variable1], t/s)      
-    case Application1(h, a) => Application1(h/s, a/s)
-    case CaseExpression1(sel, bs) => 
-      CaseExpression1(sel/s, 
-          bs map {b => Branch1(Pattern1(b.pattern.name, 
-              b.pattern.args map {v => (v / s).asInstanceOf[Variable1]}), b.term / s)});
-    case LetRecExpression1(b, e) => LetRecExpression1((b._1, (b._2 / s)), (e / s));
-  }
-  
   // replace all occurrences of t1 in term by t2 
   def replaceTerm1(term: Term1, t1: Term1, t2: Term1): Term1 = if (term == t1) t2 else term match {
     case v: Variable1 => v

@@ -87,7 +87,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                 val sub = Map[Variable1, Term1]() ++ 
                   ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
                 node.signature = (createFName(), args0)
-                val expr = applySubstitution1(construct(node.children.head), sub)
+                val expr = construct(node.children.head)/sub
                 val lam = constructLambda1(newVars, expr)
                 val appHead = Variable1(node.signature._1)
                 appHead.call = true
@@ -108,7 +108,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
       val ts = nodes map construct
       val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
           {pair => (Variable1(pair._1._1.name), pair._2)})
-      val z = applySubstitution1(construct(node0), subs)
+      val z = construct(node0)/subs
       println("_________________")
       println(node.expr)
       println(z)
