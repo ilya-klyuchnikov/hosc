@@ -188,9 +188,9 @@ object TermAlgebra {
         val arg = newVar() // binder!!
         val rs = newVar()
         val t1r = applySubstitution(t1, Map(a1 -> arg))
-        val t12 = applySubstitution(t2, Map(a2 -> arg))        
+        val t2r = applySubstitution(t2, Map(a2 -> arg))        
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
-        l2 ++= List((rs, t1, t2))
+        l2 ++= List((rs, t1r, t2r))
       }
       /*
       case (v, Application(h1, a1), Application(h2, a2)) => {
