@@ -15,8 +15,9 @@ object HE1 {
   private def heByVar(term1: Term1, term2: Term1, 
       binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = 
     (term1, term2) match {
-    case (v1: Variable1, v2: Variable1) => (v1.call == true && v2.call == true && v1.name == v2.name) ||
-      (v1.call == true && v2.call == true && letrecs.contains(v1) && letrecs(v1)== v2) ||
+    case (v1: Variable1, v2: Variable1) => 
+      (v1.call == true && v2.call == true && v1.name == v2.name) ||
+      (letrecs.contains(v1) && letrecs(v1)== v2) ||
       (v1.call == false && v2.call == false) && 
         ((binders exists {p => p._1 == v1 && p._2 == v2}) || (binders forall {p => p._1 != v1 && p._2 != v2}))
     case _ => false
