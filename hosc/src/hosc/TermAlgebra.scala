@@ -229,8 +229,10 @@ object TermAlgebra {
           val newCase = CaseExpression(selVar, newBs)
           t = applySubstitution(t, Map(v -> CaseExpression(selVar, newBs)))
           l2 ++= addDSubs
+        } else {
+          l2 += dSub
         }
-      }
+      } 
       case d => l2 += d
     }
     Generalization2(t, l2.toList)

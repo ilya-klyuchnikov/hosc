@@ -96,6 +96,8 @@ object MSG1 {
           val newCase = CaseExpression1(selVar, newBs)
           t = t/Map(v -> CaseExpression1(selVar, newBs))
           l2 ++= addDSubs
+        } else {
+          l2 += dSub
         }
       }
       case d => l2 += d
