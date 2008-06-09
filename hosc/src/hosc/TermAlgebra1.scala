@@ -22,6 +22,7 @@ object TermAlgebra1 {
   case class ObservableLam1(l: LambdaAbstraction1) extends Observable1(l)
   
   sealed abstract class Redex1(val term : Term1)
+  case class RedexCall1(v: Variable1) extends Redex1(v)
   case class RedexLetRec1(letrec: LetRecExpression1) extends Redex1(letrec)
   case class RedexLamApp1(lam: LambdaAbstraction1, app: Application1) extends Redex1(app)
   case class RedexCaseVarApp1(a: Application1, ce: CaseExpression1) extends Redex1(ce)
@@ -46,13 +47,13 @@ object TermAlgebra1 {
   def decompose1(t: Term1): TermDecomposition1 = t match {
     case c: Constructor1 => ObservableCon1(c)
     case l: LambdaAbstraction1 => ObservableLam1(l)
-    // ?? do we need to check that inner head is local var?
     case app: Application1 if getCoreLocalVar(app) != null => ObservableVarApp1(getCoreLocalVar(app), app)
-    case v: Variable1 => ObservableVar1(v)
+    case v: Variable1 if !v.call => ObservableVar1(v)
     case contextTerm => createContext(contextTerm)
   }
   
   def createContext(t: Term1): Context1 = t match {
+    case v: Variable1 if (v.call) => ContextHole1(RedexCall1(v))
     case letrec: LetRecExpression1 => ContextHole1(RedexLetRec1(letrec))
     // suppose that such term is imposssible in distilled form
     case app @ Application1(l: LambdaAbstraction1, arg) => ContextHole1(RedexLamApp1(l, app))
@@ -66,7 +67,7 @@ object TermAlgebra1 {
   }
   
   private def getCoreLocalVar(app: Application1): Variable1 = app.head match {
-    case v: Variable1 => v
+    case v: Variable1 if (!v.call) => v
     case a: Application1 => getCoreLocalVar(a)
     case _ => null
   }

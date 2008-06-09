@@ -22,7 +22,7 @@ object HLanguage1 {
    }
    
    case class Variable1(name: String) extends Term1 {
-     var call = false
+     var call = false // variable is defined by letrec construction or is defined in original program
      override def toString = labelToString + name
      def toDoc = text(name)
    }
