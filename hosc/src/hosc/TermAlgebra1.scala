@@ -74,22 +74,14 @@ object TermAlgebra1 {
   
   def applySubstitution1(term: Term1, s: Map[Variable1, Term1]): Term1 = term match {
     case v: Variable1 => s.get(v) match {case Some(t) => t; case None => v}
-    case Constructor1(n, args) => Constructor1(n, args map {applySubstitution1(_, s)})
-    case LambdaAbstraction1(v, t) => {
-      val v_ = applySubstitution1(v, s)
-      if (!v_.isInstanceOf[Variable1]) {
-        println(v)
-      }
-      LambdaAbstraction1(v_.asInstanceOf[Variable1], applySubstitution1(t, s))    
-    }      
-    case Application1(h, a) => Application1(applySubstitution1(h, s), applySubstitution1(a, s))
+    case Constructor1(n, args) => Constructor1(n, args map {_/s})
+    case LambdaAbstraction1(v, t) => LambdaAbstraction1((v/s).asInstanceOf[Variable1], t/s)      
+    case Application1(h, a) => Application1(h/s, a/s)
     case CaseExpression1(sel, bs) => 
-      CaseExpression1(applySubstitution1(sel, s), 
+      CaseExpression1(sel/s, 
           bs map {b => Branch1(Pattern1(b.pattern.name, 
-              b.pattern.args map {applySubstitution1(_, s).asInstanceOf[Variable1]}), 
-              applySubstitution1(b.term, s))});
-    case LetRecExpression1(b, e) => 
-      LetRecExpression1((b._1, applySubstitution1(b._2, s)), applySubstitution1(e, s));
+              b.pattern.args map {v => (v / s).asInstanceOf[Variable1]}), b.term / s)});
+    case LetRecExpression1(b, e) => LetRecExpression1((b._1, (b._2 / s)), (e / s));
   }
   
   // replace all occurrences of t1 in term by t2 

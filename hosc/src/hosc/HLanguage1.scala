@@ -19,6 +19,8 @@ object HLanguage1 {
        case Repeat() => "Repeat: "
        case null => ""
      }
+     
+     def / (s: Map[Variable1, Term1]) = TermAlgebra1.applySubstitution1(this, s)
    }
    
    case class Variable1(name: String) extends Term1 {
