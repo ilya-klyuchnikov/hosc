@@ -71,6 +71,16 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
               // call to this function results in recursive definition
               case repeatNodes => {
                 val vars = getFreeVars(t)
+                /*
+                var vars = Set[Variable]()
+                // getting all arguments for recursive definition
+                for (n <- repeatNodes) {
+                  val betaT = n.expr.asInstanceOf[Term]
+                  val msg = strongMsg(t, betaT)
+                  val args0 = msg.sub2 map {p => p._1}
+                  vars = vars ++ args0
+                }
+                */
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}
                 val newVars = args map {p => Variable1(createVar().name)}
