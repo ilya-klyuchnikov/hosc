@@ -185,5 +185,31 @@ object TermAlgebra1 {
     }    
     eq1(term1, term2)
   }
+  
+  def freshBinders(term: Term1): Term1 = term match {
+    case v: Variable1 => v
+    case Constructor1(name, args) => Constructor1(name, args map (freshBinders(_)))
+    case Application1(h, a) => Application1(freshBinders(h), freshBinders(a))
+    case LambdaAbstraction1(v, t) => {
+      val freshV = newVar1()
+      LambdaAbstraction1(freshV, freshBinders(t)/Map(v -> freshV))
+    }
+    case CaseExpression1(sel, bs) => CaseExpression1(freshBinders(sel), bs map {freshBinders(_)})
+    case LetRecExpression1((v, term), expr) => LetRecExpression1((v, freshBinders(term)), freshBinders(expr))
+  }
+
+  def freshBinders(b: Branch1): Branch1 = {
+    val args = b.pattern.args
+    val newVars = args map {x => newVar1()}
+    Branch1(Pattern1(b.pattern.name, newVars), freshBinders(b.term)/Map((args zip newVars):_*))
+  }
+  
+  def canFoldOrGenarilize(t: Term1) = t.label != Repeat() && (t.label==Loop() || (decompose1(t) match {
+    case c: Context1 => c.redex match { 
+      case r: RedexCall1 => true
+      case _ => false
+    }
+    case _ => false
+  }))
 
 }
