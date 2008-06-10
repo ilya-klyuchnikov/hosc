@@ -10,7 +10,7 @@ object ProcessTree1 {
   
   class Node1(var expr: Expression1, val in: Edge1, var outs: List[Edge1]) {
     override def toString = toString("")
-    var signature: (String, List[Variable1]) = null
+    var signature: Term1 = null
     var repeatedOf: Node1 = null
       
     def toString(indent: String): String = {
@@ -30,6 +30,13 @@ object ProcessTree1 {
     def children(): List[Node1] = outs map {edge => edge.child}
 
     def ancestors(): List[Node1] = if (in == null) Nil else in.parent :: in.parent.ancestors
+    
+    def isProcessed: Boolean = repeatedOf != null || 
+    (expr match {
+      case Constructor1(_, Nil) => true
+      case v : Variable1 if v.call == false => true
+      case _ => false
+    })
   }
   
   class Edge1(val parent: Node1, var child: Node1, val substitution: Map[Variable1, Term1]) {
@@ -80,6 +87,7 @@ class ProcessTree1 {
   }
   
   override def toString = rootNode.toString
+  def isClosed = leafs_.forall(_.isProcessed)
 }
 
 
