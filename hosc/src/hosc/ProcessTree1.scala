@@ -12,6 +12,7 @@ object ProcessTree1 {
     override def toString = toString("")
     var signature: Term1 = null
     var repeatedOf: Node1 = null
+    var permanent = false
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
@@ -31,12 +32,12 @@ object ProcessTree1 {
 
     def ancestors(): List[Node1] = if (in == null) Nil else in.parent :: in.parent.ancestors
     
-    def isProcessed: Boolean = repeatedOf != null || 
+    def isProcessed: Boolean = permanent || (repeatedOf != null || 
     (expr match {
       case Constructor1(_, Nil) => true
       case v : Variable1 if v.call == false => true
       case _ => false
-    })
+    }))
   }
   
   class Edge1(val parent: Node1, var child: Node1, val substitution: Map[Variable1, Term1]) {
