@@ -37,8 +37,8 @@ object HLanguage1 {
    
    case class Constructor1(name: String, args: List[Term1]) extends Term1 {
      type termType = Constructor1
-     def \\(s: Map[Variable1, Variable1]) = Constructor1(name, args map {_\\s})
-     def / (s: Map[Variable1, Term1]) =  Constructor1(name, args map {_/s})
+     def \\(s: Map[Variable1, Variable1]) ={val t=Constructor1(name, args map {_\\s}); t.label = label; t}
+     def / (s: Map[Variable1, Term1]) =  {val t=Constructor1(name, args map {_/s}); t.label = label; t}
      override def toString = labelToString + "(" + name + " " + args.mkString(" ") + ")";     
      def toDoc = args match {
        case Nil => text(name)
@@ -48,24 +48,27 @@ object HLanguage1 {
    
    case class LambdaAbstraction1(v: Variable1, t: Term1) extends Term1 {
      type termType = LambdaAbstraction1
-     def \\(s: Map[Variable1, Variable1]) = LambdaAbstraction1(v\\s, t\\s)
-     def / (s: Map[Variable1, Term1]) = LambdaAbstraction1(v, t/s)
+     def \\(s: Map[Variable1, Variable1]) = {val l1=LambdaAbstraction1(v\\s, t\\s);l1.label=label;l1}
+     def / (s: Map[Variable1, Term1]) = {val l1=LambdaAbstraction1(v, t/s);l1.label=label;l1}
      override def toString = labelToString + "%" + v.name + " {" + t + "}";
      def toDoc = "%" :: v.toDoc :: " {" :: nest(2, ED :/: t.toDoc) :/: "}" :: ED 
    }
    
    case class Application1(head: Term1, arg: Term1) extends Term1 {
      type termType = Application1
-     def \\(s: Map[Variable1, Variable1]) = Application1(head\\s, arg\\s)
-     def / (s: Map[Variable1, Term1]) = Application1(head/s, arg/s)
+     def \\(s: Map[Variable1, Variable1]) = {val a1=Application1(head\\s, arg\\s);a1.label=label;a1}
+     def / (s: Map[Variable1, Term1]) = {val a1=Application1(head/s, arg/s);a1.label=label;a1}
      override def toString = labelToString + "(" + head + " " + arg + ")";
      def toDoc = group("(" :: nest(2, head.toDoc :/: arg.toDoc ) :: ")" :: ED)
    }
    
    case class CaseExpression1(selector: Term1, branches: List[Branch1]) extends Term1 {
      type termType = CaseExpression1
-     def \\(s: Map[Variable1, Variable1]) = CaseExpression1(selector\\s, branches map {_\\s})
-     def / (s: Map[Variable1, Term1]) = CaseExpression1(selector/s, branches map {b => Branch1(b.pattern, b.term / s)})
+     def \\(s: Map[Variable1, Variable1]) = {val c1=CaseExpression1(selector\\s, branches map {_\\s});c1.label=label;c1}
+     def / (s: Map[Variable1, Term1]) = {
+       val c1=CaseExpression1(selector/s, branches map {b => Branch1(b.pattern, b.term / s)});
+       c1.label=label;c1
+     }
      override def toString = labelToString + "case (" + selector + ") of " + branches.mkString("{", " ", "}")
      def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
@@ -73,8 +76,14 @@ object HLanguage1 {
    
    case class LetRecExpression1(binding: Pair[Variable1, Term1], expr: Term1) extends Term1 {
      type termType = LetRecExpression1
-     def \\(s: Map[Variable1, Variable1]) = LetRecExpression1((binding._1\\s, binding._2\\s), expr\\s)
-     def / (s: Map[Variable1, Term1]) = LetRecExpression1((binding._1, binding._2/s), expr/s);
+     def \\(s: Map[Variable1, Variable1]) = {
+       val l1=LetRecExpression1((binding._1\\s, binding._2\\s), expr\\s);
+       l1.label=label;l1
+     }
+     def / (s: Map[Variable1, Term1]) = {
+       val l1=LetRecExpression1((binding._1, binding._2/s), expr/s);
+       l1.label=label;l1
+     }
      override def toString = labelToString + "letrec " + (binding._1 + "=" + binding._2) + " in " + expr;
      def toDoc = group("letrec" :: 
          nest(2, group (ED :/: binding._1.toDoc :: " = " :: binding._2.toDoc))

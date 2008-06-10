@@ -64,16 +64,18 @@ object MSG1 {
     for (dSub <- g.dSub) if (dSub._2.label != dSub._3.label) l2 += dSub else dSub match {
       case (v, Constructor1(n1, a1), Constructor1(n2, a2)) if n1 == n2 => {
         val newVars = a1.map(arg => newVar1())
-        val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2)) 
-        t = t/Map(v -> Constructor1(n1, newVars))
+        val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
+        val term = Constructor1(n1, newVars); term.label = dSub._2.label
+        t = t/Map(v -> term)
         l2 ++= addDSubs
       }
       case (v, LambdaAbstraction1(a1, t1), LambdaAbstraction1(a2, t2)) => {
         val arg = newVar1() // binder!!
         val rs = newVar1()
         val t1r = t1/Map(a1 -> arg)
-        val t2r = t2/Map(a2 -> arg)        
-        t = t/Map(v -> LambdaAbstraction1(arg, rs))
+        val t2r = t2/Map(a2 -> arg)
+        val term = LambdaAbstraction1(arg, rs); term.label = dSub._2.label
+        t = t/Map(v -> term)
         l2 += (rs, t1r, t2r)
       }
       case (v, app1: Application1, app2: Application1) 
@@ -83,7 +85,8 @@ object MSG1 {
         val args2 = extractAppArgs(app2)
         val newVars = args1.map(arg => newVar1())
         val addDSubs = ((newVars zip args1) zip (newVars zip args2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
-        t = t/Map(v -> constructApplication1(head, newVars))
+        val term = constructApplication1(head, newVars); term.label = dSub._2.label
+        t = t/Map(v -> term)
         l2 ++= addDSubs
       }
       case (v, LetRecExpression1((f1, a1), e1), LetRecExpression1((f2, a2), e2)) => {
@@ -92,7 +95,8 @@ object MSG1 {
         l2 += (e, e1/Map(f1->f), e2/Map(f2->f))
         l2 += (f, f1, f2)
         l2 += (a, a1/Map(f1->f), a2/Map(f2->f))
-        t = t/Map(v -> LetRecExpression1((f, a), e))
+        val term = LetRecExpression1((f, a), e); term.label = dSub._2.label
+        t = t/Map(v -> term)
       }
       case (v, CaseExpression1(sel1, bs1), CaseExpression1(sel2, bs2)) => {
         val bs1s = bs1 sort compareB
@@ -111,8 +115,8 @@ object MSG1 {
           val addDSubs = (selVar, sel1, sel2) :: 
             ((bVars zip bsR) map (pair => (pair._1, pair._2._2, pair._2._3)))
           val newBs = (bsR zip bVars) map (pair => Branch1(pair._1._1, pair._2))  
-          val newCase = CaseExpression1(selVar, newBs)
-          t = t/Map(v -> CaseExpression1(selVar, newBs))
+          val term = CaseExpression1(selVar, newBs); term.label = dSub._2.label
+          t = t/Map(v -> term)
           l2 ++= addDSubs
         } else {
           l2 += dSub
