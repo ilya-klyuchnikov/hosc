@@ -7,7 +7,7 @@ import scala.collection.mutable.ListBuffer
 object HLUtils {
   // converts hlanguage to hlanguage1
   def hlToHl1(term: Term): Term1 = term match {
-    case Variable(n) => Variable1(n)
+    case v @ Variable(n) => val v1 = Variable1(n); v1.call = v.global; v1
     case Constructor(n, args) => Constructor1(n, args map hlToHl1)
     case LambdaAbstraction(v, e) => LambdaAbstraction1(Variable1(v.name), hlToHl1(e))
     case Application(h, a) => Application1(hlToHl1(h), hlToHl1(a))
