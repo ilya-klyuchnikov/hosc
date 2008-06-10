@@ -89,7 +89,7 @@ class CodeConstructor(val tree: ProcessTree1) {
           case RedexCall1(f) => node.repeatedOf match {
              case null => {
                val code = construct(node.children.head)
-               code.label = Loop()
+               if (tree.leafs exists {_.repeatedOf == node}) code.label = Loop()
                code
              }
              case parentNode => {
