@@ -55,7 +55,7 @@ object HE1 {
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders, letrecs)))
     }
     case (LetRecExpression1((f1, a1), e1), LetRecExpression1((f2, a2), e2)) =>
-      he(e1, e2, binders, letrecs + (f1 -> f2)) && heByCoupling(a1, a2, binders, letrecs)
+      he(e1, e2, binders, letrecs + (f1 -> f2)) && heByCoupling(a1, a2, binders, letrecs + (f1 -> f2))
     case _ => false
   }
 }
