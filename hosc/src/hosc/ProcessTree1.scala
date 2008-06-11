@@ -28,6 +28,11 @@ object ProcessTree1 {
       (set /: children()) {(s, n)=> s ++ n.allRepeatedOf()}
     }
     
+    def allLoops():Set[Node1]={
+      val set: Set[Node1] = if (expr.isLoop) Set[Node1](this) else Set[Node1]()
+      (set /: children()) {(s, n)=> s ++ n.allLoops()}
+    }
+    
     def children(): List[Node1] = outs map {edge => edge.child}
 
     def ancestors(): List[Node1] = if (in == null) Nil else in.parent :: in.parent.ancestors
@@ -73,7 +78,7 @@ class ProcessTree1 {
     node.outs = edges.toList
   }
   
-  def replace(node: Node1, exp: Expression1) = {
+  def replace(node: Node1, exp: Expression1):Node1 = {
     // the node can be not leaf - but from any part of tree
     leafs_ = leafs_.remove(_ == node)
     leafs_ = leafs_.remove(_.ancestors.contains(node))
@@ -85,6 +90,7 @@ class ProcessTree1 {
       node.in.child = childNode
     }
     leafs_ = childNode :: leafs
+    childNode
   }
   
   override def toString = rootNode.toString
