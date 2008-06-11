@@ -11,6 +11,7 @@ object HLanguage1 {
    
    sealed abstract class Expression1 {
      def toDoc: Document
+     def isLoop: Boolean
    }
    sealed abstract class Term1 extends Expression1 {
      type termType <: Term1
@@ -22,7 +23,7 @@ object HLanguage1 {
        case Repeat() => "Repeat: "
        case null => ""
      }
-     
+     def isLoop = label == Loop()
      def / (s: Map[Variable1, Term1]): Term1
    }
    
@@ -31,7 +32,7 @@ object HLanguage1 {
      def  \\(s: Map[Variable1, Variable1]) = s.get(this) match {case Some(t) => t; case None => this}
      def / (s: Map[Variable1, Term1]) = s.get(this) match {case Some(t) => t; case None => this}
      var call = false // variable is defined by letrec construction or is defined in original program
-     override def toString = labelToString + (if (call) "<" + name+ ">" else name)
+     override def toString = labelToString + (if (call) "[" + name+ "]" else name)
      def toDoc = text(name)
    }
    
@@ -91,6 +92,7 @@ object HLanguage1 {
    }
    
    case class LetExpression1(bs: List[Pair[Variable1, Term1]], expr: Term1) extends Expression1 {
+     def isLoop = false
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + " in " + expr;
      def toDoc = group("let" :: 
          nest(2, ED :/: bs.foldRight(ED){(b, y) => group (b._1.toDoc :: " = " :: b._2.toDoc) :/: y})
