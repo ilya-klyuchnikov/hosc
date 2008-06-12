@@ -19,23 +19,28 @@ class CodeConstructor(val tree: ProcessTree1) {
     case term: Term1 => term.label match { 
       case Loop() => node.repeatedOf match {
         case null => {
-          val repeatNodes = tree.leafs filter {_.repeatedOf == node}
-          var vars = Set[Variable1]()
-          for (n <- repeatNodes) {
-            val repeatTerm = n.expr.asInstanceOf[Term1]
-            val msg = strongMsg(term, repeatTerm)
-            val args0 = msg.sub2 map {p => p._1}
-            vars = vars ++ args0
+          tree.leafs filter {_.repeatedOf == node} match {
+            case Nil => construct(node.children.head)
+            case repeatNodes => {
+              var vars = Set[Variable1]()
+              for (n <- repeatNodes) {
+                val repeatTerm = n.expr.asInstanceOf[Term1]
+                val msg = strongMsg(term, repeatTerm)
+                val args0 = msg.sub2 map {p => p._1}
+                vars = vars ++ args0
+              }
+              val fargs = vars.toList
+              val appHead = Variable1(createFName())
+              appHead.call = true
+              node.signature = constructApplication1(appHead, fargs)
+              val freshVars = fargs map {x => newVar1()}
+              val sub = Map((fargs zip freshVars):_*)
+              val lambdaBody = construct(node.children.head)/sub
+              val lambda = constructLambda1(freshVars, lambdaBody)
+              LetRecExpression1((appHead, lambda), node.signature)
+            }
           }
-          val fargs = vars.toList
-          val appHead = Variable1(createFName())
-          appHead.call = true
-          node.signature = constructApplication1(appHead, fargs)
-          val freshVars = fargs map {x => newVar1()}
-          val sub = Map((fargs zip freshVars):_*)
-          val lambdaBody = construct(node.children.head)/sub
-          val lambda = constructLambda1(freshVars, lambdaBody)
-          LetRecExpression1((appHead, lambda), node.signature)
+          
         }
         case parentNode => {
           val parentTerm = parentNode.expr.asInstanceOf[Term1]          
@@ -63,14 +68,18 @@ class CodeConstructor(val tree: ProcessTree1) {
             CaseExpression1(selector, branches)
           }
           case RedexLetRec1(letrec) => {
+            if (node.children.isEmpty) 
+              term
+            else{
             val letrecCallNode = node.children.head
+            val letrecCall = letrecCallNode.expr.asInstanceOf[Term1]
             tree.leafs filter {_.repeatedOf == letrecCallNode} match {
               case Nil => construct(letrecCallNode.children.head) 
               case repeatNodes => {
                 var vars = Set[Variable1]()
                 for (n <- repeatNodes) {
                   val repeatTerm = n.expr.asInstanceOf[Term1]
-                  val msg = strongMsg(term, repeatTerm)
+                  val msg = strongMsg(letrecCall, repeatTerm)
                   val args0 = msg.sub2 map {p => p._1}
                   vars = vars ++ args0
                 }
@@ -84,7 +93,7 @@ class CodeConstructor(val tree: ProcessTree1) {
                 val lambda = constructLambda1(freshVars, lambdaBody)
                 LetRecExpression1((appHead, lambda), node.signature)
               }
-            }
+            }}
           }
           case RedexCall1(f) => node.repeatedOf match {
              case null => {
