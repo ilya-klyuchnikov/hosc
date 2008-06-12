@@ -13,7 +13,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
   var defs = Map((program.fs map {f => val v = Variable1(f.name); v.call = true; (v, hlToHl1(f.lam))}):_*)
   
   def driveExp(expr: Expression1): List[Pair[Term1, Map[Variable1, Term1]]] = expr match {
-    case LetExpression1(bs, t) => (t, Map[Variable1, Term1]()) :: (bs map {b => (b._2, emptyMap)}) 
+    case LetExpression1(bs, t) => (t, Map[Variable1, Term1]()) :: Nil 
     case t: Term1 => t.label match { 
       case null => decompose1(t) match {
         case ObservableVar1(_) => Nil
