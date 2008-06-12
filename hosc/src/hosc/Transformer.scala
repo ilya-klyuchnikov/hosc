@@ -30,7 +30,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
           }
           case RedexCaseVar1(v, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
-              {b => (replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args)), emptyMap)})  
+              {b => (replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args)), emptyMap)})
           case RedexCaseVarApp1(a, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
               {b => (replaceTerm1(context.replaceHole(b.term), a, Constructor1(b.pattern.name, b.pattern.args)), emptyMap)})
@@ -57,7 +57,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
       val bExpr = beta.expr
       beta.expr match {
         case bTerm: Term1 if canFoldOrGenarilize(bTerm) => 
-          beta.ancestors.find {n1: Node1 => n1.expr match {case a: Term1 => instanceOf(a, bTerm); case _ => false}} match {            
+          beta.ancestors.find {n1: Node1 => n1.expr match {case a: Term1 => instanceOf(a, bTerm); case _ => false}} match {
             case Some(alpha) => {beta.repeatedOf = alpha;transformed = true;}
             case None => {
               beta.ancestors.find 
