@@ -8,7 +8,7 @@ import TermAlgebra._
 import TermAlgebra1._
 
 class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree) {
-  
+  val freeVarsInLetrecs = false
   def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
   
   private def construct(node: Node): Term1 = node.expr match {
@@ -24,21 +24,13 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
           val newBs = (bs zip node.children.tail) map 
             {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
           val newSel = construct(node.children.head)
-          val z = CaseExpression1(newSel, newBs)
-           println("_________________")
-           println(node.expr)
-           println(z)
-           z
+          CaseExpression1(newSel, newBs)
         }
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
           val newBs = (bs zip node.children.tail) map 
             {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
           val newSel = construct(node.children.head)
-          val z = CaseExpression1(newSel, newBs)
-           println("_________________")
-      println(node.expr)
-          println(z)
-          z
+          CaseExpression1(newSel, newBs)
         }
         case RedexCall(f) => {
           if (node.outs.isEmpty) {
@@ -53,34 +45,28 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
             val sub = Map[Variable, Term]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
             val z2 = hlToHl1(z1)
-            //println("_________________")
-            //println(node.expr)
-            //println(z2)
             z2
           } else {
-            // TODO: find all occurences (for choosing an appropriate arity for residual function)
             tree.leafs.filter(n => n.ancestors.contains(node) && 
-              (n.expr match {case ct: Term => equivalent(t, ct); case _=> false})) match {
+              (n.expr match {case ct: Term => TermAlgebra.equivalent(t, ct); case _=> false})) match {
               // call to this function does't result in recursive definition
               case Nil => 
-                val z = construct(node.children.head);
-                //println("_________________")
-                //println(node.expr)
-                //println(z)
-                z
+                construct(node.children.head);
               // call to this function results in recursive definition
               case repeatNodes => {
-                val vars = getFreeVars(t)
-                /*
-                var vars = Set[Variable]()
-                // getting all arguments for recursive definition
-                for (n <- repeatNodes) {
-                  val betaT = n.expr.asInstanceOf[Term]
-                  val msg = strongMsg(t, betaT)
-                  val args0 = msg.sub2 map {p => p._1}
-                  vars = vars ++ args0
+                var vars: Set[Variable] = null
+                if (freeVarsInLetrecs){
+                  vars = Set[Variable]()
+                  for (n <- repeatNodes) {
+                    val betaT = n.expr.asInstanceOf[Term]
+                    val msg = strongMsg(t, betaT)
+                    val args0 = msg.sub2 map {p => p._1}
+                    vars = vars ++ args0
+                  }
                 }
-                */
+                else {
+                  vars = getFreeVars(t)
+                }
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}
                 val newVars = args map {p => Variable1(createVar().name)}
@@ -91,11 +77,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                 val lam = constructLambda1(newVars, expr)
                 val appHead = Variable1(node.signature._1)
                 appHead.call = true
-                val z = LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
-                //println("_________________")
-                //println(node.expr)
-                //println(z)
-                z
+                LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
               }
             }            
           }
@@ -108,11 +90,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
       val ts = nodes map construct
       val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
           {pair => (Variable1(pair._1._1.name), pair._2)})
-      val z = construct(node0)/subs
-      println("_________________")
-      println(node.expr)
-      println(z)
-      z
+      construct(node0)/subs
     }
   }
   
