@@ -72,14 +72,14 @@ class CodeConstructor(val tree: ProcessTree1) {
               term
             else{
             val letrecCallNode = node.children.head
-            val letrecCall = letrecCallNode.expr.asInstanceOf[Term1]
+            val letrecCall = letrecCallNode.expr
             tree.leafs filter {_.repeatedOf == letrecCallNode} match {
-              case Nil => construct(letrecCallNode.children.head) 
+              case Nil => construct(letrecCallNode) 
               case repeatNodes => {
                 var vars = Set[Variable1]()
                 for (n <- repeatNodes) {
                   val repeatTerm = n.expr.asInstanceOf[Term1]
-                  val msg = strongMsg(letrecCall, repeatTerm)
+                  val msg = strongMsg(letrecCall.asInstanceOf[Term1], repeatTerm)
                   val args0 = msg.sub2 map {p => p._1}
                   vars = vars ++ args0
                 }
