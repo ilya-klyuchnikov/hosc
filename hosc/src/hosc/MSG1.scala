@@ -50,8 +50,8 @@ object MSG1 {
     
     val evidentSub = g.dSub filter (tr => f(tr._2, tr._3))
     val residualSub = g.dSub remove (tr => f(tr._2, tr._3))
-    val evidentMap = Map[Variable1, Term1]() ++ (evidentSub map (tr => (tr._1, tr._2)))
-    val term = g.term/evidentMap
+    val evidentMap = Map[Variable1, Variable1]() ++ (evidentSub map (tr => (tr._1, tr._2.asInstanceOf[Variable1])))
+    val term = g.term\\evidentMap
     val s1 = residualSub.map(triple => (triple._1, triple._2))
     val s2 = residualSub.map(triple => (triple._1, triple._3))
     Generalization(term, s1, s2)
