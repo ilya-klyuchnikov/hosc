@@ -30,20 +30,21 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
           }
           case RedexCaseVar1(v, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
-              {b => (replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args)), emptyMap)})
+              {b => (freshBinders(replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args))), emptyMap)})
           case RedexCaseVarApp1(a, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
-              {b => (replaceTerm1(context.replaceHole(b.term), a, Constructor1(b.pattern.name, b.pattern.args)), emptyMap)})
+              {b => (freshBinders(replaceTerm1(context.replaceHole(b.term), a, Constructor1(b.pattern.name, b.pattern.args))), emptyMap)})
           case RedexCall1(f) =>
             val lam = defs(f)
-            (context.replaceHole(freshBinders(lam)), emptyMap) :: Nil
+            val lam1 = freshBinders(lam)
+            (context.replaceHole(lam1), emptyMap) :: Nil
           case RedexLetRec1(letrec) => {
             defs += letrec.binding
             (context.replaceHole(letrec.expr), emptyMap) :: Nil}
         }
       }
       case _ => {
-        val t1 = t/Map(); t1.label = null  
+        val t1 = freshBinders(t); t1.label = null  
         (t1, emptyMap) :: Nil    
       }
     }    
@@ -87,6 +88,16 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
   
   def makeAbstraction(alpha: Node1, beta: Node1): Unit = {
     val g = msg(alpha.expr.asInstanceOf[Term1], beta.expr.asInstanceOf[Term1])
-    tree.replace(alpha, LetExpression1(g.sub1, g.term))
+    var t = g.term
+    var subs = g.sub1
+    var resSub = List[Substitution]()
+    var set = Set[Variable1]()
+    for (sub <- subs) {
+      sub._2 match {
+        case v: Variable1 if (!set.contains(v)) => set += v; t = t\\Map(sub._1 -> v);
+        case _ => resSub = sub :: resSub
+      }
+    }
+    tree.replace(alpha, LetExpression1(resSub, t))
   }
 }
