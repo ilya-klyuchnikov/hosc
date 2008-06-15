@@ -9,10 +9,6 @@ object TermAlgebra1 {
     i += 1
     Variable1("$" + i) 
   }
-  type Substitution = Tuple2[Variable1, Term1]
-  type DoubleSubstitution = Tuple3[Variable1, Term1, Term1]
-  case class Generalization(term: Term1, sub1: List[Substitution], sub2: List[Substitution])
-  case class Generalization2(term: Term1, dSub: List[DoubleSubstitution])
 
   sealed abstract class TermDecomposition1
   
@@ -76,12 +72,32 @@ object TermAlgebra1 {
   // replace all occurrences of t1 in term by t2 
   def replaceTerm1(term: Term1, t1: Term1, t2: Term1): Term1 = if (term == t1) t2 else term match {
     case v: Variable1 => v
-    case Constructor1(n, args) => Constructor1(n, args map {a => replaceTerm1(a, t1, t2)})
-    case Application1(h, a) => Application1(replaceTerm1(h, t1, t2), replaceTerm1(a, t1, t2))
-    case LambdaAbstraction1(v, t) => LambdaAbstraction1(v, replaceTerm1(t, t1, t2))
-    case CaseExpression1(sel, bs) => 
-      CaseExpression1(replaceTerm1(sel, t1, t2), bs map {b => Branch1(b.pattern, replaceTerm1(b.term, t1, t2))})
-    case letrec : LetRecExpression1 => letrec
+    case c@Constructor1(n, args) => {
+      val newC = Constructor1(n, args map {a => replaceTerm1(a, t1, t2)})
+      newC.label = c.label
+      newC
+    }
+    case app@Application1(h, a) => {
+      val newApp = Application1(replaceTerm1(h, t1, t2), replaceTerm1(a, t1, t2))
+      newApp.label = app.label
+      newApp
+    }
+    case lambda@LambdaAbstraction1(v, t) => {
+      val newLambda = LambdaAbstraction1(v, replaceTerm1(t, t1, t2))
+      newLambda.label = lambda.label
+      newLambda
+    }
+    case caze@CaseExpression1(sel, bs) => { 
+      val newCase = CaseExpression1(replaceTerm1(sel, t1, t2), 
+          bs map {b => Branch1(b.pattern, replaceTerm1(b.term, t1, t2))})
+      newCase.label = caze.label
+      newCase
+    }
+    case letrec @ LetRecExpression1((v, lambda), expr) => {
+      val newLetrec = LetRecExpression1((v, replaceTerm1(lambda, t1, t2)), replaceTerm1(expr, t1, t2))
+      newLetrec.label = letrec.label
+      newLetrec
+    }
   }
   
   def extractAppArgs1(term: Term1): List[Term1] = term match {
@@ -187,15 +203,23 @@ object TermAlgebra1 {
   }
   
   def freshBinders(term: Term1): Term1 = term match {
-    case v: Variable1 => v
-    case Constructor1(name, args) => Constructor1(name, args map (freshBinders(_)))
-    case Application1(h, a) => Application1(freshBinders(h), freshBinders(a))
-    case LambdaAbstraction1(v, t) => {
+    case v: Variable1 => val v1 = Variable1(v.name); v1.call = v.call; v1.label = v.label; v1
+    case c@Constructor1(name, args) => val t=Constructor1(name, args map (freshBinders(_))); t.label = c.label; t 
+    case app@Application1(h, a) => val t=Application1(freshBinders(h), freshBinders(a)); t.label=app.label;t
+    case la@LambdaAbstraction1(v, t) => {
       val freshV = newVar1()
-      LambdaAbstraction1(freshV, freshBinders(t)/Map(v -> freshV))
+      val t1 = LambdaAbstraction1(freshV, freshBinders(t)/Map(v -> freshV))
+      t1.label = la.label; t1
     }
-    case CaseExpression1(sel, bs) => CaseExpression1(freshBinders(sel), bs map {freshBinders(_)})
-    case LetRecExpression1((v, term), expr) => LetRecExpression1((v, freshBinders(term)), freshBinders(expr))
+    case ce@CaseExpression1(sel, bs) => {
+      val t = CaseExpression1(freshBinders(sel), bs map {freshBinders(_)})
+      t.label = ce.label
+      t
+    }
+    case lr@LetRecExpression1((v, term), expr) => {
+      val t = LetRecExpression1((v, freshBinders(term)), freshBinders(expr))
+      t.label = lr.label; t
+    }
   }
 
   def freshBinders(b: Branch1): Branch1 = {
