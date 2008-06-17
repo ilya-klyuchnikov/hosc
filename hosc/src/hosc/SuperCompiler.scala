@@ -77,7 +77,17 @@ class SuperCompiler(program: Program){
     if (g.sub1.isEmpty){
       t.replace(alpha, g.term)
     } else {
-      t.replace(alpha, LetExpression(g.sub1, g.term))
+      var term = g.term
+      var subs = g.sub1
+      var resSub = List[Substitution]()
+      var set = Set[Variable]()
+      for (sub <- subs) {
+        sub._2 match {
+          case v: Variable if (!set.contains(v)) => set += v; term = term\\Map(sub._1 -> v);
+          case _ => resSub = sub :: resSub
+        }
+      }
+      t.replace(alpha, LetExpression(resSub, term))
     }    
   }
   
