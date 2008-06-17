@@ -1,5 +1,7 @@
 package hosc;
 
+import HLanguage._
+
 class ProcessTreeSVG(tree: ProcessTree) {
   var map = Map[ProcessTree.Node, Tuple4[Int, Int, Int, Int]]()
   
@@ -44,8 +46,12 @@ class ProcessTreeSVG(tree: ProcessTree) {
         children += 
           <svg:line x1={"" + (trX+width(node)/2)} y1={""+(trY+30)} x2={"" + (trX+trChX+width(child)/2)} y2={""+(trY+100)}/>
         if (!out.substitution.isEmpty)
-        children +=
-          <svg:text x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
+        children += (node.expr match {
+          case l : LetExpression =>
+          <svg:text fill="red" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
+          case _ =>
+          <svg:text fill="green" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
+        })
         children ++= nodeToSVG(child, trX + trChX, trY + 100)
         trChX += width(child)
       }

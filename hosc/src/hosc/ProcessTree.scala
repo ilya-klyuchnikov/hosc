@@ -124,12 +124,13 @@ object ProcessTree {
     def sub(map: Map[Variable, Variable]): Unit = {
       expr = expr\\map        
       for (e <- outs) {
+        e.substitution = Map(e.substitution.toList.map({p => Pair[Variable, Term](p._1\\map, p._2\\map)}):_*)
         e.child.sub(map)
       }
     }
   }
   
-  class Edge(val parent: Node, var child: Node, val substitution: Map[Variable, Term]) {
+  class Edge(val parent: Node, var child: Node, var substitution: Map[Variable, Term]) {
     override def toString = "Edge("+ substitution + ", " + child + ")"
   }
   

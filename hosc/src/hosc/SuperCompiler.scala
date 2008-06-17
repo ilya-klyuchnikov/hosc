@@ -9,7 +9,7 @@ class SuperCompiler(program: Program){
   
   def driveExp(expr: BaseExpression): List[Pair[Term, Map[Variable, Term]]] = expr match {
     case LetExpression(bs, t) => {
-      (t.asInstanceOf[Term], Map[Variable, Term]()) :: 
+      (t.asInstanceOf[Term], Map[Variable, Term](bs map {p => (p._1, p._2.asInstanceOf[Term])} :_*)) :: 
         (bs map {b => (b._2.asInstanceOf[Term], emptyMap)}) 
     }
     case t: Term => decompose(t) match {
@@ -31,7 +31,7 @@ class SuperCompiler(program: Program){
         }
         case RedexCaseVar(v, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
-            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})  
+            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), Map(v-> Constructor(b.pattern.name, b.pattern.args)))})  
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
             {b => (replaceTerm(context.replaceHole(b.term), a, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})

@@ -59,7 +59,7 @@ object HLanguage {
    }
    case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends BaseExpression {
      def \\(s: Map[Variable, Variable]) = LetExpression(bs map {b => (b._1\\s, b._2\\s)}, expr\\s);
-     override def toString = "(let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr + ")" 
+     override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr 
      def toDoc = group("let" :: 
            nest(2, ED :/: bs.foldRight(ED){(b, y) => group (b._1.toDoc :: " = " :: b._2.toDoc) :/: y})
            :/: "in " :: nest(2, ED :/: expr.toDoc))
