@@ -31,7 +31,7 @@ class HOSC {
     <div>
     <h2>Supercompiled Expression</h2>
     <div><pre>{writer1.toString}</pre></div>
-    <h2>Supercompiled Expression Sugared</h2>
+    <h2>Supercompiled Expression Ensugared</h2>
     <div><pre>{writer.toString}</pre></div>
     <h2>Partial Process Tree</h2>
     <div>{svg}</div>
