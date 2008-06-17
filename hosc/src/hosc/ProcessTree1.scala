@@ -34,6 +34,8 @@ object ProcessTree1 {
     }
     
     def children(): List[Node1] = outs map {edge => edge.child}
+    
+    def allChildren(): Set[Node1] = Set[Node1](children():_*) ++ ((children :\ Set[Node1]()) {(a, b) => b ++ a.allChildren()})
 
     def ancestors(): List[Node1] = if (in == null) Nil else in.parent :: in.parent.ancestors
     
