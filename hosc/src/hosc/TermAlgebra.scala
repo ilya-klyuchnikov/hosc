@@ -102,8 +102,8 @@ object TermAlgebra {
     case _ => term2 match {
       case Constructor(_, args) => args exists (he(term1, _, binders))
       case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
-      case Application(h, a) => he(term1, h, binders) || he(term1, a, binders)
-      case CaseExpression(sel, bs) => he(term1, sel, binders)
+      case a:Application => lineApp(a) exists (he(term1, _, binders))
+      case CaseExpression(sel, bs) => he(term1, sel, binders) || (bs exists {b => he(term1, b.term)})
       case _ => false
     }
   }
@@ -114,7 +114,10 @@ object TermAlgebra {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2, binders))
     case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders)
-    case (Application(h1, a1), Application(h2, a2)) => he(h1, h2, binders) && he(a1, a2, binders)
+    case (a1: Application, a2: Application) => {
+      val (line1, line2) = (lineApp(a1), lineApp(a2)) 
+      line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders)))
+    }
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB
       val bs2_ = bs2 sort compareB
@@ -362,6 +365,11 @@ object TermAlgebra {
   def extractAppArgs(term: Term): List[Term] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
+  }
+  
+  def lineApp(term: Term): List[Term] = term match {
+    case Application(h, a) => lineApp(h) ::: (a:: Nil)
+    case t => t :: Nil
   }
   
   def getAllVars(expr: Expression): Set[Variable] = expr match {
