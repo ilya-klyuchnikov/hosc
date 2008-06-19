@@ -30,7 +30,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
           }
           case RedexCaseVar1(v, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
-              {b => (freshBinders(replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args))), emptyMap)})
+              {b => (freshBinders(replaceTerm1(context.replaceHole(b.term), v, Constructor1(b.pattern.name, b.pattern.args))), Map(v-> Constructor1(b.pattern.name, b.pattern.args)))})
           case RedexCaseVarApp1(a, CaseExpression1(sel, bs)) =>
             (sel, emptyMap) :: (bs map 
               {b => (freshBinders(replaceTerm1(context.replaceHole(b.term), a, Constructor1(b.pattern.name, b.pattern.args))), emptyMap)})
@@ -62,7 +62,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
             case Some(alpha) => {beta.repeatedOf = alpha;transformed = true;}
             case None => {
               beta.ancestors.find 
-                {n1: Node1 => n1.expr match {case a: Term1 => he(a, bTerm); case _ => false}} 
+                {n1: Node1 => n1.expr match {case a: Term1 => heByCoupling(a, bTerm); case _ => false}} 
                   match {
                     case Some(alpha) => {
                       val aTerm = alpha.expr.asInstanceOf[Term1] 
@@ -98,6 +98,12 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
         case _ => resSub = sub :: resSub
       }
     }
-    tree.replace(alpha, LetExpression1(resSub, t))
+    println("GENERALIZING")
+    println(alpha.expr)
+    println(beta.expr)
+    val let = LetExpression1(resSub, t) 
+    println(g)
+    println(let)
+    tree.replace(alpha, let)
   }
 }
