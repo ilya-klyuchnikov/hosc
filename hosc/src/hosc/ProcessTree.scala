@@ -67,7 +67,7 @@ object ProcessTree {
                 node1.expr match {
                   case pt: Term => {
                     if 
-                    (equivalent(pt, t)) //(instanceOf(pt, t)) 
+                    (equivalent(pt, t))
                     return node1
                   }
                   case _ => 
