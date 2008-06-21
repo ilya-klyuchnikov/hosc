@@ -46,24 +46,18 @@ class SuperCompiler(program: Program){
       val bExpr = beta.expr
       beta.expr match {
         case bTerm: Term if callInRedex_?(bTerm) => 
-          beta.ancestors.find {n1: Node => n1.expr match {case c: Term => he(c, bTerm); case _ => false}} match {
+          beta.ancestors.find {n1: Node => n1.expr match {case c: Term => heByCoupling(c, bTerm); case _ => false}} match {
             case None => drive(p, beta)
             case Some(alpha) => {
-              val aTerm = alpha.expr.asInstanceOf[Term]
-              val msg_ = msg(aTerm, bTerm)
-              if (isConV(msg_.term)){
-                drive(p, beta)
-              } else {
-                if (instanceOf(aTerm, bTerm))
-                  makeAbstraction(p, beta, alpha)
-                else
-                  makeAbstraction(p, alpha, beta)
-              }
+              val aTerm = alpha.expr.asInstanceOf[Term]              
+              if (instanceOf(aTerm, bTerm))
+                makeAbstraction(p, beta, alpha)
+              else
+                makeAbstraction(p, alpha, beta)              
             }
           }        
         case _ => drive(p, beta)
-      }
-      
+      }      
     }
     renameVars(p)
   }  
@@ -89,32 +83,6 @@ class SuperCompiler(program: Program){
       }
       t.replace(alpha, LetExpression(resSub, term))
     }    
-  }
-  
-  // a < b
-  def extract(t: ProcessTree, alpha: Node, beta: Node): Unit = {
-    val (aTerm, bTerm) = (alpha.expr.asInstanceOf[Term], beta.expr.asInstanceOf[Term])
-    val nv = newVar()
-    var extractedTerm: Term  = null
-    def extract1(t: Term): Term = {
-       if (extractedTerm != null || !he(aTerm, t)) return t
-       var t1: Term = null
-       t match {
-         case Constructor(name, args) => t1 = Constructor(name, args map extract1);
-         case Application(h, a) => t1 = Application(extract1(h), extract1(a));
-         case LambdaAbstraction(v, lt) => t1 = LambdaAbstraction(v, extract1(lt));
-         case CaseExpression(sel, bs) => t1 = CaseExpression(extract1(sel), bs map {b => Branch(b.pattern, extract1(b.term))})
-         case x => t1 = x
-       }
-       if (extractedTerm == null) {
-         extractedTerm = t1
-         return nv
-       } else {
-         return t1
-       }
-    }
-    val nt = extract1(bTerm)
-    t.replace(beta, LetExpression(List((nv, extractedTerm)), nt))
   }
   
   def renameVars(p: ProcessTree): ProcessTree = {
