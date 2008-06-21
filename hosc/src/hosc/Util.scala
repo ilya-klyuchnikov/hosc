@@ -65,6 +65,8 @@ object Util {
     term
   }
   
+  def termFromString(input: String) = HParsers.parseTerm(new CharArrayReader(input.toCharArray)).get
+  
   def typeForGroundTerm(input: String, program: Program) = {
     val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
