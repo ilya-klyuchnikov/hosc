@@ -7,6 +7,7 @@ import HLUtils._
 import ProcessTree1._
 import MSG1._
 import HE1._
+import util.Canonizer.{canonize1 => can}
 
 class Transformer(val tree: ProcessTree1, val program: Program) {
   val emptyMap = Map[Variable1, Term1]()
@@ -58,8 +59,14 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
       val bExpr = beta.expr
       beta.expr match {
         case bTerm: Term1 if canFoldOrGenarilize(bTerm) => 
-          beta.ancestors.find {n1: Node1 => n1.expr match {case a: Term1 => instanceOf(a, bTerm); case _ => false}} match {
-            case Some(alpha) => {beta.repeatedOf = alpha;transformed = true;}
+          beta.ancestors.find 
+          {
+            n1: Node1 => n1.expr match {
+              case a: Term1 => if (bTerm.label == null) callInRedex1_?(a) && instanceOf(a, bTerm) else instanceOf(a, bTerm); 
+              case _ => false
+            }
+          } match {
+            case Some(alpha) => {beta.repeatedOf = alpha; transformed = true;}
             case None => {
               beta.ancestors.find 
                 {n1: Node1 => n1.expr match {case a: Term1 => heByCoupling(a, bTerm); case _ => false}} 
@@ -87,21 +94,15 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
   }
   
   def makeAbstraction(alpha: Node1, beta: Node1): Unit = {
-    val g = msg(alpha.expr.asInstanceOf[Term1], beta.expr.asInstanceOf[Term1])
+    val alphaTerm = alpha.expr.asInstanceOf[Term1]
+    val betaTerm = beta.expr.asInstanceOf[Term1]
+    val g = msg(alphaTerm, betaTerm)
     var t = g.term
     var subs = g.sub1
-    var resSub = List[Substitution]()
-    var set = Set[Variable1]()
-    for (sub <- subs) {
-      sub._2 match {
-        case v: Variable1 if (!set.contains(v)) => set += v; t = t\\Map(sub._1 -> v);
-        case _ => resSub = sub :: resSub
-      }
-    }
     println("GENERALIZING")
-    println(alpha.expr)
-    println(beta.expr)
-    val let = LetExpression1(resSub, t) 
+    println(can(alphaTerm))
+    println(can(betaTerm))
+    val let = LetExpression1(subs, g.term) 
     println(g)
     println(let)
     tree.replace(alpha, let)
