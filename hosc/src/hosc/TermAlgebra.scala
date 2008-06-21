@@ -84,6 +84,8 @@ object TermAlgebra {
   
   def he(term1: Term, term2: Term): Boolean = he(term1, term2, Nil)
   
+  def heByCoupling(term1: Term, term2: Term): Boolean = heByCoupling(term1, term2, Nil)
+  
   def strictHe(term1: Term, term2: Term) = heByDiving(term1, term2, Nil)
   
   private def he(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
@@ -195,13 +197,6 @@ object TermAlgebra {
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
         l2 ++= List((rs, t1r, t2r))
       }
-      /*
-      case (v, Application(h1, a1), Application(h2, a2)) => {
-        val head = newVar()
-        val arg = newVar()
-        t = applySubstitution(t, Map(v -> Application(head, arg)))
-        l2 ++= List((head, h1, h2), (arg, a1, a2))
-      }*/
       case (v, app1: Application, app2: Application) 
       if getAppLevel(app1) == getAppLevel(app2) && getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
         val head = getCoreLocalHead(app1)
