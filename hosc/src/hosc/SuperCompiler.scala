@@ -45,22 +45,30 @@ class SuperCompiler(program: Program){
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term if callInRedex_?(bTerm) => 
-          beta.ancestors.find {n1: Node => n1.expr match {case c: Term => heByCoupling(c, bTerm); case _ => false}} match {
-            case None => drive(p, beta)
-            case Some(alpha) => {
-              val aTerm = alpha.expr.asInstanceOf[Term]              
-              if (instanceOf(aTerm, bTerm))
-                makeAbstraction(p, beta, alpha)
-              else
-                makeAbstraction(p, alpha, beta)              
+        case bTerm: Term if callInRedex_?(bTerm) =>
+          beta.ancestors.find 
+          {n1: Node => n1.expr match {case c: Term => callInRedex_?(c) && instanceOf(c, bTerm); case _ => false}} 
+            match {
+              case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+              case None =>
+              beta.ancestors.find 
+              {n1: Node => n1.expr match {case c: Term => callInRedex_?(c)&& heByCoupling(c, bTerm); case _ => false}} 
+                match {
+                  case None => drive(p, beta)
+                  case Some(alpha) => makeAbstraction(p, alpha, beta)
+                }
             }
-          }        
+                  
         case _ => drive(p, beta)
       }      
     }
     renameVars(p)
-  }  
+  }
+  
+  def instanceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
+    case aTerm: Term => callInRedex_?(aTerm) && instanceOf(aTerm, bTerm);
+    case _ => false
+  }
   
   def drive(t: ProcessTree, n: Node): Unit = {
     t.addChildren(n, driveExp(n.expr))
@@ -73,15 +81,7 @@ class SuperCompiler(program: Program){
     } else {
       var term = g.term
       var subs = g.sub1
-      var resSub = List[Substitution]()
-      var set = Set[Variable]()
-      for (sub <- subs) {
-        sub._2 match {
-          case v: Variable if (!set.contains(v)) => set += v; term = term\\Map(sub._1 -> v);
-          case _ => resSub = sub :: resSub
-        }
-      }
-      t.replace(alpha, LetExpression(resSub, term))
+      t.replace(alpha, LetExpression(g.sub1, g.term))
     }    
   }
   
