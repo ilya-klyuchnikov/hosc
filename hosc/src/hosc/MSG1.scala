@@ -41,10 +41,8 @@ object MSG1 {
       g
     }
     val g = msg_(term1, term2)
-    val bv = getBoundedVars(g.term) // alpha conversion!!
     def f(t1: Term1, t2: Term1): Boolean = (t1, t2) match {
-      case (v1: Variable1, v2: Variable1) =>
-        v1.name == v2.name  && (v1.call == true && v2.call == true || bv.contains(v1) && bv.contains(v2)) 
+      case (v1: Variable1, v2: Variable1) => v1.name == v2.name 
       case _ => false
     }
     

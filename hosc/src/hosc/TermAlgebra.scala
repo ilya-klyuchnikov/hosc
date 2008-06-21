@@ -161,10 +161,8 @@ object TermAlgebra {
       g
     }
     val g = msg_(term1, term2)
-    val bv = getBoundedVars(g.term) // alpha conversion!!
     def f(t1: Term, t2: Term): Boolean = (t1, t2) match {
-      case (v1: Variable, v2: Variable) =>
-        v1.name == v2.name  && (v1.global == true && v2.global == true || bv.contains(v1) && bv.contains(v2)) 
+      case (v1: Variable, v2: Variable) => v1.name == v2.name
       case _ => false
     }
     
