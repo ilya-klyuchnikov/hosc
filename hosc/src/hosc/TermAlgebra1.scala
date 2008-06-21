@@ -134,7 +134,7 @@ object TermAlgebra1 {
     res
   }
   
-  def compareB(b1: Branch1, b2: Branch1) = b1.pattern.name.compareTo(b2.pattern.name) < 0
+  def compareB1(b1: Branch1, b2: Branch1) = b1.pattern.name.compareTo(b2.pattern.name) < 0
   
   def extractAppArgs(term: Term1): List[Term1] = term match {
     case Application1(h, a) => extractAppArgs(h) ::: List(a)
@@ -181,8 +181,8 @@ object TermAlgebra1 {
       case (LambdaAbstraction1(b1, v1), LambdaAbstraction1(b2, v2)) =>
         eq1(b1, b2) && eq1(v1, v2)
       case (CaseExpression1(sel1, bs1), CaseExpression1(sel2, bs2)) => {
-        val bs1s = bs1 sort compareB
-        val bs2s = bs2 sort compareB
+        val bs1s = bs1 sort compareB1
+        val bs2s = bs2 sort compareB1
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){
           eq1(sel1, sel2) && ((bs1s zip bs2s) forall {
             b => ((b._1.pattern.args zip b._2.pattern.args) forall (args => eq1(args._1, args._2))) &&

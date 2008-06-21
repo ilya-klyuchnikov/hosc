@@ -50,8 +50,8 @@ object HE1 {
       line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders, letrecs)))
     }
     case (CaseExpression1(sel1, bs1), CaseExpression1(sel2, bs2)) => {
-      val bs1_ = bs1 sort compareB
-      val bs2_ = bs2 sort compareB
+      val bs1_ = bs1 sort compareB1
+      val bs2_ = bs2 sort compareB1
       he(sel1, sel2, binders, letrecs) && 
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders, letrecs)))

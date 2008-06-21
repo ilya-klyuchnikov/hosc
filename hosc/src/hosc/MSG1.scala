@@ -62,6 +62,9 @@ object MSG1 {
     var t = g.term;
     // terms need to have the same label to match:
     for (dSub <- g.dSub) if (dSub._2.label != dSub._3.label) l2 += dSub else dSub match {
+      /*case (v, v1: Variable1, v2: Variable1) if v1 == v2 => {
+        t = t\\Map(v -> v1)
+      }*/
       case (v, Constructor1(n1, a1), Constructor1(n2, a2)) if n1 == n2 => {
         val newVars = a1.map(arg => newVar1())
         val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
@@ -99,8 +102,8 @@ object MSG1 {
         t = t/Map(v -> term)
       }
       case (v, CaseExpression1(sel1, bs1), CaseExpression1(sel2, bs2)) => {
-        val bs1s = bs1 sort compareB
-        val bs2s = bs2 sort compareB
+        val bs1s = bs1 sort compareB1
+        val bs2s = bs2 sort compareB1
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){
           // binders are refreshed and the same
           val bsR = for(bs <- bs1s zip bs2s) yield {
@@ -139,9 +142,11 @@ object MSG1 {
   
   //returns Pair[List[DoubleSubstitution], List[DoubleSubstitution]]
   // the first element of pair is list of common subs
-  private def f1(ds: DoubleSubstitution, p: Pair[List[DoubleSubstitution], List[DoubleSubstitution]]) = p match {
-    case (Nil, l) => l.partition(triple => triple._2 == ds._2 && triple._3 == ds._3) match {
-      case (Nil, _) => (Nil, ds :: l) 
+  private def f1(ds: DoubleSubstitution, p: Pair[List[DoubleSubstitution], List[DoubleSubstitution]]):
+    Pair[List[DoubleSubstitution], List[DoubleSubstitution]] = 
+  p match {
+    case (Nil, r) => r.partition(rsub => rsub._2 == ds._2 && rsub._3 == ds._3) match {
+      case (Nil, _) => (Nil, ds :: r) 
       case (same, dif) => (ds :: same, dif)
     }
     case (l1 @ s :: _, l2) => if (ds._2 == s._2 && ds._3 == s._3) (ds :: l1, l2) else (l1, ds :: l2)
