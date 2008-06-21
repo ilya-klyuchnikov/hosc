@@ -45,28 +45,40 @@ class SuperCompiler(program: Program){
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term if callInRedex_?(bTerm) =>
-          beta.ancestors.find 
-          {n1: Node => n1.expr match {case c: Term => callInRedex_?(c) && instanceOf(c, bTerm); case _ => false}} 
-            match {
-              case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
-              case None =>
-              beta.ancestors.find 
-              {n1: Node => n1.expr match {case c: Term => callInRedex_?(c)&& heByCoupling(c, bTerm); case _ => false}} 
-                match {
-                  case None => drive(p, beta)
-                  case Some(alpha) => makeAbstraction(p, alpha, beta)
+        case bTerm: Term if callInRedex_?(bTerm) => {
+          beta.ancestors find equivalenceTest(bTerm) match {
+            case Some(alpha) => beta.repeatedOf = alpha; 
+            case None => {
+              beta.ancestors find instanceTest(bTerm) match {
+                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case None => { 
+                  beta.ancestors find heByCouplingTest(bTerm) match {
+                    case None => drive(p, beta)
+                    case Some(alpha) => makeAbstraction(p, alpha, beta)
+                  }
                 }
+              }
             }
-                  
+          }
+        }
         case _ => drive(p, beta)
       }      
     }
     renameVars(p)
   }
   
-  def instanceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
+  private def instanceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
     case aTerm: Term => callInRedex_?(aTerm) && instanceOf(aTerm, bTerm);
+    case _ => false
+  }
+  
+  private def equivalenceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
+    case aTerm: Term => equivalent(aTerm, bTerm);
+    case _ => false
+  }
+  
+  private def heByCouplingTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
+    case aTerm: Term => callInRedex_?(aTerm) && heByCoupling(aTerm, bTerm);
     case _ => false
   }
   

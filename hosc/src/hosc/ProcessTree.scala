@@ -10,6 +10,7 @@ object ProcessTree {
   class Node(var expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
     var signature: (String, List[Variable]) = null
+    var repeatedOf: Node = null
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
@@ -24,94 +25,14 @@ object ProcessTree {
 
     def ancestors(): List[Node] = if (in == null) Nil else in.parent :: in.parent.ancestors
 
-    def isProcessed: Boolean = expr match {
+    def isProcessed: Boolean = (repeatedOf != null || 
+      (expr match {
       case Constructor(_, Nil) => true
       case v : Variable if v.global == false => true
-      case t: Term => {
-        decompose(t) match {
-          case o: Observable => false
-          case c: Context => c.redex match {
-            case r: RedexCall => {
-              var edge = in
-              while (edge != null) {
-                val node1 = edge.parent
-                node1.expr match {
-                  case pt: Term => 
-                    if 
-                      (equivalent(pt, t))//(instanceOf(pt, t)) 
-                    return true
-                  case _ => 
-                }
-                edge = node1.in
-              }
-              false
-            }
-            case _ => false
-          }
-        }
-      }
       case _ => false
-    }
+    }))
     
-    def getRepParent(): Node = expr match {
-      case Constructor(_, Nil) => null
-      case v : Variable if v.global == false => null
-      case t: Term => {
-        decompose(t) match {
-          case o: Observable => null
-          case c: Context => c.redex match {
-            case r: RedexCall => {
-              var edge = in
-              while (edge != null) {
-                val node1 = edge.parent
-                node1.expr match {
-                  case pt: Term => {
-                    if 
-                    (equivalent(pt, t))
-                    return node1
-                  }
-                  case _ => 
-                }
-                edge = node1.in
-              }
-              null
-            }
-            case _ => null
-          }
-        }
-      }
-      case _ => null
-    }
-    
-    def getInstanceParent(): Node = expr match {
-    case Constructor(_, Nil) => null
-    case v : Variable if v.global == false => null
-    case t: Term => {
-      decompose(t) match {
-        case o: Observable => null
-        case c: Context => c.redex match {
-          case r: RedexCall => {
-            var edge = in
-            while (edge != null) {
-              val node1 = edge.parent
-              node1.expr match {
-                case pt: Term => {
-                  if 
-                    (instanceOf(pt, t)) 
-                  return node1
-                }
-                case _ => 
-              }
-              edge = node1.in
-            }
-            null
-          }
-          case _ => null
-        }
-      }
-    }
-    case _ => null
-  }
+    def getRepParent(): Node = repeatedOf
     
     def getAllVars(): Set[Variable] = {
       var vars = TermAlgebra.getAllVars(expr)
