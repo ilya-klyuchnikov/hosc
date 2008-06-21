@@ -235,5 +235,13 @@ object TermAlgebra1 {
     }
     case _ => false
   }))
+  
+  def callInRedex1_?(t: Term1) = decompose1(t) match {
+    case c: Context1 => c.redex match { 
+      case r: RedexCall1 => true
+      case _ => false
+    }
+    case _ => false
+  }
 
 }
