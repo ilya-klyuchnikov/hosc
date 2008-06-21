@@ -1,10 +1,31 @@
 package hosc.util;
 
 import hosc.TermAlgebra1.compareB1
+import hosc.TermAlgebra.compareB
 import hosc.HLanguage1._
 import hosc.HLanguage._
 
 object Canonizer {
+  def canonize(tt: Term):Term = tt match {
+    case v: Variable => v
+    case c@Constructor(name, args) => {
+      Constructor(name, args map canonize)
+    }
+    case la@LambdaAbstraction(x, term) => {
+      LambdaAbstraction(x, canonize(term))
+    }
+    case a@Application(head, arg) => {
+      Application(canonize(head), canonize(arg))
+    }
+    case ce@CaseExpression(sel, bs) => {
+      val sortedBranches = bs sort compareB
+      val canonizedBranches = sortedBranches map {b => Branch(b.pattern, canonize(b.term))}
+      val canonizedSelector = canonize(sel)
+      CaseExpression(canonizedSelector, canonizedBranches)
+    }
+  }
+
+
   def canonize1(tt: Term1):Term1 = tt match {
     case v: Variable1 => v
     case c@Constructor1(name, args) => {
