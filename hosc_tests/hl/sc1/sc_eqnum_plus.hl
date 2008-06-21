@@ -2,15 +2,21 @@ number :: Z | S number;
 boolean :: True | False;
 
 eqnum  (plus x y) (plus y x)
+
 where
 
-plus = %x{ %y {
-case x of {Z: y; S x1: S (plus x1 y);}
-}}
+plus = %x2{ 
+	%y2 {
+  		case x2 of {
+  			Z: y2; 
+  			S x1: S (plus x1 y2);
+  		}
+	}
+}
 
-eqnum = %x { %y {
-	case x of {
-		Z : case y of {Z: True; S y1: False;};
-		S x1: case y of {Z: False; S y1: eqnum x1 y1;};
+eqnum = %x3 { %y3 {
+	case x3 of {
+		Z : case y3 of {Z: True; S y4: False;};
+		S x5: case y3 of {Z: False; S y5: eqnum x5 y5;};
 	}
 }}

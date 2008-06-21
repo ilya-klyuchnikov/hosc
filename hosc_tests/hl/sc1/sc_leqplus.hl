@@ -1,0 +1,18 @@
+list $a :: Nil | Cons $a (list $a);
+number :: Z | S number;
+boolean :: True | False;
+
+leq x (plus x y)
+where
+
+plus = %x{ %y {
+case x of {Z: y; S x1: (plus x1 (S y));}
+}}
+
+leq = %x {%y{
+  case x of {
+    Z: True;
+    S x1: case y of {Z: False; S y1: leq x1 y1;};
+  }
+
+}}
