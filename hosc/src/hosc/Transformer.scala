@@ -102,7 +102,17 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
     println("GENERALIZING")
     println(can(alphaTerm))
     println(can(betaTerm))
-    val let = LetExpression1(subs, g.term) 
+    
+    var resSub = List[Substitution]()
+    var set = Set[Variable1]()
+    for (sub <- subs) {
+      sub match {
+        case (v1, v2: Variable1) if v1.call => t = t\\Map(v1 -> v2);
+        case _ => resSub = sub :: resSub
+      }
+    }
+    
+    val let = LetExpression1(resSub, t) 
     println(g)
     println(let)
     tree.replace(alpha, let)
