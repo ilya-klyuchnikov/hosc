@@ -2,6 +2,7 @@ package hosc;
 
 import HLanguage1._
 import MSG1.msg
+import scala.collection.mutable.ListBuffer
 
 object TermAlgebra1 {
   var i = 0
@@ -116,6 +117,20 @@ object TermAlgebra1 {
       getAllVars1(expr) ++ getAllVars1(b._2) + b._1
   }
   
+  def getVarsOrdered(exprr: Term1): List[Variable1] = {
+    val buffer = new ListBuffer[Variable1]
+    def dump(expr: Term1): Unit = expr match {
+      case v: Variable1 => if (!buffer.contains(v)) buffer + v 
+      case Constructor1(_, args) => args map dump
+      case LambdaAbstraction1(x, term) => dump(x); dump(term)
+      case Application1(head, arg) => dump(head); dump(arg);
+      case CaseExpression1(sel, bs) => dump(sel); bs map {b => b.pattern.args map dump; dump(b.term)};
+      case LetRecExpression1(b, term) => dump(b._1); dump(b._2); dump(term);
+    }
+    dump(exprr)
+    buffer.toList
+  }
+  
   def constructLambda1(vs: List[Variable1], e: Term1): Term1 = {
     def constructLambda_(vs_ : List[Variable1]) : Term1 = vs_ match {
       case Nil => e;
@@ -227,14 +242,6 @@ object TermAlgebra1 {
     val newVars = args map {x => newVar1()}
     Branch1(Pattern1(b.pattern.name, newVars), freshBinders(b.term)/Map((args zip newVars):_*))
   }
-  
-  def canFoldOrGenarilize(t: Term1) = t.label != Repeat() && (t.label==Loop() || (decompose1(t) match {
-    case c: Context1 => c.redex match { 
-      case r: RedexCall1 => true
-      case _ => false
-    }
-    case _ => false
-  }))
   
   def callInRedex1_?(t: Term1) = decompose1(t) match {
     case c: Context1 => c.redex match { 

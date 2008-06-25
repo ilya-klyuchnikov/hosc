@@ -58,28 +58,14 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
       val beta = tree.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term1 if canFoldOrGenarilize(bTerm) => 
-          beta.ancestors.find 
-          {
-            n1: Node1 => n1.expr match {
-              case a: Term1 => if (bTerm.label == null) callInRedex1_?(a) && instanceOf(a, bTerm) else instanceOf(a, bTerm); 
-              case _ => false
-            }
-          } match {
+        case bTerm: Term1 if canBeEnchanced(bTerm) => 
+          beta.ancestors find instanceTest(bTerm) match {
             case Some(alpha) => {beta.repeatedOf = alpha; transformed = true;}
             case None => {
-              beta.ancestors.find 
-                {n1: Node1 => n1.expr match {case a: Term1 => heByCoupling(a, bTerm); case _ => false}} 
-                  match {
-                    case Some(alpha) => {
-                      val aTerm = alpha.expr.asInstanceOf[Term1] 
-                      msg(aTerm, bTerm).term match {
-                        case Variable1(_) => {drive(beta); transformed = true}
-                        case _ => {makeAbstraction(alpha, beta); transformed = true}
-                      }
-                    }
-                    case None => {drive(beta); transformed = true}
-                  }
+              beta.ancestors find heByCouplingTest(bTerm) match {
+                case Some(alpha) => makeAbstraction(alpha, beta); transformed = true
+                case None => drive(beta); transformed = true
+              }
             }
           }
         case _ => {drive(beta); transformed = true}
@@ -87,6 +73,58 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
       
     }
     transformed
+  }
+  
+  private def canBeEnchanced(t: Term1) = 
+    if (t.label==Loop()) {
+      true 
+    } else if (t.label != Repeat()) decompose1(t) match {
+      case c: Context1 => c.redex match { 
+        case r: RedexCall1 => true
+        case r: RedexCaseVar1 => true
+        case r: RedexCaseVarApp1 => true
+        case r: RedexLetRec1 => true
+        case _ => false
+      }
+      case _ => false
+    } else {
+      false
+    }
+  
+  private def instanceTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
+    case aTerm: Term1 => /*!letrecDirectChild(aNode) &&*/ sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
+    case _ => false
+  }
+  
+  private def heByCouplingTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
+    case aTerm: Term1 => !letrecDirectChild(aNode) && sameRedex(aTerm, bTerm) && heByCoupling(aTerm, bTerm);
+    case _ => false
+  } 
+  
+  private def letrecDirectChild(n: Node1): Boolean = {
+    for (a <- n.ancestors) {
+      if (a.children.size > 1) {
+        return false
+      } else {
+        a.expr match {
+          case possibleLetrec: Term1 => decompose1(possibleLetrec) match {
+            case possibleLetRecContext: Context1 => possibleLetRecContext.redex match {
+              case RedexLetRec1(_) => if (a.ungeneralized) return true
+              case _ => 
+            }
+          case _ =>
+          }
+         case _ => 
+        }
+      }
+    }
+    false
+  }
+
+  
+  def sameRedex(t1: Term1, t2: Term1) : Boolean = (decompose1(t1), decompose1(t2)) match {
+    case (c1: Context1, c2: Context1) => c1.redex.getClass() == c2.redex.getClass()
+    case _ => false
   }
   
   def drive(n: Node1): Unit = {

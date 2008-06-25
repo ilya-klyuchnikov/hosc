@@ -29,7 +29,7 @@ class CodeConstructor(val tree: ProcessTree1) {
                 val args0 = msg.sub2 map {p => p._1}
                 vars = vars ++ args0
               }
-              val fargs = vars.toList
+              val fargs = getVarsOrdered(term) filter {vars.contains(_)}
               val appHead = Variable1(createFName())
               appHead.call = true
               node.signature = constructApplication1(appHead, fargs)
@@ -58,9 +58,28 @@ class CodeConstructor(val tree: ProcessTree1) {
           case RedexLamApp1(lam, app) => construct(node.children.head)
           case RedexCaseCon1(c, ce) => construct(node.children.head)
           case RedexCaseVar1(v, CaseExpression1(sel, bs)) => {
-            val branches = (bs zip node.children.tail) map {p => Branch1(p._1.pattern, construct(p._2))}
-            val selector = construct(node.children.head)
-            CaseExpression1(selector, branches)
+            node.repeatedOf match {
+              case null => {
+                tree.leafs filter {_.repeatedOf == node} match {
+                  case Nil => {
+                    val branches = (bs zip node.children.tail) map {p => Branch1(p._1.pattern, construct(p._2))}
+                    val selector = construct(node.children.head)
+                    CaseExpression1(selector, branches)
+                  }
+                  case some => {
+                    val branches = (bs zip node.children.tail) map {p => Branch1(p._1.pattern, construct(p._2))}
+                    val selector = construct(node.children.head)
+                    val code = CaseExpression1(selector, branches)
+                    code.label = Loop()
+                    code
+                  }
+                }
+              }
+              case a => {
+                term.label = Repeat()
+                term
+              }
+            }
           }
           case RedexCaseVarApp1(a, CaseExpression1(sel, bs)) => {
             val branches = (bs zip node.children.tail) map {p => Branch1(p._1.pattern, construct(p._2))}
@@ -68,6 +87,7 @@ class CodeConstructor(val tree: ProcessTree1) {
             CaseExpression1(selector, branches)
           }
           case RedexLetRec1(letrec) => {
+            // TODO!!!
             if (node.children.isEmpty) 
               term
             else{
@@ -83,7 +103,7 @@ class CodeConstructor(val tree: ProcessTree1) {
                   val args0 = msg.sub2 map {p => p._1}
                   vars = vars ++ args0
                 }
-                val fargs = vars.toList
+                val fargs = getVarsOrdered(term) filter {vars.contains(_)}
                 val appHead = Variable1(createFName())
                 appHead.call = true
                 node.signature = constructApplication1(appHead, fargs)
