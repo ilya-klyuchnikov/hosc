@@ -9,12 +9,13 @@ class Ungeneralizer(tree: ProcessTree1, constructor: CodeConstructor) {
     var someWorkWasDone = false
     do {
       someWorkWasDone = false
-      val letchilds = tree.leafs filter {_.expr match {case l: LetRecExpression1 => true; case _ => false;}}
-      for (c <- letchilds) {
-        c.ancestors() find {p => p.expr match {case l: LetExpression1 => true; case _ => false}} match {
+      val letrecs = tree.leafs filter {_.expr match {case l: LetRecExpression1 => true; case _ => false;}}
+      for (lr <- letrecs) {
+        lr.ancestors() find {p => p.expr match {case l: LetExpression1 => true; case _ => false}} match {
           case Some(alpha) => {
             val code = constructor.construct(alpha)
-            tree.replace(alpha, code)
+            val ungeneralizedNode = tree.replace(alpha, code)
+            ungeneralizedNode.ungeneralized = true
             ungeneralized = true
             someWorkWasDone = true
           }

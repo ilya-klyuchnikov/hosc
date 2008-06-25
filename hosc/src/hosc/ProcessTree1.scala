@@ -13,6 +13,7 @@ object ProcessTree1 {
     var signature: Term1 = null
     var repeatedOf: Node1 = null
     var permanent = false
+    var ungeneralized = false
       
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
