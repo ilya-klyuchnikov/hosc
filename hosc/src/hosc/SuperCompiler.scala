@@ -45,7 +45,7 @@ class SuperCompiler(program: Program){
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term if callInRedex_?(bTerm) => {
+        case bTerm: Term if canBeEnhanced_?(bTerm) => {
           beta.ancestors find equivalenceTest(bTerm) match {
             case Some(alpha) => beta.repeatedOf = alpha; 
             case None => {
@@ -53,8 +53,8 @@ class SuperCompiler(program: Program){
                 case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
-                    case None => drive(p, beta)
                     case Some(alpha) => makeAbstraction(p, alpha, beta)
+                    case None => drive(p, beta)
                   }
                 }
               }
@@ -68,7 +68,7 @@ class SuperCompiler(program: Program){
   }
   
   private def instanceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
-    case aTerm: Term => callInRedex_?(aTerm) && instanceOf(aTerm, bTerm);
+    case aTerm: Term => sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
     case _ => false
   }
   
@@ -78,7 +78,22 @@ class SuperCompiler(program: Program){
   }
   
   private def heByCouplingTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
-    case aTerm: Term => callInRedex_?(aTerm) && heByCoupling(aTerm, bTerm);
+    case aTerm: Term => sameRedex(aTerm, bTerm) && heByCoupling(aTerm, bTerm);
+    case _ => false
+  }
+  
+  def canBeEnhanced_?(t: Term) = decompose(t) match {
+    case c: Context => c.redex match { 
+      case r: RedexCall => true
+      case r: RedexCaseVar => true
+      case r: RedexCaseVarApp => true
+      case _ => false
+    }
+    case _ => false
+  }
+  
+  def sameRedex(t1: Term, t2: Term) : Boolean = (decompose(t1), decompose(t2)) match {
+    case (c1: Context, c2: Context) => c1.redex.getClass() == c2.redex.getClass()
     case _ => false
   }
   

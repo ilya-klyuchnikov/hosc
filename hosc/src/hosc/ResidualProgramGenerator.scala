@@ -21,10 +21,60 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
         case RedexLamApp(lam, app) => construct(node.children.head)
         case RedexCaseCon(c, ce) => construct(node.children.head)
         case RedexCaseVar(v, CaseExpression(sel, bs)) => {
-          val newBs = (bs zip node.children.tail) map 
-            {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
-          val newSel = construct(node.children.head)
-          CaseExpression1(newSel, newBs)
+          if (node.getRepParent != null) {
+            val alphaNode: Node = node.getRepParent()
+            val alphaT = alphaNode.expr.asInstanceOf[Term]
+            
+            val (appHead, args) = alphaNode.signature
+            val z = constructApplication(Variable(appHead), args)
+            
+            val msg = strongMsg(alphaT, t)
+            // after substitution:
+            val sub = Map[Variable, Term]() ++ msg.sub2
+            val z1 = applySubstitution(z, sub)
+            val z2 = hlToHl1(z1)
+            z2
+          } else {{
+            tree.leafs.filter(n => n.repeatedOf == node) match {
+              case Nil => {
+                val newBs = (bs zip node.children.tail) map 
+                  {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
+                val newSel = construct(node.children.head)
+                CaseExpression1(newSel, newBs)
+              }
+              case repeatNodes => {
+                var vars: Set[Variable] = null
+                if (freeVarsInLetrecs){
+                  vars = Set[Variable]()
+                  for (n <- repeatNodes) {
+                    val betaT = n.expr.asInstanceOf[Term]
+                    val msg = strongMsg(t, betaT)
+                    val args0 = msg.sub2 map {p => p._1}
+                    vars = vars ++ args0
+                  }
+                }
+                else {
+                  vars = getFreeVars(t)
+                }
+                val args0 = vars.toList 
+                val args = args0 map {hlToHl1(_)}
+                val newVars = args map {p => Variable1(createVar().name)}
+                val sub = Map[Variable1, Term1]() ++ 
+                  ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
+                node.signature = (createFName(), args0)
+                
+                val newBs = (bs zip node.children.tail) map 
+                 {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
+                val newSel = construct(node.children.head)
+                val ce = CaseExpression1(newSel, newBs)/sub
+                
+                val lam = constructLambda1(newVars, ce)
+                val appHead = Variable1(node.signature._1)
+                appHead.call = true
+                LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
+              }
+            }          
+          }}
         }
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
           val newBs = (bs zip node.children.tail) map 
@@ -33,7 +83,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
           CaseExpression1(newSel, newBs)
         }
         case RedexCall(f) => {
-          if (node.outs.isEmpty) {
+          if (node.getRepParent != null) {
             val alphaNode: Node = node.getRepParent()
             val alphaT = alphaNode.expr.asInstanceOf[Term]
             
@@ -47,11 +97,11 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
             val z2 = hlToHl1(z1)
             z2
           } else {
-            tree.leafs.filter(n => n.ancestors.contains(node) && 
-              (n.expr match {case ct: Term => TermAlgebra.equivalent(t, ct); case _=> false})) match {
+            tree.leafs.filter(n => n.repeatedOf == node) match {
               // call to this function does't result in recursive definition
-              case Nil => 
+              case Nil => {
                 construct(node.children.head);
+              }
               // call to this function results in recursive definition
               case repeatNodes => {
                 var vars: Set[Variable] = null

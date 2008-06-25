@@ -347,14 +347,6 @@ object TermAlgebra {
     case _ => false
   }
   
-  def callInRedex_?(t: Term) = decompose(t) match {
-    case c: Context => c.redex match { 
-      case r: RedexCall => true
-      case _ => false
-    }
-    case _ => false
-  }
-  
   def extractAppArgs(term: Term): List[Term] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
