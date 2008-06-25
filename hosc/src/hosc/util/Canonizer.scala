@@ -24,6 +24,10 @@ object Canonizer {
       CaseExpression(canonizedSelector, canonizedBranches)
     }
   }
+  
+  def canonize(p: Program): Program = {
+    Program(p.ts, canonize(p.goal), p.fs map {f => Function(f.name, canonize(f.lam).asInstanceOf[LambdaAbstraction])})
+  }
 
 
   def canonize1(tt: Term1):Term1 = tt match {
@@ -51,8 +55,8 @@ object Canonizer {
       ce1.label = ce.label
       ce1
     }    
-    case lr@LetRecExpression1(b, expr) => {
-      val lr1 = LetRecExpression1(b, canonize1(expr))
+    case lr@LetRecExpression1((v, l), expr) => {
+      val lr1 = LetRecExpression1((v, canonize1(l)), canonize1(expr))
       lr1.label = lr.label
       lr1
     }
