@@ -75,10 +75,10 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
     transformed
   }
   
-  private def canBeEnchanced(t: Term1) = 
-    if (t.label==Loop()) {
-      true 
-    } else if (t.label != Repeat()) decompose1(t) match {
+  private def canBeEnchanced(t: Term1) = t.label match {
+    case Loop() => true
+    case Repeat() => false
+    case null => decompose1(t) match {
       case c: Context1 => c.redex match { 
         case r: RedexCall1 => true
         case r: RedexCaseVar1 => true
@@ -87,9 +87,8 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
         case _ => false
       }
       case _ => false
-    } else {
-      false
     }
+  }
   
   private def instanceTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
     case aTerm: Term1 => /*!letrecDirectChild(aNode) &&*/ sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
@@ -109,7 +108,7 @@ class Transformer(val tree: ProcessTree1, val program: Program) {
         a.expr match {
           case possibleLetrec: Term1 => decompose1(possibleLetrec) match {
             case possibleLetRecContext: Context1 => possibleLetRecContext.redex match {
-              case RedexLetRec1(_) => if (a.ungeneralized) return true
+              case RedexLetRec1(_) => return true 
               case _ => 
             }
           case _ =>

@@ -86,34 +86,64 @@ class CodeConstructor(val tree: ProcessTree1) {
             val selector = construct(node.children.head)
             CaseExpression1(selector, branches)
           }
-          case RedexLetRec1(letrec) => {
-            // TODO!!!
-            if (node.children.isEmpty) 
-              term
-            else{
-            val letrecCallNode = node.children.head
-            val letrecCall = letrecCallNode.expr
-            tree.leafs filter {_.repeatedOf == letrecCallNode} match {
-              case Nil => construct(letrecCallNode) 
-              case repeatNodes => {
-                var vars = Set[Variable1]()
-                for (n <- repeatNodes) {
-                  val repeatTerm = n.expr.asInstanceOf[Term1]
-                  val msg = strongMsg(letrecCall.asInstanceOf[Term1], repeatTerm)
-                  val args0 = msg.sub2 map {p => p._1}
-                  vars = vars ++ args0
-                }
-                val fargs = getVarsOrdered(term) filter {vars.contains(_)}
-                val appHead = Variable1(createFName())
-                appHead.call = true
-                node.signature = constructApplication1(appHead, fargs)
-                val freshVars = fargs map {x => newVar1()}
-                val sub = Map((fargs zip freshVars):_*)
-                val lambdaBody = construct(letrecCallNode.children.head)/sub
-                val lambda = constructLambda1(freshVars, lambdaBody)
-                LetRecExpression1((appHead, lambda), node.signature)
+          case RedexLetRec1(letrec) => {            
+            if (node.children.isEmpty) node.repeatedOf match {
+              // case 1: the leaf that is not an instance of it ancestor
+              case null => term
+              // case 2: the leaf that is an instance of it ancestor: folding is performed
+              case parentNode => {
+                val parentTerm = parentNode.expr.asInstanceOf[Term1]          
+                val msg = strongMsg(parentTerm, term)
+                parentNode.signature/Map(msg.sub2:_*)
               }
-            }}
+            } else {
+              tree.leafs filter {_.repeatedOf == node} match {
+                case Nil => {
+                  val letrecCallNode = node.children.head
+                  val letrecCall = letrecCallNode.expr
+                  tree.leafs filter {_.repeatedOf == letrecCallNode} match {
+                    case Nil => construct(letrecCallNode) 
+                    case repeatNodes => {
+                      var vars = Set[Variable1]()
+                      for (n <- repeatNodes) {
+                        val repeatTerm = n.expr.asInstanceOf[Term1]
+                        val msg = strongMsg(letrecCall.asInstanceOf[Term1], repeatTerm)
+                        val args0 = msg.sub2 map {p => p._1}
+                        vars = vars ++ args0
+                      }
+                      val fargs = getVarsOrdered(term) filter {vars.contains(_)}
+                      val appHead = Variable1(createFName())
+                      appHead.call = true
+                      node.signature = constructApplication1(appHead, fargs)
+                      val freshVars = fargs map {x => newVar1()}
+                      val sub = Map((fargs zip freshVars):_*)
+                      val lambdaBody = construct(letrecCallNode.children.head)/sub
+                      val lambda = constructLambda1(freshVars, lambdaBody)
+                      LetRecExpression1((appHead, lambda), node.signature)
+                    }
+                  }
+                }
+                case repeatNodes => {
+                  var vars = Set[Variable1]()
+                  for (n <- repeatNodes) {
+                    val repeatTerm = n.expr.asInstanceOf[Term1]
+                    val msg = strongMsg(term, repeatTerm)
+                    val args0 = msg.sub2 map {p => p._1}
+                    vars = vars ++ args0
+                  }
+                  val fargs = getVarsOrdered(term) filter {vars.contains(_)}
+                  val appHead = Variable1(createFName())
+                  appHead.call = true
+                  node.signature = constructApplication1(appHead, fargs)
+                  val freshVars = fargs map {x => newVar1()}
+                  val sub = Map((fargs zip freshVars):_*)
+                  val lambdaBody = construct(node.children.head)/sub
+                  val lambda = constructLambda1(freshVars, lambdaBody)
+                  LetRecExpression1((appHead, lambda), node.signature)
+                }
+              }
+              
+            }
           }
           case RedexCall1(f) => node.repeatedOf match {
              case null => {
