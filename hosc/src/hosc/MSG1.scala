@@ -91,6 +91,7 @@ object MSG1 {
         l2 ++= addDSubs
       }
       case (v, LetRecExpression1((f1, a1), e1), LetRecExpression1((f2, a2), e2)) => {
+        // to be investigated!!!
         val f = newVar1(); f.call = true
         val e = newVar1(); val a = newVar1();
         l2 += (e, e1/Map(f1->f), e2/Map(f2->f))

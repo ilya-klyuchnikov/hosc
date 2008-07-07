@@ -70,6 +70,12 @@ object TermAlgebra1 {
     case _ => null
   }
   
+  def getCoreAppVar(app: Application1): Variable1 = app.head match {
+    case v: Variable1 => v
+    case a: Application1 => getCoreAppVar(a)
+    case _ => null
+  }
+  
   // replace all occurrences of t1 in term by t2 
   def replaceTerm1(term: Term1, t1: Term1, t2: Term1): Term1 = if (term == t1) t2 else term match {
     case v: Variable1 => v
@@ -99,6 +105,11 @@ object TermAlgebra1 {
       newLetrec.label = letrec.label
       newLetrec
     }
+  }
+  
+  def extractAppArgs(term: Term1): List[Term1] = term match {
+    case Application1(h, a) => extractAppArgs(h) ::: List(a)
+    case _ => Nil
   }
   
   def extractAppArgs1(term: Term1): List[Term1] = term match {
@@ -150,11 +161,6 @@ object TermAlgebra1 {
   }
   
   def compareB1(b1: Branch1, b2: Branch1) = b1.pattern.name.compareTo(b2.pattern.name) < 0
-  
-  def extractAppArgs(term: Term1): List[Term1] = term match {
-    case Application1(h, a) => extractAppArgs(h) ::: List(a)
-    case _ => Nil
-  }
   
   def getBoundedVars(t: Term1): Set[Variable1] = t match {
     case v: Variable1 => Set()
@@ -236,6 +242,33 @@ object TermAlgebra1 {
       t.label = lr.label; t
     }
   }
+  
+  def freshAllBinders(term: Term1): Term1 = term match {
+    case v: Variable1 => val v1 = Variable1(v.name); v1.call = v.call; v1.label = v.label; v1
+    case c@Constructor1(name, args) => val t=Constructor1(name, args map (freshAllBinders(_))); t.label = c.label; t 
+    case app@Application1(h, a) => val t=Application1(freshAllBinders(h), freshAllBinders(a)); t.label=app.label;t
+    case la@LambdaAbstraction1(v, t) => {
+      val freshV = newVar1()
+      val t1 = LambdaAbstraction1(freshV, freshAllBinders(t)/Map(v -> freshV))
+      t1.label = la.label; t1
+    }
+    case ce@CaseExpression1(sel, bs) => {
+      val t = CaseExpression1(freshAllBinders(sel), bs map {freshAllBinders(_)})
+      t.label = ce.label
+      t
+    }
+    case lr@LetRecExpression1((v, term), expr) => {
+      val freshV = newVar1()
+      val t = LetRecExpression1((freshV, freshAllBinders(term)/Map(v -> freshV)), freshAllBinders(expr)/Map(v -> freshV))
+      t.label = lr.label; t
+    }
+  }
+  
+  def freshAllBinders(b: Branch1): Branch1 = {
+    val args = b.pattern.args
+    val newVars = args map {x => newVar1()}
+    Branch1(Pattern1(b.pattern.name, newVars), freshAllBinders(b.term)/Map((args zip newVars):_*))
+  }
 
   def freshBinders(b: Branch1): Branch1 = {
     val args = b.pattern.args
@@ -249,6 +282,16 @@ object TermAlgebra1 {
       case _ => false
     }
     case _ => false
+  }
+  
+  def getFreeVars(t: Term1): Set[Variable1] = t match {
+    case v: Variable1 => if (v.call) Set() else Set(v)
+    case Constructor1(_, args) => (Set[Variable1]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
+    case LambdaAbstraction1(x, term) => getFreeVars(term) - x
+    case Application1(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case CaseExpression1(sel, bs) => 
+      getFreeVars(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
+    case LetRecExpression1((v, term), expr) => getFreeVars(term) ++ getFreeVars(expr) - v
   }
 
 }

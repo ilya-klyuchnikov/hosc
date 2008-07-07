@@ -54,7 +54,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                   }
                 }
                 else {
-                  vars = getFreeVars(t)
+                  vars = TermAlgebra.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}
@@ -115,7 +115,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                   }
                 }
                 else {
-                  vars = getFreeVars(t)
+                  vars = TermAlgebra.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}

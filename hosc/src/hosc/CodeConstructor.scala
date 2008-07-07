@@ -6,6 +6,7 @@ import TermAlgebra1._
 import MSG1._
 
 class CodeConstructor(val tree: ProcessTree1) {
+  val freeVarsInLetrecs = true
   var i = 0
   def createFName() = {
     i += 1
@@ -23,11 +24,15 @@ class CodeConstructor(val tree: ProcessTree1) {
             case Nil => construct(node.children.head)
             case repeatNodes => {
               var vars = Set[Variable1]()
-              for (n <- repeatNodes) {
-                val repeatTerm = n.expr.asInstanceOf[Term1]
-                val msg = strongMsg(term, repeatTerm)
-                val args0 = msg.sub2 map {p => p._1}
-                vars = vars ++ args0
+              if (freeVarsInLetrecs){
+                for (n <- repeatNodes) {
+                  val repeatTerm = n.expr.asInstanceOf[Term1]
+                  val msg = strongMsg(term, repeatTerm)
+                  val args0 = msg.sub2 map {p => p._1}
+                  vars = vars ++ args0
+                }
+              } else {
+                vars = getFreeVars(term)
               }
               val fargs = getVarsOrdered(term) filter {vars.contains(_)}
               val appHead = Variable1(createFName())
@@ -105,11 +110,15 @@ class CodeConstructor(val tree: ProcessTree1) {
                     case Nil => construct(letrecCallNode) 
                     case repeatNodes => {
                       var vars = Set[Variable1]()
-                      for (n <- repeatNodes) {
-                        val repeatTerm = n.expr.asInstanceOf[Term1]
-                        val msg = strongMsg(letrecCall.asInstanceOf[Term1], repeatTerm)
-                        val args0 = msg.sub2 map {p => p._1}
-                        vars = vars ++ args0
+                      if (freeVarsInLetrecs){
+                        for (n <- repeatNodes) {
+                          val repeatTerm = n.expr.asInstanceOf[Term1]
+                          val msg = strongMsg(letrecCall.asInstanceOf[Term1], repeatTerm)
+                          val args0 = msg.sub2 map {p => p._1}
+                          vars = vars ++ args0
+                        }
+                      } else {
+                        vars = getFreeVars(term)
                       }
                       val fargs = getVarsOrdered(term) filter {vars.contains(_)}
                       val appHead = Variable1(createFName())
@@ -125,11 +134,15 @@ class CodeConstructor(val tree: ProcessTree1) {
                 }
                 case repeatNodes => {
                   var vars = Set[Variable1]()
-                  for (n <- repeatNodes) {
-                    val repeatTerm = n.expr.asInstanceOf[Term1]
-                    val msg = strongMsg(term, repeatTerm)
-                    val args0 = msg.sub2 map {p => p._1}
-                    vars = vars ++ args0
+                  if (freeVarsInLetrecs){
+                    for (n <- repeatNodes) {
+                      val repeatTerm = n.expr.asInstanceOf[Term1]
+                      val msg = strongMsg(term, repeatTerm)
+                      val args0 = msg.sub2 map {p => p._1}
+                      vars = vars ++ args0
+                    }
+                  } else {
+                    vars = getFreeVars(term)
                   }
                   val fargs = getVarsOrdered(term) filter {vars.contains(_)}
                   val appHead = Variable1(createFName())
