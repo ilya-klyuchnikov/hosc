@@ -26,9 +26,10 @@ object HE1 {
   }
   
   private def heByDiving(term1: Term1, term2: Term1, 
-      binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = term1 match {
-    case v: Variable1 if binders exists {v1 => v1._1 == v} => false
-    case _ => term2 match {
+      binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = {
+    val term1Vars = Set(getVarsOrdered(term1):_*)
+    for (p <- binders) if (term1Vars contains p._1) return false
+    term2 match {
       case Constructor1(_, args) => args exists (he(term1, _, binders, letrecs))
       case LambdaAbstraction1(v, t) => he(term1, t, (null, v)::binders, letrecs)
       case a: Application1 => lineApp(a) exists (he(term1, _, binders, letrecs))
