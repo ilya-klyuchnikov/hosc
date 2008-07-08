@@ -16,14 +16,11 @@ object Driver1 {
       case CaseExpression1(sel, bs) => CaseExpression1(traverse(sel), bs map {b => Branch1(b.pattern, traverse(b.term)) })
       case LetRecExpression1((f, fdef), expr) => LetRecExpression1((f, traverse(fdef)), traverse(expr))
       case LambdaAbstraction1(v, expr) => LambdaAbstraction1(v, traverse(expr))
-      case app @ Application1(head, arg) => {        
-        val coreF = getCoreAppVar(app)
-        if (coreF == oldF) {
-          val newF = newVar1()
-          newF.call = true
+      case app @ Application1(head, arg) => {
+        if (getCoreAppVar(app) == oldF) {
+          val newF = newVar1(); newF.call = true
           val fargs = extractAppArgs(app)
-          LetRecExpression1((newF, freshAllBinders(body)/Map(oldF -> newF)), 
-              freshAllBinders(constructApplication1(newF, fargs))) 
+          LetRecExpression1((newF, freshAllBinders(body)/Map(oldF -> newF)), freshAllBinders(constructApplication1(newF, fargs))) 
         } else {
           Application1(traverse(head), traverse(arg))
         }
