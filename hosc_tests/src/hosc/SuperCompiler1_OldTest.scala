@@ -4,7 +4,7 @@ import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage._
 import Util._
-class SuperCompiler1Test {
+class SuperCompiler1_OldTest {
   @Test def leqxplusxy(): Unit ={    
     SuperCompilerApp1.main(Array("-si", "hl/sc1/sc_leqxplusxy.hl",
         "-t", "output/sc_leqxplusxy.svg",
