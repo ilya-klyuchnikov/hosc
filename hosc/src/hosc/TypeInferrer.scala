@@ -401,6 +401,8 @@ class TypeInferrer(p: Program) {
       val lv = TypeVariable(v.name)
       te = te.install(lv, ts)
     }
+    println("TypeInferrer transformed program to this exp:")
+    println(util.Formatter.format(expr))
     tc(te, expr).t
   }
   
