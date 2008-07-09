@@ -11,7 +11,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
   
-  def term: Parser[Term] = p(tr2 | appl) | failure("term is expected")
+  def term: Parser[Term] = p(tr2 | appl) | err("term is expected")
   def appl = chainl1(tr0, tr1, success(Application(_: Term, _: Term)))
     
   // head of application
@@ -22,9 +22,9 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
   private def variable = p(lident ^^ Variable)  
-  private def lambdaAbstraction = p("%" ~> variable ~ ("{" ~> term <~ "}") ^^ LambdaAbstraction)    
-  private def caseExpression = p("case" ~> term ~ ("of" ~> "{"~> (branch+) <~ "}") ^^ CaseExpression)
-  private def branch = p(pattern ~ (":" ~> term <~ ";") ^^ Branch)  
+  private def lambdaAbstraction = p("%" ~> c(variable) ~ (c("{") ~> term <~ c("}")) ^^ LambdaAbstraction)    
+  private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
+  private def branch = p(pattern ~ (c(":") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
   def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))  
@@ -59,6 +59,8 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   }
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
+  
+  def c[T](p: => Parser[T]): Parser[T] = commit(p)
   
   def error(msg: String, pos: Positional) = {
     lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e

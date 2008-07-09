@@ -33,4 +33,20 @@ trait StrongParsers extends Parsers {
       }
     }
   }
+  
+  override def rep1[T](first: => Parser[T], p: => Parser[T]): Parser[List[T]] = Parser{ in0 =>
+    val xs = new scala.collection.mutable.ListBuffer[T]
+    var in = in0
+    var res = first(in)
+    while(res.successful) {
+      xs += res.get
+      in = res.next
+      res = p(in)
+    }
+    
+    res match {
+      case e: Error => e
+      case _  => if (!xs.isEmpty) Success(xs.toList, in) else Failure(res.asInstanceOf[NoSuccess].msg, in0) 
+    }
+  }
 }
