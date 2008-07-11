@@ -3,8 +3,7 @@ package hosc
 import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
-import GraphAnalysis.{SCC => C, Vertex => V, Arc => A, _}
-
+import GraphAnalysis.{GraphComponent => C, Vertex => V, Arc => A, _}
 
 class GraphAnalysisTest {
   
@@ -14,7 +13,7 @@ class GraphAnalysisTest {
     val expected = C(Set(a), false) :: C(Set(b), false) :: C(Set(c), false) :: C(Set(d), false) :: Nil;
     val vs = List(a, b, c, d)
     val g = Graph(vs, arcs) 
-    val actual = analizeDependencies(g)
+    val actual = analyzeDependencies(g)
     assertEquals(expected, actual)
   }
   
@@ -24,7 +23,7 @@ class GraphAnalysisTest {
     val arcs = A(a, a) :: A(c, d) :: A(b, c) :: A(a, b) :: Nil
     val vs = List(a, b, c, d)
     val g = Graph(vs, arcs) 
-    val actual = analizeDependencies(g)
+    val actual = analyzeDependencies(g)
     assertEquals(expected, actual)
   }
   
@@ -34,7 +33,7 @@ class GraphAnalysisTest {
     val arcs = A(a, b) :: A(b, c) :: A(c, a) :: A(d, e) :: A(e, d) :: A(c, d) :: A(b, e) :: Nil
     val vs = List(a, b, c, d, e)
     val g = Graph(vs, arcs) 
-    val actual = analizeDependencies(g)
+    val actual = analyzeDependencies(g)
     assertEquals(expected, actual)
   }
   

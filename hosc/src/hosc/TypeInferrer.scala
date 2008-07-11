@@ -129,7 +129,7 @@ object TypeInferrer {
 import TypeInferrer._
 class TypeInferrer(p: Program) {
   
-  private def tc(te: TypeEnv, expr: Expression): Result = expr match {
+  def tc(te: TypeEnv, expr: Expression): Result = expr match {
     case v: Variable => tcVar(te, v)
     case a: Application => tcApp(te, a)
     case l: LambdaAbstraction => tcLambda(te, l)
@@ -199,7 +199,7 @@ class TypeInferrer(p: Program) {
     tcLambda1(nv, tc(te1, l.t))
   }
   
-  private def tcBranch(te: TypeEnv, b: Branch): Result = {
+  def tcBranch(te: TypeEnv, b: Branch): Result = {
     
     val cd = p.getTypeDefinitionForDC(b.pattern.name).get
     val dc = p.getDataConstructor(b.pattern.name).get
@@ -236,7 +236,7 @@ class TypeInferrer(p: Program) {
     tcl0(tes,tss)
   }
   
-  private def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
+  def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
     val r = tclb(te, caseExp.branches)    
     val tv = newTyvar
     val pairs = r.ts map {(tv, _)}    
@@ -345,7 +345,7 @@ class TypeInferrer(p: Program) {
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
-    val sccs = analizeDependencies(g)
+    val sccs = analyzeDependencies(g)
     for (f <- p.fs) {
       var expr: Expression = Variable(f.name)
       for (scc <- sccs){
@@ -366,7 +366,7 @@ class TypeInferrer(p: Program) {
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
-    val sccs = analizeDependencies(g)
+    val sccs = analyzeDependencies(g)
     var expr: Expression = term
     for (scc <- sccs){
       val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
@@ -384,7 +384,7 @@ class TypeInferrer(p: Program) {
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
-    val sccs = analizeDependencies(g)
+    val sccs = analyzeDependencies(g)
     var expr: Expression = term
     for (scc <- sccs){
       val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
