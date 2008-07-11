@@ -44,7 +44,7 @@ object TypeInferrer {
     override def toString = ""
   }
   
-  def delta(x: TypeVariable, t: Type) = new Subst {
+  private def delta(x: TypeVariable, t: Type) = new Subst {
     override def baseApply(tv: TypeVariable): Type = if (x == tv) t else tv
     override def toString = x + "=" + t + ";"
   }
@@ -74,13 +74,13 @@ object TypeInferrer {
     def sub(s: Subst) = TypeEnv(al map {p => (p._1, p._2.sub(s))})
   }
   
-  def tyvars(t: Type): List[TypeVariable] = t match {
+  private def tyvars(t: Type): List[TypeVariable] = t match {
     case tv @ TypeVariable(a) => List(tv)
     case Arrow(t1, t2) => tyvars(t1) union tyvars(t2)
     case TypeConstructor(k, ts) => (List[TypeVariable]() /: ts) ((tvs, t) => tvs union tyvars(t))
   }  
 
-  def mgu(t: Type, u: Type, s: Subst): Subst = (t, u) match {
+  private def mgu(t: Type, u: Type, s: Subst): Subst = (t, u) match {
     case (a:TypeVariable, b: TypeVariable) if a == b =>
       s
     case (a:TypeVariable, _) if s(a) == a =>
@@ -97,7 +97,7 @@ object TypeInferrer {
       throw new TypeError("cannot unify " + s(t) + " with " + s(u))
   }
   
-  def mguL(ts: List[Pair[Type, Type]], s: Subst) = {
+  private def mguL(ts: List[Pair[Type, Type]], s: Subst) = {
     (s /: ts) {(s, p) => mgu(p._1, p._2, s)}
   }
   
@@ -106,7 +106,7 @@ object TypeInferrer {
   }
   case class ResultL(s: Subst, ts: List[Type])
   
-  def equal(type1: Type, type2: Type): Boolean = {
+  private def equal(type1: Type, type2: Type): Boolean = {
     def equal1(tp1: Type, tp2: Type): Boolean = {
       var map1to2 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
       def test(t1: Type, t2: Type): Boolean = (t1, t2) match {
@@ -129,7 +129,7 @@ object TypeInferrer {
 import TypeInferrer._
 class TypeInferrer(p: Program) {
   
-  def tc(te: TypeEnv, expr: Expression): Result = expr match {
+  private def tc(te: TypeEnv, expr: Expression): Result = expr match {
     case v: Variable => tcVar(te, v)
     case a: Application => tcApp(te, a)
     case l: LambdaAbstraction => tcLambda(te, l)
@@ -139,13 +139,13 @@ class TypeInferrer(p: Program) {
     case c: CaseExpression => tcCase(te, c)
   }
   
-  def tcVar(te: TypeEnv, v: Variable): Result = {
+  private def tcVar(te: TypeEnv, v: Variable): Result = {
     val tv = new TypeVariable(v.name)
     val ts = te.value(tv)
     Result(emptySubst, ts.newInstance)
   }
   
-  def tcApp(t: TypeEnv, a: Application): Result = {
+  private def tcApp(t: TypeEnv, a: Application): Result = {
     def tcApp0(te: TypeEnv, app: Application): Result = 
       tcApp1(newTyvar(), tcl(te, List(app.head, app.arg)))
     
@@ -161,7 +161,7 @@ class TypeInferrer(p: Program) {
     Result(s, s(tv))
   }
   
-  def tcCase(te: TypeEnv, caseExp: CaseExpression): Result = {    
+  private def tcCase(te: TypeEnv, caseExp: CaseExpression): Result = {    
     val r1 = tcCaseRaw(te, caseExp)
     //val s = r1.s
     val r2 = tc(te, caseExp.selector)
@@ -173,7 +173,7 @@ class TypeInferrer(p: Program) {
     Result(s compose r1.s, s(arr.t2))
   }
   
-  def tcCon(te: TypeEnv, c: Constructor): Result = {
+  private def tcCon(te: TypeEnv, c: Constructor): Result = {
     val cd = p.getTypeDefinitionForDC(c.name).get
     
     val originalTvars = cd.args    
@@ -188,7 +188,7 @@ class TypeInferrer(p: Program) {
     Result(sub, TypeConstructor(cd.name, cvars))
   }
   
-  def tcLambda(te: TypeEnv, l: LambdaAbstraction): Result = {    
+  private def tcLambda(te: TypeEnv, l: LambdaAbstraction): Result = {    
     def tcLambda1(v: TypeVariable, r: Result) = Result(r.s, Arrow(r.s(v), r.t))
     
     val nv = newTyvar()
@@ -199,7 +199,7 @@ class TypeInferrer(p: Program) {
     tcLambda1(nv, tc(te1, l.t))
   }
   
-  def tcBranch(te: TypeEnv, b: Branch): Result = {
+  private def tcBranch(te: TypeEnv, b: Branch): Result = {
     
     val cd = p.getTypeDefinitionForDC(b.pattern.name).get
     val dc = p.getDataConstructor(b.pattern.name).get
@@ -220,7 +220,7 @@ class TypeInferrer(p: Program) {
   }
   
   //type-checking of list of branches
-  def tclb(tes: TypeEnv, tss: List[Branch]) = {
+  private def tclb(tes: TypeEnv, tss: List[Branch]) = {
     def tcl0(te: TypeEnv, ts: List[Branch]): ResultL = ts match {
       case Nil => ResultL(emptySubst, Nil) 
       case e :: es => tcl1(te, es, tcBranch(te, e))
@@ -236,7 +236,7 @@ class TypeInferrer(p: Program) {
     tcl0(tes,tss)
   }
   
-  def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
+  private def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
     val r = tclb(te, caseExp.branches)    
     val tv = newTyvar
     val pairs = r.ts map {(tv, _)}    
@@ -248,7 +248,7 @@ class TypeInferrer(p: Program) {
   
   //calculates schematic vars of t (given unknowns);
   // creates type scheme where schematic vars are freshed 
-  def genBar(unknowns: List[TypeVariable], t: Type) = {
+  private def genBar(unknowns: List[TypeVariable], t: Type) = {
     // schematic vars
     val scvs = tyvars(t).removeDuplicates -- unknowns
     // map from schematic vars to new vars
@@ -261,13 +261,13 @@ class TypeInferrer(p: Program) {
     TypeScheme(al map {_._2}, t1)
   }
   
-  def addDecls(te: TypeEnv, vs: List[TypeVariable], ts: List[Type]) = {
+  private def addDecls(te: TypeEnv, vs: List[TypeVariable], ts: List[Type]) = {
     val unknowns = te.unknownsVars
     val schemes = ts map {genBar(unknowns, _)}
     TypeEnv((vs zip schemes) ::: te.al)
   }
   
-  def tcLet(env: TypeEnv, l: LetExpression): Result = {
+  private def tcLet(env: TypeEnv, l: LetExpression): Result = {
     
     def tcLet1(te: TypeEnv, xs: List[TypeVariable], e: Expression, r: ResultL) = {
       val gamma1 = te.sub(r.s)
@@ -281,9 +281,9 @@ class TypeInferrer(p: Program) {
     tcLet1(env, tvs, l.expr, tcl(env, letExps))
   }
   
-  def tcLet2(s: Subst, r: Result) = Result(s compose r.s, r.t)
+  private def tcLet2(s: Subst, r: Result) = Result(s compose r.s, r.t)
   
-  def tcLetRec(env: TypeEnv, l: LetRecExpression): Result = {
+  private def tcLetRec(env: TypeEnv, l: LetRecExpression): Result = {
     def newBVar(x: TypeVariable, tvn: TypeVariable) = (x, TypeScheme(Nil, tvn))
     def newBVars(xs: List[TypeVariable]) = xs map {x => newBVar(x, newTyvar)}
     
@@ -315,7 +315,7 @@ class TypeInferrer(p: Program) {
   }
   
   // type-checking of list of expressions
-  def tcl(tes: TypeEnv, tss: List[Expression]) = {
+  private def tcl(tes: TypeEnv, tss: List[Expression]) = {
     def tcl0(te: TypeEnv, ts: List[Expression]): ResultL = ts match {
       case Nil => ResultL(emptySubst, Nil) 
       case e :: es => tcl1(te, es, tc(te, e))
@@ -331,7 +331,7 @@ class TypeInferrer(p: Program) {
     tcl0(tes,tss)
   }
   
-  def getFreeVars(t: Term): Set[Variable] = t match {
+  private def getFreeVars(t: Term): Set[Variable] = t match {
     case v: Variable => Set(v)
     case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
     case LambdaAbstraction(x, term) => getFreeVars(term) - x
