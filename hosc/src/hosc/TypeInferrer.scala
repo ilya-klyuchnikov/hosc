@@ -1,7 +1,6 @@
 package hosc
 
-import HLanguage._
-import GraphAnalysis._
+import EnrichedLambdaCalculus._
 
 object TypeInferrer {
   private var n: Int = 0
@@ -133,7 +132,34 @@ object TypeInferrer {
 }
 
 import TypeInferrer._
-class TypeInferrer(p: Program) {
+class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
+  
+  private val cnameDC = Map(typeDefs flatMap {_.cons map {c => c.name -> c}}:_*)
+  private val cnameTD = Map(typeDefs flatMap {td => td.cons map {_.name -> td} }:_*)
+  
+  def inferType(expr: Expression) = {
+    var te = TypeEnv(Nil)
+    for (v <- getFreeVars(expr)){
+      val nv = newTyvar()
+      val ts = TypeScheme(Nil, nv)
+      val lv = TypeVariable(v.name)
+      te = te.install(lv, ts)
+    }
+    tc(te, expr).t
+  }
+  
+  private def getFreeVars(expr: Expression): Set[Variable] = expr match {
+    case v: Variable => Set(v)
+    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
+    case LambdaAbstraction(x, term) => getFreeVars(term) - x
+    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case CaseExpression(sel, bs) => 
+      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
+    case LetRecExpression(bs, expr) => 
+      ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
+    case LetExpression(bs, expr) => 
+      ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
+  }
   
   def tc(te: TypeEnv, expr: Expression): Result = expr match {
     case v: Variable => checkVar(te, v)
@@ -313,11 +339,11 @@ class TypeInferrer(p: Program) {
     val rl = check(te, c.args)
     
     // construct equqations saying that declared types equal to inferred ones
-    val conDef = p.getTypeDefinitionForDC(c.name).get    
+    val conDef = cnameTD(c.name)
     val typeParams = conDef.args
     // just substitution refreshing parametric variables
     val fSub = (emptySubst /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
-    val freshedDcArgs: List[Type] = p.getDataConstructor(c.name).get.args map fSub    
+    val freshedDcArgs: List[Type] = cnameDC(c.name).args map fSub    
     val typeEqns = freshedDcArgs zip rl.ts
     
     // solve equations and construct answer
@@ -403,8 +429,8 @@ class TypeInferrer(p: Program) {
   // deals with branch as with pattern-matching lambda abstraction
   def tcBranch(te: TypeEnv, b: Branch): Result = {
     
-    val cd = p.getTypeDefinitionForDC(b.pattern.name).get
-    val dc = p.getDataConstructor(b.pattern.name).get
+    val cd = cnameTD(b.pattern.name)
+    val dc = cnameDC(b.pattern.name)
     
     val originalTvars = cd.args
     val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
@@ -454,82 +480,6 @@ class TypeInferrer(p: Program) {
       val rs = check(environment sub r1.s, es)
       ResultL(rs.s compose r1.s, rs.s(r1.t) :: rs.ts)
     }
-  }
-  
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////  
-  private def getFreeVars(t: Term): Set[Variable] = t match {
-    case v: Variable => Set(v)
-    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
-    case LambdaAbstraction(x, term) => getFreeVars(term) - x
-    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
-    case CaseExpression(sel, bs) => 
-      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
-  }
-  
-  def tcProgram(): Unit = {
-    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
-    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
-    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
-    val g = Graph(vxs.values.toList, arcs)
-    val sccs = analyzeDependencies(g)
-    for (f <- p.fs) {
-      var expr: Expression = Variable(f.name)
-      for (scc <- sccs){
-        val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
-        if (scc.recursive){
-          expr = LetRecExpression(bs, expr)
-        } else {
-          expr = LetExpression(bs, expr)
-        }
-      }       
-      //f.`type` = tc(TypeEnv(Nil), expr).t
-    }
-    tcTerm(p.goal)
-  }
-  
-  def tcGroundTerm(term: Term) = {
-    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
-    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
-    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
-    val g = Graph(vxs.values.toList, arcs)
-    val sccs = analyzeDependencies(g)
-    var expr: Expression = term
-    for (scc <- sccs){
-      val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
-      if (scc.recursive){
-        expr = LetRecExpression(bs, expr)
-      } else {
-        expr = LetExpression(bs, expr)
-      }
-    }       
-    tc(TypeEnv(Nil), expr).t
-  }
-  
-  def tcTerm(term: Term) = {
-    val fs = (Map[String, Function]() /: p.fs) {(m, f) => m + (f.name -> f)}
-    val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
-    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
-    val g = Graph(vxs.values.toList, arcs)
-    val sccs = analyzeDependencies(g)
-    var expr: Expression = term
-    for (scc <- sccs){
-      val bs = scc.vs.toList map (x => (Variable(x.name), fs(x.name).lam))
-      if (scc.recursive){
-        expr = LetRecExpression(bs, expr)
-      } else {
-        expr = LetExpression(bs, expr)
-      }
-    }
-    var te = TypeEnv(Nil)
-    for (v <- getFreeVars(term)){
-      val nv = newTyvar()
-      val ts = TypeScheme(Nil, nv)
-      val lv = TypeVariable(v.name)
-      te = te.install(lv, ts)
-    }
-    println("TypeInferrer transformed program to this exp:")
-    println(util.Formatter.format(expr))
-    tc(te, expr).t
   }
   
 }

@@ -87,23 +87,21 @@ object HLanguage {
      def toDoc = text(name) :: text(" = ") :: lam.toDoc
    }
    
-   case class Program(ts: List[TypeDefinition], goal: Term, fs: List[Function]) {
+   case class Program(ts: List[TypeConstructorDefinition], goal: Term, fs: List[Function]) {
      def getTypeConstructorDefinition(tcName: String): Option[TypeConstructorDefinition] = {
        for (td <- ts) td match {case tcd: TypeConstructorDefinition if tcName == tcd.name => return Some(tcd); case _ => } 
        None
      }
      def getTypeDefinitionForDC(dataConsName: String): Option[TypeConstructorDefinition] = {
-       for (td <- ts) td match {
-         case tcd: TypeConstructorDefinition => for (dc <- tcd.cons) if (dc.name == dataConsName) return Some(tcd)
-         case _ => 
-       }
+       for (td <- ts) 
+         for (dc <- td.cons) 
+           if (dc.name == dataConsName) return Some(td)
        None
      }
      def getDataConstructor(dataConsName: String): Option[DataConstructor] = {
-       for (td <- ts) td match {
-         case tcd: TypeConstructorDefinition => for (dc <- tcd.cons) if (dc.name == dataConsName) return Some(dc)
-         case _ => 
-       }
+       for (td <- ts)
+         for (dc <- td.cons) 
+           if (dc.name == dataConsName) return Some(dc)
        None
      }
      def getFunction(n: String): Option[Function] = {
