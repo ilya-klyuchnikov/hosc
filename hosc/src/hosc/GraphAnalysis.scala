@@ -1,7 +1,7 @@
 package hosc
 
 /** 
-  *  GraphAnalysis module incorporates algorithms for spliting graph into graph components
+  *  GraphAnalysis module incorporates algorithms for splitting graph into graph components
   *  (namely: strongly connected components and singleton components) and for performing 
   *  topological sorting of mentioned components.
   *  

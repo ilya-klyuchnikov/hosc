@@ -11,7 +11,7 @@ import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
 
 
 class TypeInferrerTest {
-  //@Ignore
+
   @Test def simpleApplications(): Unit = {
     val ti = new TypeInferrer(null)
     val v = L(V("b"), L(V("a"), V("b")))
@@ -38,7 +38,6 @@ class TypeInferrerTest {
     println(r)
   }
   
-  //@Ignore
   @Test def simpleConstructors(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
@@ -58,7 +57,6 @@ class TypeInferrerTest {
     println(r3)
   }
   
-  //@Ignore
   @Test def simpleBranches(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
@@ -84,7 +82,6 @@ class TypeInferrerTest {
     //println(r4)
   }
   
-  //@Ignore
   @Test def simpleCaseRaw(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
@@ -113,7 +110,6 @@ class TypeInferrerTest {
     
   }
   
-  //@Ignore
   @Test def simpleCase(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
@@ -142,7 +138,7 @@ class TypeInferrerTest {
     }
     
   }
-  //@Ignore
+
   @Test def simpleProgram(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     println(programResult)
