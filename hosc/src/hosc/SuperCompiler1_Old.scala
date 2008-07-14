@@ -3,12 +3,14 @@ package hosc;
 import HLanguage._
 import HLanguage1._
 import TermAlgebra1._
-import ProcessTree1._
+import sc1.ProcessTree1
+import sc1.ProcessTree1SVG
+import sc1.ProcessTree1._
 import HLUtils._
 import hosc.util.Canonizer._
 
 class SuperCompiler1_Old(program: Program) {
-  val debug = true
+  val debug = false
   var i = 0
   val scProgram: Program = {
     val pt = new SuperCompiler(program).buildProcessTree(program.goal)

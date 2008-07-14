@@ -8,7 +8,7 @@ object TermAlgebra1 {
   var i = 0
   def newVar1() = {
     i += 1
-    Variable1("$" + i) 
+    Variable1("v$" + i) 
   }
 
   sealed abstract class TermDecomposition1

@@ -1,4 +1,4 @@
-package hosc;
+package hosc.sc1
 
 class ProcessTree1SVG(tree: ProcessTree1) {
   var map = Map[ProcessTree1.Node1, Tuple4[Int, Int, Int, Int]]()

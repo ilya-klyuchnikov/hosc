@@ -1,4 +1,4 @@
-package hosc
+package hosc.sc1
 
 import HLanguage1._
 import TermAlgebra1._
@@ -14,9 +14,11 @@ object ProcessTree1 {
     var repeatedOf: Node1 = null
     var permanent = false
     var ungeneralized = false
+    var supercompiled = false
+    var instance = false
       
     def toString(indent: String): String = {
-      val sb = new StringBuilder(indent + "|__" + expr)
+      val sb = new StringBuilder(indent + "|__" + (if (supercompiled) "**" else "") + expr)
       for (edge <- outs) {
         sb.append("\n  " + indent + "|" + edge.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", ""))
         sb.append("\n" + edge.child.toString(indent + "  "))
@@ -40,7 +42,7 @@ object ProcessTree1 {
 
     def ancestors(): List[Node1] = if (in == null) Nil else in.parent :: in.parent.ancestors
     
-    def isProcessed: Boolean = permanent || (repeatedOf != null || 
+    def isProcessed: Boolean = instance || permanent || (repeatedOf != null || 
     (expr match {
       case Constructor1(_, Nil) => true
       case v : Variable1 if v.call == false => true

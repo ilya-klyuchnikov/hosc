@@ -1,6 +1,8 @@
 package hosc
 
 import HLanguage1._
+import sc1.ProcessTree1
+import sc1.ProcessTree1._
 
 class Ungeneralizer(tree: ProcessTree1, constructor: CodeConstructor) {
   def ungeneralize(): Boolean = {

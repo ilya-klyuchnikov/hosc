@@ -4,7 +4,8 @@ import HLanguage._
 import HLanguage1._
 import TermAlgebra1._
 import HLUtils._
-import ProcessTree1._
+import sc1.ProcessTree1
+import sc1.ProcessTree1._
 import MSG1._
 import HE1._
 import util.Canonizer.{canonize1 => can}

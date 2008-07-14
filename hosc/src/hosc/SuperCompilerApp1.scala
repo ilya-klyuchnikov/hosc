@@ -14,6 +14,9 @@ import HLanguage._
 import HLanguage1._
 import HParsers._
 import Util._
+import sc1.ProcessTree1
+import sc1.ProcessTree1._
+import sc1.ProcessTree1SVG
 
 object SuperCompilerApp1 {
   val help = """usage: hosc.SuperCompilerApp1 [-si sinput_file | -i input_file] -t tree_output_file -p program_output_file

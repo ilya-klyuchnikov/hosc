@@ -6,6 +6,7 @@ import HLanguage.{Application => Application0, Variable => Variable0, CaseExpres
   Branch => Branch0, Pattern => Pattern0,
   Constructor => Constructor0, LambdaAbstraction => LambdaAbstraction0, 
   LetExpression => LetExpression0, LetRecExpression => LetRecExpression0, Expression => Expression0, Program => Program0, _}
+import HLanguage1._
 import TermAlgebra._
 import util.Formatter._
 
@@ -22,6 +23,20 @@ object LangUtils {
       LetExpression(bs map {b => (Variable(b._1.name), hl0ToELC(b._2))}, hl0ToELC(lexpr))
     case LetRecExpression0(bs, lexpr) => 
       LetRecExpression(bs map {b => (Variable(b._1.name), hl0ToELC(b._2))}, hl0ToELC(lexpr))
+  }
+  
+  def hl1ToELC(expr: Expression1): Expression = expr match {
+    case Variable1(n) => Variable(n)
+    case Constructor1(n, args) => Constructor(n, args map hl1ToELC)
+    case LambdaAbstraction1(v, e) => LambdaAbstraction(Variable(v.name), hl1ToELC(e))
+    case Application1(h, a) => Application(hl1ToELC(h), hl1ToELC(a))
+    case CaseExpression1(sel, bs) => 
+      CaseExpression(hl1ToELC(sel), 
+          bs map {b => Branch(Pattern(b.pattern.name, b.pattern.args map {v => Variable(v.name)}), hl1ToELC(b.term))})
+    case LetExpression1(bs, lexpr) => 
+      LetExpression(bs map {b => (Variable(b._1.name), hl1ToELC(b._2))}, hl1ToELC(lexpr))
+    case LetRecExpression1(b, lexpr) => 
+      LetRecExpression((Variable(b._1.name), hl1ToELC(b._2)) :: Nil, hl1ToELC(lexpr))
   }
   
   def normalize(p: Program0): Expression0 = {
