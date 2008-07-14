@@ -1,4 +1,4 @@
-package hosc.h1parsers;
+package hosc.sc1
 
 import scala.util.parsing.syntax.StdTokens
 
