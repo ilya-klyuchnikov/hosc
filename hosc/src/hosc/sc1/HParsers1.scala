@@ -51,4 +51,5 @@ object HParsers1 extends HTokenParsers1 with StrongParsers with ImplicitConversi
   
   def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
   def program1 = (typeConstrDefinition*) ~ term  ^^ Program1
+  def parseProgram(r: Reader[Char]) = strong(program1, "<eof> expected") (new lexical.Scanner(r))
 }
