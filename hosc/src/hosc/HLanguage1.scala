@@ -1,5 +1,6 @@
 package hosc
 
+import scala.util.parsing.input.Positional
 import scala.text.Document
 import scala.text.Document._
 
@@ -9,9 +10,10 @@ object HLanguage1 {
    case class Loop extends Label
    case class Repeat extends Label
    
-   sealed abstract class Expression1 {
+   sealed abstract class Expression1 extends Positional {
      def toDoc: Document
      def isLoop: Boolean
+     def \\(s: Map[Variable1, Variable1]): Expression1
    }
    sealed abstract class Term1 extends Expression1 {
      type termType <: Term1
@@ -86,12 +88,14 @@ object HLanguage1 {
        l1.label=label;l1
      }
      override def toString = labelToString + "letrec " + (binding._1 + "=" + binding._2) + " in " + expr;
-     def toDoc = group("letrec" :: 
+     def toDoc = group("( letrec" :: 
          nest(2, group (ED :/: binding._1.toDoc :: " = " :: binding._2.toDoc))
-         :/: "in " :: nest(2, ED :/: expr.toDoc))
+         :/: "in " :: nest(2, ED :/: expr.toDoc) :: ")" :: ED)
    }
    
    case class LetExpression1(bs: List[Pair[Variable1, Term1]], expr: Term1) extends Expression1 {
+     def \\(s: Map[Variable1, Variable1]) = LetExpression1(bs map {b => ((b._1\\s).asInstanceOf[Variable1],
+         (b._2\\s).asInstanceOf[Term1])}, expr\\s);
      def isLoop = false
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + " in " + expr;
      def toDoc = group("let" :: 
