@@ -35,7 +35,7 @@ object HE1 {
       case a: Application1 => lineApp(a) exists (he(term1, _, binders, letrecs))
       case CaseExpression1(sel, bs) => he(term1, sel, binders, letrecs) || 
         (bs exists {b => he(term1, b.term, binders, letrecs)})
-      case LetRecExpression1(_, e) => he(term1, e, binders, letrecs)
+      case LetRecExpression1((v, t), e) => he(term1, e, binders, letrecs) || he(term1, t, binders, letrecs)
       case _ => false
     }
   }  
