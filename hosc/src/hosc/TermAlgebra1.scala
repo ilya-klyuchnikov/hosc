@@ -8,7 +8,7 @@ object TermAlgebra1 {
   var i = 0
   def newVar1() = {
     i += 1
-    Variable1("v$" + i) 
+    Variable1("$" + i) 
   }
 
   sealed abstract class TermDecomposition1
@@ -117,13 +117,15 @@ object TermAlgebra1 {
     case _ => Nil
   }
   
-  def getAllVars1(expr: Term1): Set[Variable1] = expr match {
+  def getAllVars1(expr: Expression1): Set[Variable1] = expr match {
     case v: Variable1 => Set(v)
     case Constructor1(_, args) => (Set[Variable1]() /: args) {(vs, term) => vs ++ getAllVars1(term)}
     case LambdaAbstraction1(x, term) => getAllVars1(term) + x
     case Application1(head, arg) => getAllVars1(head) ++ getAllVars1(arg)
     case CaseExpression1(sel, bs) => 
       getAllVars1(sel) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b.term) ++ b.pattern.args}
+    case LetExpression1(bs, expr) =>
+      getAllVars1(expr) ++ (Set[Variable1]() /: bs) {(vs, b) => vs ++ getAllVars1(b._2) + b._1}
     case LetRecExpression1(b, expr) =>
       getAllVars1(expr) ++ getAllVars1(b._2) + b._1
   }
