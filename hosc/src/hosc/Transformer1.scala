@@ -1,7 +1,7 @@
 package hosc;
 
 import HLanguage1._
-import TermAlgebra1._
+import sc1.TermAlgebra1._
 
 class Transformer1(val program: Program1) {
   val emptyMap = Map[Variable1, Term1]()

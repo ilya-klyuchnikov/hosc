@@ -2,12 +2,12 @@ package hosc;
 
 import HLanguage._
 import HLanguage1._
-import TermAlgebra1._
+import sc1.TermAlgebra1._
 import HLUtils._
 import sc1.ProcessTree1
 import sc1.ProcessTree1._
-import MSG1._
-import HE1._
+import sc1.MSG1._
+import sc1.HE1._
 import util.Canonizer.{canonize1 => can}
 
 class Transformer(val tree: ProcessTree1, val program: Program) {

@@ -3,37 +3,38 @@ package hosc
 import HLanguage1._
 import sc1.ProcessTree1
 import sc1.ProcessTree1._
-import TermAlgebra1._
-import MSG1._
-import HE1._
+import sc1.TermAlgebra1._
+import sc1.MSG1._
+import sc1.HE1._
 import util.Canonizer.{canonize1 => can}
 import hosc.util.Formatter.{format => form}
 import sc1.SuperCompiler1
+import sc1.CodeConstructor1
 
-class SuperCompiler2(val inputTerm: Term1, varsUtil: Vars1Util) {
+class SuperCompiler2(val program: Program1, varsUtil: Vars1Util) {
   
-  val driver = new Driver1(varsUtil)
-  def superCompile(): (ProcessTree1, Term1) = {
+  val driver = new sc1.Driver1(varsUtil)
+  def superCompile(): (ProcessTree1, Program1) = {
     var i = 0
-    val p = ProcessTree1(inputTerm)
+    val p = ProcessTree1(program.expr)
     println(p)
           println("===========================")
     while (!p.isClosed) {
       i += 1
-      println("#########################" + i)
-      println(p)
-      println("===========================")
+      //println("#########################" + i)
+      //println(p)
+      //println("===========================")
       if (i == 13) {
         println(i)
       }
       val lll =  p.leafs.filter(!_.isProcessed)
       lll match {
         case nnn :: Nil if nnn.supercompiled => {
-          println("ONE UNPROCEEDED LEAF:")
-          println("AHTUNG!!!")
-          println(form(nnn.expr.asInstanceOf[Term1]))
-          println(p)
-          println("===========================")
+          //println("ONE UNPROCEEDED LEAF:")
+          //println("AHTUNG!!!")
+          //println(form(nnn.expr.asInstanceOf[Term1]))
+          //println(p)
+          //println("===========================")
         }
         case _ =>
       }
@@ -59,8 +60,8 @@ class SuperCompiler2(val inputTerm: Term1, varsUtil: Vars1Util) {
         case _ => drive(p, beta)
       }      
     }
-    val codeConstructor = new CodeConstructor1(p, varsUtil)
-    (p, codeConstructor.construct(p.rootNode))
+    val codeConstructor = new CodeConstructor1(program, p, varsUtil)
+    (p, codeConstructor.constructProgram(p.rootNode))
   }
   
   private def drive(tree: ProcessTree1, node: Node1): Unit = 
@@ -68,13 +69,13 @@ class SuperCompiler2(val inputTerm: Term1, varsUtil: Vars1Util) {
       tree.addChildren(node, driver.drive(node.expr))
     } else node.expr match {
       case t: Term1 => if (!node.supercompiled && canBeEnhanced_?(t) && !letrecDirectChild(node))  {
-        val sc1 = new SuperCompiler1(t, varsUtil)
-        val (tree1, superCompiledTerm) = sc1.superCompile()
-        node.expr = superCompiledTerm
+        val sc1 = new SuperCompiler1(Program1(program.ts, t), varsUtil)
+        val (tree1, superCompiledProgram) = sc1.superCompile()
+        node.expr = superCompiledProgram.expr
         node.supercompiled = true
         println("++++++++++++++")
         println("TTT1: " + t)
-        println("TTT2: " + superCompiledTerm)
+        println("TTT2: " + superCompiledProgram.expr)
         println("++++++++++++++")          
       } else {
         tree.addChildren(node, driver.drive(node.expr))
@@ -157,7 +158,19 @@ class SuperCompiler2(val inputTerm: Term1, varsUtil: Vars1Util) {
   }
 
   private def heByCouplingTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
-    case aTerm: Term1 => /*sameRedex(aTerm, bTerm) &&*/ heByCoupling(aTerm, bTerm);
+    case aTerm: Term1 => {
+      /*sameRedex(aTerm, bTerm) &&*/ 
+        val he1 = heByCoupling(aTerm, bTerm)
+        val he2 = HE2.heByCoupling(aTerm, bTerm)
+        if (he1 == false && he2 == true) {
+          println("HE2!!!!!!!!!!!")
+          println(form(can(aTerm)))
+          println("***************")
+          println(form(can(bTerm)))
+          println("***************")
+        }
+        he1
+    }
     case _ => false
   }
   

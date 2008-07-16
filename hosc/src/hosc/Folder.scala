@@ -3,8 +3,8 @@ package hosc;
 import HLanguage1._
 import sc1.ProcessTree1
 import sc1.ProcessTree1._
-import TermAlgebra1._
-import MSG1._
+import sc1.TermAlgebra1._
+import sc1.MSG1._
 
 /**
   performs advanced folding (residual code generation) for a given 

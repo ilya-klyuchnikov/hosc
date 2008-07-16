@@ -1,6 +1,6 @@
 package hosc.util;
 
-import hosc.TermAlgebra1.compareB1
+import hosc.sc1.TermAlgebra1.compareB1
 import hosc.TermAlgebra.compareB
 import hosc.HLanguage1._
 import hosc.HLanguage._

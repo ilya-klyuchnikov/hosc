@@ -2,7 +2,7 @@ package hosc;
 
 import HLanguage._
 import HLanguage1._
-import TermAlgebra1._
+import sc1.TermAlgebra1._
 import sc1.ProcessTree1
 import sc1.ProcessTree1SVG
 import sc1.ProcessTree1._

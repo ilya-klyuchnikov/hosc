@@ -1,4 +1,4 @@
-package hosc
+package hosc.sc1
 
 import scala.util.parsing.input.StreamReader
 import scala.util.parsing.input.CharArrayReader
@@ -14,49 +14,35 @@ import HLanguage._
 import HLanguage1._
 import HParsers._
 import Util._
-import sc1.ProcessTree1
-import sc1.ProcessTree1._
-import sc1.ProcessTree1SVG
 
-import sc1.HParsers1
 import hosc.util.Canonizer.{canonize1 => can}
 
-object SuperCompiler2App {
-  val help = """usage: hosc.SuperCompiler2App -i input_file -t tree_output_file -p program_output_file
+object SuperCompiler1SApp {
+  val help = """usage: hosc.SuperCompiler1SApp -i input_file  -p program_output_file
   |Where:
   |input_file            path to input file where code is written HL1 language syntax
-  |tree_output_file      path to file where process tree will be placed (in SVG format)
   |program_output_file   path to file where residual program will be placed
   |""".stripMargin
   def main(args : Array[String]) : Unit = {
     var fileName: String = null
-    var outFileName: String = null
     var outProgramFileName: String = null
     var sugared = false
     args.toList match {
-      case "-i" :: input_file :: "-t" :: output_file :: "-p" :: output_file_1 :: Nil =>
+      case "-i" :: input_file :: "-p" :: output_file_1 :: Nil =>
         fileName = input_file
-        outFileName = output_file
         outProgramFileName = output_file_1
       case "-help" :: Nil => 
         println(help)
         return
       case _ => 
-        throw new IllegalArgumentException("run spcs.SuperCompiler2App -help for help")       
+        throw new IllegalArgumentException("run spcs.SuperCompiler1App -help for help")       
     }
     
-    val program = program1FromFile(fileName)
-    val sc = new SuperCompiler2(program, new Vars1Util())
-    val (tree, resTerm) = sc.superCompile()    
-    val svg = new ProcessTree1SVG(tree).treeToSVG
+    val program1 = program1FromFile(fileName)
+    val sc = new SuperCompiler1S(program1, new Vars1Util())
+    val resProgram:Program1 = sc.superCompile()    
     
-    val svgFile = new java.io.File(outFileName)
-    if (!svgFile.exists){
-      svgFile.createNewFile()
-    } 
-    scala.xml.XML.save(outFileName, svg)
-    
-    val doc = resTerm.toDoc
+    val doc = resProgram.toDoc
     val slFile = new java.io.File(outProgramFileName)
     if (!slFile.exists){
       slFile.createNewFile()
@@ -86,7 +72,7 @@ object SuperCompiler2App {
       val program = pr.get
       val canExpr = can(program.expr)      
       val canProgram = Program1(program.ts, canExpr)
-      sc1.Postprocessor1.postprocess(canProgram)
+      Postprocessor1.postprocess(canProgram)
       val elcExpr = LangUtils.hl1ToELC(canExpr)
       val typeInferrer = new TypeInferrer(canProgram.ts)
       typeInferrer.inferType(elcExpr)

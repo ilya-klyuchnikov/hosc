@@ -5,7 +5,7 @@ import HLanguage1._
 import HLUtils._
 import ProcessTree._
 import TermAlgebra._
-import TermAlgebra1._
+import sc1.TermAlgebra1._
 
 class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree) {
   val freeVarsInLetrecs = false
