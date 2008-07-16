@@ -152,7 +152,8 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     case v: Variable => Set(v)
     case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
     case LambdaAbstraction(x, term) => getFreeVars(term) - x
-    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case Application(head, arg) => 
+      getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression(sel, bs) => 
       getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
     case LetRecExpression(bs, expr) => 
@@ -299,13 +300,13 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     */  
   private def tcLetRec(env: TypeEnv, letrec: LetRecExpression): Result = {
     // TODO: refactor after Result is eliminated
-    val letRecVars = letrec.bs map {_._1}
+    val (letRecVars, letRecRSides) = List.unzip(letrec.bs) 
     
     val xs = letRecVars map {x => TypeVariable(x.name)}
     val schemes = letRecVars map {x => TypeScheme(Nil, newTyvar)}
     
     // check right hand sides in extended env
-    val rl = check(TypeEnv((xs zip schemes) :::  env.al), letrec.bs map {_._2})
+    val rl = check(TypeEnv((xs zip schemes) :::  env.al), letRecRSides)
     
     val phi1 = rl.s
     val rSideTypes = rl.ts
