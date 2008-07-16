@@ -48,9 +48,25 @@ object ProcessTree1 {
       case v : Variable1 if v.call == false => true
       case _ => false
     }))
+    
+    def getAllVars1(): Set[Variable1] = {
+      var vars = TermAlgebra1.getAllVars1(expr)
+      for (e <- outs) {
+        vars = vars ++ e.child.getAllVars1()
+      }
+      vars
+    }
+    
+    def sub(map: Map[Variable1, Variable1]): Unit = {
+      expr = expr\\map        
+      for (e <- outs) {
+        e.substitution = Map(e.substitution.toList.map({p => Pair[Variable1, Term1](p._1\\map, p._2\\map)}):_*)
+        e.child.sub(map)
+      }
+    }
   }
   
-  class Edge1(val parent: Node1, var child: Node1, val substitution: Map[Variable1, Term1]) {
+  class Edge1(val parent: Node1, var child: Node1, var substitution: Map[Variable1, Term1]) {
     override def toString = "Edge("+ substitution + ", " + child + ")"
   }
   

@@ -1,14 +1,15 @@
-package hosc;
+package hosc.sc1
 
 import HLanguage1._
-import sc1.ProcessTree1
-import sc1.ProcessTree1._
+import ProcessTree1._
 import TermAlgebra1._
 import MSG1._
 
-class CodeConstructor1(val tree: ProcessTree1, val varsUtil: Vars1Util) {
+class CodeConstructor1(program: Program1, tree: ProcessTree1, varsUtil: Vars1Util) {
   
-  def construct(node: Node1): Term1 = node.expr match {
+  def constructProgram(node: Node1): Program1 = Program1(program.ts, construct(node))
+  
+  private def construct(node: Node1): Term1 = node.expr match {
     case LetExpression1(bindings, _) => {
       construct(node.children.head)/Map(bindings:_*)
     }
@@ -39,11 +40,10 @@ class CodeConstructor1(val tree: ProcessTree1, val varsUtil: Vars1Util) {
                     vars = vars ++ args0
                   }                  
                   val fargs = getVarsOrdered(term) filter {vars.contains(_)}
-                  val appHead = varsUtil.createFreshLetrecVar()
-                  node.signature = constructApplication1(appHead, fargs)
+                  val appHead = createFVar
+                  node.signature = constructApplication1(appHead, fargs)                  
                   
-                  
-                  val freshVars = fargs map {x => newVar1()}
+                  val freshVars = fargs map {x => createVar()}
                   val sub = Map((fargs zip freshVars):_*)
                   
                   val newBs = (bs zip node.children.tail) map {p => Branch1(p._1.pattern, construct(p._2))}
@@ -84,9 +84,9 @@ class CodeConstructor1(val tree: ProcessTree1, val varsUtil: Vars1Util) {
                     vars = vars ++ args0
                   }                  
                   val fargs = getVarsOrdered(term) filter {vars.contains(_)}
-                  val appHead = varsUtil.createFreshLetrecVar()
+                  val appHead = createFVar()//varsUtil.createFreshLetrecVar()
                   node.signature = constructApplication1(appHead, fargs)
-                  val freshVars = fargs map {x => newVar1()}
+                  val freshVars = fargs map {x => createVar()}
                   val sub = Map((fargs zip freshVars):_*)
                   val lambdaBody = construct(node.children.head)/sub
                   val lambda = constructLambda1(freshVars, lambdaBody)
@@ -103,5 +103,47 @@ class CodeConstructor1(val tree: ProcessTree1, val varsUtil: Vars1Util) {
         }
       }
     }    
+  }
+  
+  var i = 0;
+  val usedVars = tree.rootNode.getAllVars1()
+  def createVar(): Variable1 = {      
+    var nv: Variable1 = null
+    do {
+      nv = varFor(i)
+      i += 1
+    } while (usedVars contains nv)
+    nv
+    //varsUtil.createFreshVar
+  }
+  
+  var fi = 0;
+  def createFVar(): Variable1 = {      
+    var nv: Variable1 = null
+    do {
+      nv = fVarFor(fi)
+      fi += 1
+    } while (usedVars contains nv)
+    nv.call = true
+    nv
+    //varsUtil.createFreshLetrecVar
+  }
+  
+  private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
+  private val fNames = Array('f', 'g', 'h');
+  private var fUsed = Set[String]()
+  
+  private def varFor(j: Int) = {
+    if (j < 10) 
+      Variable1("" + vNames(j))
+    else 
+      Variable1("" + vNames(j % 10) + Integer.toString(j / 10))   
+  }
+  
+  private def fVarFor(j: Int) = {
+    if (j < 3) 
+      Variable1("" + fNames(j))
+    else 
+      Variable1(fNames(j % 3) + Integer.toString(j / 3))   
   }
 }

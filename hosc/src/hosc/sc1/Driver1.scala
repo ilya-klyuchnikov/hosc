@@ -1,4 +1,4 @@
-package hosc;
+package hosc.sc1
 
 import HLanguage1._
 import TermAlgebra1._

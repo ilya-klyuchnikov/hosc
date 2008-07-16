@@ -9,6 +9,8 @@ object Postprocessor1 {
     process(program.expr, Set[Variable1]())
   }
   
+  def postprocess(t: Term1) = process(t, Set())
+  
   def process(t: Term1, letrecs: Set[Variable1]): Unit = t match {
     case v: Variable1 => v.call = (letrecs contains v)
     case Constructor1(_, args) => for (a <- args) process(a, letrecs)

@@ -4,16 +4,12 @@ import scala.util.parsing.input.{Positional, Reader}
 import scala.util.parsing.combinator.ImplicitConversions
 import HLanguage1._
 
-object HParsers1 extends HTokenParsers1 with StrongParsers with ImplicitConversions {
+object HParsers1 extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "::", "|", "[", "]", "->")
   lexical.reserved += ("case", "of", "where", "letrec", "in", "Repeat", "Loop")
   
-  // expressions
-  def term: Parser[Term1] = (("Repeat" ~ ":")~> term0 ^^ {case t => t.label = Repeat(); t}) | 
-                            (("Loop" ~ ":") ~> term0 ^^ {case t => t.label = Loop(); t}) | 
-                            term0
-  def term0: Parser[Term1] = tr2 | appl | letrec | failure("term is expected")
+  def term: Parser[Term1] = tr2 | appl | letrec | failure("term is expected")
   def appl = chainl1(tr0, tr1, success(Application1(_: Term1, _: Term1)))
     
   // head of application
@@ -23,15 +19,14 @@ object HParsers1 extends HTokenParsers1 with StrongParsers with ImplicitConversi
   // top constructor; cannot be head of application
   private def tr2: Parser[Constructor1] =  uident ~ (tr1*) ^^ Constructor1 | ("(" ~> tr2 <~ ")")
   
-  private def variable = ((lident | fident | sident) ^^ Variable1) | 
-                         (("[" ~> (lident | fident | sident) <~ "]") ^^ {case name => val v = Variable1(name); v.call = true; v})  
-  private def lambdaAbstraction = "%" ~> variable ~ ("{" ~> term <~ "}") ^^ LambdaAbstraction1    
-  private def caseExpression = "case" ~> term ~ ("of" ~> "{"~> (branch+) <~ "}") ^^ CaseExpression1
-  private def branch = pattern ~ (":" ~> term <~ ";") ^^ Branch1  
+  private def variable = p(lident ^^ Variable1)   
+  private def lambdaAbstraction = "%" ~> c(variable) ~ (c("{") ~> term <~ c("}")) ^^ LambdaAbstraction1    
+  private def caseExpression = "case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression1
+  private def branch = pattern ~ (c(":") ~> c(term) <~ c(";")) ^^ Branch1  
   private def pattern = uident ~ (variable*) ^^ Pattern1
   
-  private def letrec = ("letrec" ~> variable) ~ ("=" ~> term) ~ ("in" ~> term) ^^ 
-                       {case v ~ l ~ e => LetRecExpression1((v, l), e)}
+  private def letrec:Parser[LetRecExpression1] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ 
+                       {case v ~ l ~ e => LetRecExpression1((v, l), e)} | ("(" ~> letrec <~ ")")
   
   // types
   private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
@@ -48,6 +43,7 @@ object HParsers1 extends HTokenParsers1 with StrongParsers with ImplicitConversi
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
     
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
+  def c[T](p: => Parser[T]): Parser[T] = commit(p)
   
   def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
   def program1 = (typeConstrDefinition*) ~ term  ^^ Program1
