@@ -8,14 +8,12 @@ import HE1._
 import util.Canonizer.{canonize1 => can}
 import hosc.util.Formatter.{format => form}
 
-class SuperCompiler1(val term: Term1, varsUtil: Vars1Util) {
+class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
   var driver = new Driver1(varsUtil)
   
-  def superCompile(): (ProcessTree1, Term1) = {
-    val p = ProcessTree1(term)
+  def superCompile(): (ProcessTree1, Program1) = {
+    val p = ProcessTree1(program.expr)
     while (!p.isClosed) {
-      //println(p)
-      println("=============")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -25,15 +23,11 @@ class SuperCompiler1(val term: Term1, varsUtil: Vars1Util) {
             case None => {
               beta.ancestors find instanceTest(bTerm) match {
                 case Some(alpha1) => {
-                  System.out.println("instance")
-                  //beta.instance = true
-                  println("INSTANCE FROM SCP1")
                   makeAbstraction(p, beta, alpha1)
                 } 
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
                     case Some(alpha) => {
-                      println("GENERALIZING FROM SCP1")
                       makeAbstraction(p, alpha, beta)
                     }
                     case None => drive(p, beta)
@@ -46,9 +40,9 @@ class SuperCompiler1(val term: Term1, varsUtil: Vars1Util) {
         case _ => drive(p, beta)
       }      
     }
-    val codeConstructor = new CodeConstructor1(p, varsUtil)
-    
-    (p, codeConstructor.construct(p.rootNode))
+    val codeConstructor = new CodeConstructor1(program, p, varsUtil)
+    renameVars(p)
+    (p, codeConstructor.constructProgram(p.rootNode))
   }
   
   private def drive(t: ProcessTree1, n: Node1): Unit = {
@@ -59,25 +53,20 @@ class SuperCompiler1(val term: Term1, varsUtil: Vars1Util) {
     val alphaTerm = alpha.expr.asInstanceOf[Term1]
     val betaTerm = beta.expr.asInstanceOf[Term1]
     val g = msg(alphaTerm, betaTerm)
-    var t = g.term
+    var generalizedTerm = g.term
     var subs = g.sub1
-    println(form(can(alphaTerm)))
-    println()
-    println(form(can(betaTerm)))
     
     var resSub = List[Substitution]()
     var set = Set[Variable1]()
+    // eliminate letrecs mapping
     for (sub <- subs) {
       sub match {
-        case (v1, v2: Variable1) if v1.call => t = t\\Map(v1 -> v2);
+        case (v1, v2: Variable1) if v1.call => generalizedTerm = generalizedTerm\\Map(v1 -> v2);
         case _ => resSub = sub :: resSub
       }
     }
     
-    val let = LetExpression1(resSub, t) 
-    println(g)
-    println(let)
-    println("=======================")
+    val let = LetExpression1(resSub, generalizedTerm) 
     tree.replace(alpha, let)
   }
   
@@ -111,4 +100,55 @@ class SuperCompiler1(val term: Term1, varsUtil: Vars1Util) {
     case (c1: Context1, c2: Context1) => c1.redex.getClass() == c2.redex.getClass()
     case _ => false
   }
+  def renameVars(p: ProcessTree1): ProcessTree1 = {
+    val vars = p.rootNode.getAllVars1()
+    var i = 0
+    var j = 0
+    def createVar(v: Variable1): Variable1 = {
+      if (v.call) {
+        var nv: Variable1 = null
+        do {
+          nv = fvarFor(j)
+          j += 1
+        } while (vars contains nv)
+        nv.call = true
+        nv
+      } else {
+        var nv: Variable1 = null
+        do {
+          nv = varFor(i)
+          i += 1
+        } while (vars contains nv)
+        nv
+      }
+    }
+    var map = Map[Variable1, Variable1]()
+    for (v <- vars.toList) {
+      if (isSynthetic(v)) {
+        map = map + (v -> createVar(v))
+      }
+    }
+    p.rootNode sub map
+    p
+  }
+  
+  private val vNames = Array("xx", "yy", "zz", "uu", "vv", "ww", "pp", "rr", "ss", "tt");
+  private val fNames = Array("ff", "gg", "hh");
+  
+  private def varFor(j: Int) = {
+    if (j <= 9) 
+      Variable1("" + vNames(j))
+    else 
+      Variable1("" + vNames(j % 10) + Integer.toString(j / 10))   
+  }
+  
+  private def fvarFor(j: Int): Variable1 = {
+    if (j < 3) 
+      Variable1("" + fNames(j))
+    else 
+      Variable1(fNames(j % 3) + Integer.toString(j / 3))   
+  }
+  
+  private def isSynthetic(v: Variable1) = v.name startsWith "$" 
+
 }
