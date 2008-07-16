@@ -45,7 +45,7 @@ object HParsers1 extends HTokenParsers with StrongParsers with ImplicitConversio
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
   def c[T](p: => Parser[T]): Parser[T] = commit(p)
   
-  def parseTerm(r: Reader[Char]) = strong(term, "<eof> expected") (new lexical.Scanner(r))
+  def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))
   def program1 = (typeConstrDefinition*) ~ term  ^^ Program1
-  def parseProgram(r: Reader[Char]) = strong(program1, "<eof> expected") (new lexical.Scanner(r))
+  def parseProgram(r: Reader[Char]) = strong(program1) (new lexical.Scanner(r))
 }

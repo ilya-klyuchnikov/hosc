@@ -23,12 +23,12 @@ trait StrongParsers extends Parsers {
     }
   }
   
-  def strong[T](p: => Parser[T], msg: String): Parser[T] = new Parser[T]{
+  def strong[T](p: => Parser[T]): Parser[T] = new Parser[T]{
     def apply(in: Input)  = {
       val res = p(in)
       res match {
         case Success(out, in1) if res.next.atEnd  => res
-        case Success(_, _) => if (lastNoSuccess == null) Failure(msg, res.next) else lastNoSuccess
+        case Success(_, _) => Failure("EOF expected but " + res.next.first + " found", res.next)
         case f : NoSuccess => f
       }
     }
@@ -49,4 +49,4 @@ trait StrongParsers extends Parsers {
       case _  => if (!xs.isEmpty) Success(xs.toList, in) else Failure(res.asInstanceOf[NoSuccess].msg, in0) 
     }
   }
-}
+} 
