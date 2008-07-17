@@ -1,9 +1,9 @@
-package hosc;
+package hosc.sc0
 
 import HLanguage._
 
 // qualifies global variables
-object Postprocessor {
+object Postprocessor0 {
   
   def postprocess(program: Program) = {
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))

@@ -1,11 +1,11 @@
-package hosc
+package hosc.sc0
 
 import scala.util.parsing.input.Positional
 
 import HLanguage._
-import HParsers._
+import HParsers0._
 
-object Validator {
+object Validator0 {
   case class ValidatorError(error: HError) extends Exception(error.toString) {}
   def validate(s: Success[Program]) =  {
     val p = s.get

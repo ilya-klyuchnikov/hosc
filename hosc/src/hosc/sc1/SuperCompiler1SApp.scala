@@ -12,7 +12,6 @@ import java.io.BufferedReader
 
 import HLanguage._
 import HLanguage1._
-import HParsers._
 import Util._
 
 import hosc.util.Canonizer.{canonize1 => can}

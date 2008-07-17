@@ -1,9 +1,9 @@
 package hosc.util;
 
-import hosc.sc1.TermAlgebra1.compareB1
-import hosc.TermAlgebra.compareB
-import hosc.HLanguage1._
-import hosc.HLanguage._
+import sc1.TermAlgebra1.compareB1
+import sc0.TermAlgebra0.compareB
+import HLanguage1._
+import HLanguage._
 
 object Canonizer {
   def canonize(tt: Term):Term = tt match {

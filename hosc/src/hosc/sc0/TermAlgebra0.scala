@@ -1,8 +1,8 @@
-package hosc;
+package hosc.sc0
 
 import HLanguage._
 
-object TermAlgebra {
+object TermAlgebra0 {
   var i = 0
   def newVar() = {
     i += 1

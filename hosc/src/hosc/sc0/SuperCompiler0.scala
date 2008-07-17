@@ -1,10 +1,10 @@
-package hosc;
+package hosc.sc0
 
 import HLanguage._
-import TermAlgebra._
-import ProcessTree._
+import TermAlgebra0._
+import ProcessTree0._
 
-class SuperCompiler(program: Program){
+class SuperCompiler0(program: Program){
   val emptyMap = Map[Variable, Term]()
   
   def driveExp(expr: BaseExpression): List[Pair[Term, Map[Variable, Term]]] = expr match {
@@ -39,8 +39,8 @@ class SuperCompiler(program: Program){
     }
   }  
   
-  def buildProcessTree(e: BaseExpression): ProcessTree = {
-    val p = ProcessTree(e)
+  def buildProcessTree(e: BaseExpression): ProcessTree0 = {
+    val p = ProcessTree0(e)
     while (!p.isClosed) {
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
@@ -97,11 +97,11 @@ class SuperCompiler(program: Program){
     case _ => false
   }
   
-  def drive(t: ProcessTree, n: Node): Unit = {
+  def drive(t: ProcessTree0, n: Node): Unit = {
     t.addChildren(n, driveExp(n.expr))
   }
   
-  def makeAbstraction(t: ProcessTree, alpha: Node, beta: Node): Unit = {
+  def makeAbstraction(t: ProcessTree0, alpha: Node, beta: Node): Unit = {
     val g = msg(alpha.expr.asInstanceOf[Term], beta.expr.asInstanceOf[Term])
     if (g.sub1.isEmpty){
       t.replace(alpha, g.term)
@@ -112,7 +112,7 @@ class SuperCompiler(program: Program){
     }    
   }
   
-  def renameVars(p: ProcessTree): ProcessTree = {
+  def renameVars(p: ProcessTree0): ProcessTree0 = {
     val vars = p.rootNode.getAllVars()
     var i = 0
     def createVar(): Variable = {      

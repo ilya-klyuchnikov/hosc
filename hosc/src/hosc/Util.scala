@@ -4,6 +4,7 @@ import scala.util.parsing.input.{CharArrayReader, Reader}
 import java.io.{BufferedReader, File, FileReader}
 import HLanguage._
 import LangUtils._
+import sc0.HParsers0
 
 object Util {
   def programFromFile(fileName: String): Program = {
@@ -19,7 +20,7 @@ object Util {
       }
     } while (str != null)
     in.close();
-    val pr = HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    val pr = HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
     if (pr.successful) {
       val program = pr.get
       val ti = new TypeInferrer(program.ts)
@@ -31,7 +32,7 @@ object Util {
   }
   
   def programFromString(input: String): Program = {
-    val pr = HParsers.parseProgram(new CharArrayReader(input.toCharArray))
+    val pr = HParsers0.parseProgram(new CharArrayReader(input.toCharArray))
     if (pr.successful) {
       val program = pr.get
       val ti = new TypeInferrer(program.ts)

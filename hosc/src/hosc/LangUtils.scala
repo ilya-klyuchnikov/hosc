@@ -7,7 +7,7 @@ import HLanguage.{Application => Application0, Variable => Variable0, CaseExpres
   Constructor => Constructor0, LambdaAbstraction => LambdaAbstraction0, 
   LetExpression => LetExpression0, LetRecExpression => LetRecExpression0, Expression => Expression0, Program => Program0, _}
 import HLanguage1._
-import TermAlgebra._
+import sc0.TermAlgebra0._
 import util.Formatter._
 
 object LangUtils {

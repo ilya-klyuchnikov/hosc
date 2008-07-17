@@ -1,10 +1,10 @@
-package hosc
+package hosc.sc0
 
 import scala.util.parsing.input.{Positional, Reader}
 import scala.util.parsing.combinator.ImplicitConversions
 import HLanguage._
 
-object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
+object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "::", "|", "->")
   lexical.reserved += ("case", "of", "where")
@@ -50,12 +50,12 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def validate(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s @ Success(_, _) => Validator.validate(s)
+    case s @ Success(_, _) => Validator0.validate(s)
   }
   
   def postprocess(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s @ Success(_, _) => Postprocessor.postprocess(s.get); s
+    case s @ Success(_, _) => Postprocessor0.postprocess(s.get); s
   }
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)

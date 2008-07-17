@@ -1,12 +1,12 @@
-package hosc
+package hosc.sc0
 
 import scala.util.parsing.input.{CharArrayReader, Reader}
 
 import HLanguage._
-import TermAlgebra._
+import TermAlgebra0._
 import Util._
 
-class Interpreter(program: Program) {
+class Interpreter0(program: Program) {
   
   def this(fileName: String) = this(Util.programFromFile(fileName))
   
@@ -18,7 +18,7 @@ class Interpreter(program: Program) {
   
   def eval(): Term = {
     // validate that term is ground
-    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
+    Validator0.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
     eval(program.goal)
   }
   

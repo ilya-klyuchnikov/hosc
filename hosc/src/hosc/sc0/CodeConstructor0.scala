@@ -1,13 +1,13 @@
-package hosc;
+package hosc.sc0
 
 import HLanguage._
 import HLanguage1._
 import HLUtils._
-import ProcessTree._
-import TermAlgebra._
+import ProcessTree0._
+import TermAlgebra0._
 import sc1.TermAlgebra1._
 
-class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
+class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, freeVarsInLetrecs: Boolean) {
   def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
   
   private def construct(node: Node): Term1 = node.expr match {
@@ -53,7 +53,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                   }
                 }
                 else {
-                  vars = TermAlgebra.getFreeVars(t)
+                  vars = TermAlgebra0.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}
@@ -114,7 +114,7 @@ class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTr
                   }
                 }
                 else {
-                  vars = TermAlgebra.getFreeVars(t)
+                  vars = TermAlgebra0.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0 map {hlToHl1(_)}

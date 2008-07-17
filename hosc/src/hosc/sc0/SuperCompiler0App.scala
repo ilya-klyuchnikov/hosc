@@ -1,4 +1,4 @@
-package hosc;
+package hosc.sc0
 
 import scala.util.parsing.input.StreamReader
 import scala.util.parsing.input.CharArrayReader
@@ -11,10 +11,9 @@ import java.io.FileWriter
 import java.io.BufferedReader
 
 import HLanguage._
-import HParsers._
 import Util._
 
-object SuperCompilerApp {
+object SuperCompiler0App {
   val help = """usage: hosc.SuperCompilerApp [-si sinput_file | -i input_file] -t tree_output_file -p program_output_file
   |Where:
   |sinput_file           path to input file where code is written using syntactic sugar
@@ -46,9 +45,9 @@ object SuperCompilerApp {
     }
     
     val program = programFromFile(fileName)
-    val sc = new SuperCompiler(program)
+    val sc = new SuperCompiler0(program)
     val pt = sc.buildProcessTree(program.goal)    
-    val svg = new ProcessTreeSVG(pt).treeToSVG
+    val svg = new ProcessTree0SVG(pt).treeToSVG
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){
@@ -56,7 +55,7 @@ object SuperCompilerApp {
     } 
     scala.xml.XML.save(outFileName, svg)
     
-    val g = new ResidualProgramGenerator(program, pt, true)
+    val g = new CodeConstructor0(program, pt, true)
     val p = g.generateProgram()
     val doc = p.toDoc
     val slFile = new java.io.File(outProgramFileName)
