@@ -90,8 +90,9 @@ object MSG1 {
         t = t/Map(v -> term)
         l2 ++= addDSubs
       }
-      case (v, LetRecExpression1((f1, a1), e1), LetRecExpression1((f2, a2), e2)) => {
-        // to be investigated!!!
+      case (v, lr1@LetRecExpression1((f1, a1), e1), lr2@LetRecExpression1((f2, a2), e2)) 
+        if HE1.heByCoupling(lr1, lr2) || HE1.heByCoupling(lr2, lr1) => {
+        // to be investigated!!! // h-order generalization is needed
         val f = newVar1(); f.call = true
         val e = newVar1(); val a = newVar1();
         l2 += (e, e1/Map(f1->f), e2/Map(f2->f))
