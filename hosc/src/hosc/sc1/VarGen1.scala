@@ -1,18 +1,18 @@
-package hosc;
+package hosc.sc1
 
 import HLanguage1._
 
-class Vars1Util {
+class VarGen1 {
   var i = 0
   
   def createFreshVar() = {
     i += 1
-    Variable1("$$" + i)
+    Variable1("$v" + i)
   }
   
   def createFreshLetrecVar() = {
     i += 1
-    val freshLetrecVar = Variable1("$$" + i)
+    val freshLetrecVar = Variable1("$f" + i)
     freshLetrecVar.call = true
     freshLetrecVar
   }
