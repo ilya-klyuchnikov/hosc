@@ -13,7 +13,7 @@ object HParsers1 extends HTokenParsers with StrongParsers with ImplicitConversio
   def appl = chainl1(tr0, tr1, success(Application1(_: Term1, _: Term1)))
     
   // head of application
-  private def tr0: Parser[Term1] = variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")")
+  private def tr0: Parser[Term1] = variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")") | letrec
   // argument of or application constructor
   private def tr1 = tr0 | uident ^^ {x => Constructor1(x, Nil)} | ("(" ~> term <~ ")")
   // top constructor; cannot be head of application
