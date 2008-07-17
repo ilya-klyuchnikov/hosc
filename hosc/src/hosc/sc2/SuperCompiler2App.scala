@@ -20,7 +20,6 @@ import sc1.ProcessTree1SVG
 import sc1.HParsers1
 import sc1.VarGen1
 import sc1.InputUtil1._
-import hosc.util.Canonizer.{canonize1 => can}
 
 object SuperCompiler2App {
   val help = """usage: hosc.sc2.SuperCompiler2App -i input_file -t tree_output_file -p program_output_file

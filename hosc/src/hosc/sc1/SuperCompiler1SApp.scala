@@ -12,9 +12,7 @@ import java.io.BufferedReader
 
 import HLanguage._
 import HLanguage1._
-import Util._
-
-import hosc.util.Canonizer.{canonize1 => can}
+import InputUtil1._
 
 object SuperCompiler1SApp {
   val help = """usage: hosc.SuperCompiler1SApp -i input_file  -p program_output_file
@@ -51,33 +49,5 @@ object SuperCompiler1SApp {
     doc.format(100, fw)
     fw.flush();
     fw.close(); 
-  }
-  
-  def program1FromFile(fileName: String) = {
-    val file = new File(fileName)
-    val sb = new StringBuilder
-    val in = new BufferedReader(new FileReader(fileName));
-    var str: String = null
-    do {
-      str = in.readLine
-      if (str != null){
-        sb.append(str)
-        sb.append("\n")
-      }
-    } while (str != null)
-    in.close();
-    val pr = HParsers1.parseProgram(new CharArrayReader(sb.toString.toCharArray))
-    if (pr.successful) {
-      val program = pr.get
-      val canExpr = can(program.expr)      
-      val canProgram = Program1(program.ts, canExpr)
-      Postprocessor1.postprocess(canProgram)
-      val elcExpr = LangUtils.hl1ToELC(canExpr)
-      val typeInferrer = new TypeInferrer(canProgram.ts)
-      typeInferrer.inferType(elcExpr)
-      canProgram
-    } else { 
-      throw new IllegalArgumentException(pr.toString)
-    }
   }
 }

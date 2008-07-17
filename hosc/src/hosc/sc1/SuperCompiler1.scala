@@ -5,8 +5,7 @@ import ProcessTree1._
 import TermAlgebra1._
 import MSG1._
 import HE1._
-import util.Canonizer.{canonize1 => can}
-import hosc.util.Formatter.{format => form}
+import LangUtils._
 
 class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
   var driver = new Driver1(varsUtil)

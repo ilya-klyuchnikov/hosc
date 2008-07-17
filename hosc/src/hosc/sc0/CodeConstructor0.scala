@@ -2,7 +2,7 @@ package hosc.sc0
 
 import HLanguage._
 import HLanguage1._
-import HLUtils._
+import LangUtils._
 import ProcessTree0._
 import TermAlgebra0._
 import sc1.TermAlgebra1._

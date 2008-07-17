@@ -3,7 +3,6 @@ package hosc.sc1
 import scala.util.parsing.input.{CharArrayReader, Reader, StreamReader}
 import java.io.{BufferedReader, File, FileReader}
 import LangUtils._
-import hosc.util.Canonizer.{canonize1 => can}
 import HLanguage1._
 
 object InputUtil1 {
@@ -11,7 +10,7 @@ object InputUtil1 {
     val pr = HParsers1.parseProgram(new CharArrayReader(input.toCharArray))
     if (pr.successful) {
       val program = pr.get
-      val canExpr = can(program.expr)      
+      val canExpr = canonize1(program.expr)      
       val canProgram = Program1(program.ts, canExpr)
       Postprocessor1.postprocess(canProgram)
       val elcExpr = LangUtils.hl1ToELC(canExpr)
@@ -28,7 +27,7 @@ object InputUtil1 {
     val pr = HParsers1.parseProgram(StreamReader(new FileReader(fileName)))
     if (pr.successful) {
       val program = pr.get
-      val canExpr = can(program.expr)      
+      val canExpr = canonize1(program.expr)      
       val canProgram = Program1(program.ts, canExpr)
       Postprocessor1.postprocess(canProgram)
       val elcExpr = LangUtils.hl1ToELC(canExpr)

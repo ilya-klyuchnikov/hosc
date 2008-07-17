@@ -1,13 +1,12 @@
 package hosc.sc2
 
 import HLanguage1._
+import LangUtils._
 import sc1.ProcessTree1
 import sc1.ProcessTree1._
 import sc1.TermAlgebra1._
 import sc1.MSG1._
 import sc1.HE1._
-import util.Canonizer.{canonize1 => can}
-import hosc.util.Formatter.{format => form}
 import sc1.SuperCompiler1
 import sc1.SuperCompiler1S
 import sc1.CodeConstructor1
@@ -132,9 +131,9 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
     var t = g.term
     var subs = g.sub1
     println("GENERALIZING FROM SCP2")
-    println(form(can(alphaTerm)))
+    println(format(canonize1(alphaTerm)))
     println()
-    println(form(can(betaTerm)))
+    println(format(canonize1(betaTerm)))
     
     var resSub = List[Substitution]()
     var set = Set[Variable1]()
@@ -147,7 +146,7 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
     
     val let = LetExpression1(resSub, t) 
     println(g)
-    println(form(let))
+    println(format(let))
     println("=======================")
     tree.replace(alpha, let)
   }
@@ -169,9 +168,9 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
         val he2 = HE2.heByCoupling(aTerm, bTerm)
         if (he1 == false && he2 == true) {
           println("HE2!!!!!!!!!!!")
-          println(form(can(aTerm)))
+          println(format(canonize1(aTerm)))
           println("***************")
-          println(form(can(bTerm)))
+          println(format(canonize1(bTerm)))
           println("***************")
         }
         he1
