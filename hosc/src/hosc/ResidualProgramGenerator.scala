@@ -7,8 +7,7 @@ import ProcessTree._
 import TermAlgebra._
 import sc1.TermAlgebra1._
 
-class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree) {
-  val freeVarsInLetrecs = false
+class ResidualProgramGenerator(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
   def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
   
   private def construct(node: Node): Term1 = node.expr match {

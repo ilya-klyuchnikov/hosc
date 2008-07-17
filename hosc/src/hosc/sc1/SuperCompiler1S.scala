@@ -2,7 +2,7 @@ package hosc.sc1;
 
 import HLanguage1._
 
-class SuperCompiler1S(val program: Program1, varsUtil: Vars1Util) {
+class SuperCompiler1S(val program: Program1, varsUtil: VarGen1) {
   def superCompile(): Program1 = {
     var superCompiledP1 = (new SuperCompiler1(program, varsUtil).superCompile())._2
     val eq0 = TermAlgebra1.equivalent(superCompiledP1.expr, program.expr)

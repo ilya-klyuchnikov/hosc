@@ -5,13 +5,23 @@ import ProcessTree1._
 import TermAlgebra1._
 import MSG1._
 
-class CodeConstructor1(program: Program1, tree: ProcessTree1, varsUtil: Vars1Util) {
+class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
   
   def constructProgram(node: Node1): Program1 = Program1(program.ts, construct(node))
   
   private def construct(node: Node1): Term1 = node.expr match {
+    /*
     case LetExpression1(bindings, _) => {
       construct(node.children.head)/Map(bindings:_*)
+    }
+    */
+    case LetExpression1(bs, t) => {
+      val node0 = node.outs.head.child
+      val nodes = node.outs.tail map {edge => edge.child}
+      val ts = nodes map construct
+      val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
+          {pair => (Variable1(pair._1._1.name), pair._2)})
+      construct(node0)/subs
     }
     case term: Term1 => decompose1(term) match {
       case ObservableVar1(v) => v
@@ -114,7 +124,7 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varsUtil: Vars1Uti
       i += 1
     } while (usedVars contains nv)
     nv
-    //varsUtil.createFreshVar
+    varGen.createFreshVar
   }
   
   var fi = 0;
@@ -126,7 +136,7 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varsUtil: Vars1Uti
     } while (usedVars contains nv)
     nv.call = true
     nv
-    //varsUtil.createFreshLetrecVar
+    varGen.createFreshLetrecVar
   }
   
   private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');

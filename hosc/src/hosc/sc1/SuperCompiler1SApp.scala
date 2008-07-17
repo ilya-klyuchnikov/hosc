@@ -39,7 +39,7 @@ object SuperCompiler1SApp {
     }
     
     val program1 = program1FromFile(fileName)
-    val sc = new SuperCompiler1S(program1, new Vars1Util())
+    val sc = new SuperCompiler1S(program1, new VarGen1())
     val resProgram:Program1 = sc.superCompile()    
     
     val doc = resProgram.toDoc

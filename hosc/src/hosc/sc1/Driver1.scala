@@ -4,7 +4,7 @@ import HLanguage1._
 import TermAlgebra1._
 
 
-class Driver1(val varsUtil: Vars1Util) {
+class Driver1(val varsUtil: VarGen1) {
   val EM = Map[Variable1, Term1]()
  
   /** 
@@ -14,7 +14,11 @@ class Driver1(val varsUtil: Vars1Util) {
    * @param expr expression in HL1 language 
    */
   def drive(expr: Expression1): List[Pair[Term1, Map[Variable1, Term1]]] = expr match {
-    case LetExpression1(bs, t) => (t, Map[Variable1, Term1]()) :: Nil 
+    //case LetExpression1(bs, t) => (t, Map[Variable1, Term1]()) :: Nil
+    case LetExpression1(bs, t) => {
+      (t.asInstanceOf[Term1], Map[Variable1, Term1](bs map {p => (p._1, p._2.asInstanceOf[Term1])} :_*)) :: 
+        (bs map {b => (b._2.asInstanceOf[Term1], EM)}) 
+    } 
     case t: Term1 => decompose1(t) match {
       case ObservableVar1(_) => Nil
       case ObservableCon1(c) => c.args map {a => (a, EM)}

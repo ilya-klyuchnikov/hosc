@@ -8,7 +8,7 @@ import HE1._
 import util.Canonizer.{canonize1 => can}
 import hosc.util.Formatter.{format => form}
 
-class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
+class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
   var driver = new Driver1(varsUtil)
   
   def superCompile(): (ProcessTree1, Program1) = {
@@ -23,11 +23,13 @@ class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
             case None => {
               beta.ancestors find instanceTest(bTerm) match {
                 case Some(alpha1) => {
+                  println("INSTANCE!!")
                   makeAbstraction(p, beta, alpha1)
                 } 
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
                     case Some(alpha) => {
+                      println("GENERALIZING FROM SCP1")
                       makeAbstraction(p, alpha, beta)
                     }
                     case None => drive(p, beta)
@@ -41,7 +43,7 @@ class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
       }      
     }
     val codeConstructor = new CodeConstructor1(program, p, varsUtil)
-    renameVars(p)
+    //renameVars(p)
     (p, codeConstructor.constructProgram(p.rootNode))
   }
   
@@ -55,7 +57,9 @@ class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
     val g = msg(alphaTerm, betaTerm)
     var generalizedTerm = g.term
     var subs = g.sub1
-    
+    //println(form(can(alphaTerm)))
+    //println()
+    //println(form(can(betaTerm)))
     var resSub = List[Substitution]()
     var set = Set[Variable1]()
     // eliminate letrecs mapping
@@ -67,6 +71,9 @@ class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
     }
     
     val let = LetExpression1(resSub, generalizedTerm) 
+    //println(g)
+    //println(form(let))
+    //println("=======================")
     tree.replace(alpha, let)
   }
   
@@ -81,15 +88,15 @@ class SuperCompiler1(val program: Program1, varsUtil: Vars1Util) {
   }
 
   private def heByCouplingTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
-    case aTerm: Term1 => sameRedex(aTerm, bTerm) && heByCoupling(aTerm, bTerm);
+    case aTerm: Term1 => /*sameRedex(aTerm, bTerm) &&*/ heByCoupling(aTerm, bTerm);
     case _ => false
   }
   
   private def canBeEnhanced_?(t: Term1) = decompose1(t) match {
     case c: Context1 => c.redex match { 
-      case _: RedexCall1 => true
-      case _: RedexCaseVar1 => true
-      case _: RedexCaseVarApp1 => true
+      //case _: RedexCall1 => true
+      //case _: RedexCaseVar1 => true
+      //case _: RedexCaseVarApp1 => true
       case _: RedexLetRec1 => true
       case _ => false
     }

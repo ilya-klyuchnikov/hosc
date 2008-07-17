@@ -30,7 +30,7 @@ object SuperCompiler1App {
     }
     
     val inProgram = program1FromFile(fileName)
-    val sc = new SuperCompiler1(inProgram, new Vars1Util())
+    val sc = new SuperCompiler1(inProgram, new VarGen1())
     val (tree, resProgram) = sc.superCompile()    
     val svg = new ProcessTree1SVG(tree).treeToSVG
     

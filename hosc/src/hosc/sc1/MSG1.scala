@@ -80,7 +80,8 @@ object MSG1 {
         l2 += (rs, t1r, t2r)
       }
       case (v, app1: Application1, app2: Application1) 
-      if getAppLevel(app1) == getAppLevel(app2) && getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
+      if getAppLevel(app1) == getAppLevel(app2) && getCoreLocalHead(app1) == getCoreLocalHead(app2) => {
+        // todo: match var call
         val head = getCoreLocalHead(app1)
         val args1 = extractAppArgs(app1)
         val args2 = extractAppArgs(app2)

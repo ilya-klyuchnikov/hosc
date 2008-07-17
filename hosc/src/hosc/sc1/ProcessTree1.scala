@@ -18,7 +18,7 @@ object ProcessTree1 {
     var instance = false
       
     def toString(indent: String): String = {
-      val sb = new StringBuilder(indent + "|__" + (if (supercompiled) "**" else "") + expr)
+      val sb = new StringBuilder(indent + "|__" + (if (outs.isEmpty && !isProcessed) "???" else "") + (if (supercompiled) "**" else "") + expr)
       for (edge <- outs) {
         sb.append("\n  " + indent + "|" + edge.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", ""))
         sb.append("\n" + edge.child.toString(indent + "  "))

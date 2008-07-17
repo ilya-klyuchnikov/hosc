@@ -14,7 +14,7 @@ class SuperCompiler1_Old(program: Program) {
   var i = 0
   val scProgram: Program = {
     val pt = new SuperCompiler(program).buildProcessTree(program.goal)
-    val generator = new ResidualProgramGenerator(program, pt)
+    val generator = new ResidualProgramGenerator(program, pt, true)
     val p1 = hl1ToHl(generator.generateProgram())
     Postprocessor.postprocess(p1)
     p1
