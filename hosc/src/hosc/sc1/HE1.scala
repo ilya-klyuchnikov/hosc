@@ -34,7 +34,7 @@ object HE1 {
       case LambdaAbstraction1(v, t) => he(term1, t, (null, v)::binders, letrecs)
       case a: Application1 => lineApp(a) exists (he(term1, _, binders, letrecs))
       case CaseExpression1(sel, bs) => he(term1, sel, binders, letrecs) || 
-        (bs exists {b => he(term1, b.term, binders, letrecs)})
+        (bs exists {b => he(term1, b.term, (b.pattern.args map {a => (null, a)}) ::: binders, letrecs)})
       case LetRecExpression1((v, t), e) => he(term1, e, binders, letrecs) || he(term1, t, binders, letrecs)
       case _ => false
     }
