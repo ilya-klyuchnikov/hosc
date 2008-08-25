@@ -19,6 +19,7 @@ boolean :: True | False;
 list $a :: Nil | Cons $a (list $a);
 
 loop (State (S x) Z Z) y
+//loop a y
 
 where
 

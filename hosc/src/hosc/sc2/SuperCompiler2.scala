@@ -18,30 +18,14 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
   def superCompile(): (ProcessTree1, Program1) = {
     var i = 0
     val p = ProcessTree1(program.expr)
-    println(p)
-          println("===========================")
     while (!p.isClosed) {
       i += 1
       println("#########################" + i)
       println(p)
       println("===========================")
-      if (i == 13) {
-        println(i)
-      }
-      val lll =  p.leafs.filter(!_.isProcessed)
-      lll match {
-        case nnn :: Nil if nnn.supercompiled => {
-          //println("ONE UNPROCEEDED LEAF:")
-          //println("AHTUNG!!!")
-          //println(form(nnn.expr.asInstanceOf[Term1]))
-          //println(p)
-          //println("===========================")
-        }
-        case _ =>
-      }
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
-      if (beta.supercompiled) {
+      if (!untransformedLetrec_?(beta)) {
       beta.expr match {
         case bTerm: Term1 if canBeEnhanced_?(bTerm) => {
           beta.ancestors find equivalenceTest(bTerm) match {
@@ -71,15 +55,18 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
       tree.addChildren(node, driver.drive(node.expr))
     } else*/ node.expr match {
       case t: Term1 => if (!node.supercompiled && canBeEnhanced2_?(t) && !letrecDirectChild(node))  {
-        val sc1 = new SuperCompiler1S(Program1(program.ts, t), varsUtil)
-        //val sc1 = new SuperCompiler1(Program1(program.ts, t), varsUtil)
-        //val (tree1, superCompiledProgram) = sc1.superCompile()
-        val superCompiledProgram = sc1.superCompile()
+        //val sc1 = new SuperCompiler1S(Program1(program.ts, t), varsUtil)
+        println("++++++++++++++++");
+        val sc1 = new SuperCompiler1(Program1(program.ts, t), varsUtil)
+        val (tree1, superCompiledProgram) = sc1.superCompile()
+        //val superCompiledProgram = sc1.superCompile()
         node.expr = superCompiledProgram.expr
         node.supercompiled = true
         println("++++++++++++++")
-        println("TTT1: " + t)
-        println("TTT2: " + superCompiledProgram.expr)
+        println("BEFORE SC: ")
+        println(format(t))
+        println("AFTER SC: ")
+        println(format(superCompiledProgram.expr))
         println("++++++++++++++")          
       } else {
         tree.addChildren(node, driver.drive(node.expr))
@@ -157,7 +144,13 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
   }
   
   private def equivalenceTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
-    case aTerm: Term1 => equivalent(aTerm, bTerm);
+    case aTerm: Term1 => {
+      if (equivalent(aTerm, bTerm)) {
+        return true;
+      } else {
+        return false;
+      }
+    }
     case _ => false
   }
 
@@ -173,6 +166,7 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
           println(format(canonize1(bTerm)))
           println("***************")
         }
+      
         he1
     }
     case _ => false
@@ -191,6 +185,9 @@ class SuperCompiler2(val program: Program1, varsUtil: VarGen1) {
   
   private def canBeEnhanced2_?(t: Term1) = decompose1(t) match {
   case c: Context1 => c.redex match {
+    //case _: RedexCall1 => true
+    //case _: RedexCaseVar1 => true
+    //case _: RedexCaseVarApp1 => true
     case _: RedexLetRec1 => true
     case _ => false
   }

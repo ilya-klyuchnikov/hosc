@@ -2,7 +2,10 @@ number :: Z | S number;
 boolean :: True | False;
 pair :: P number number;
 
-eqnum (add a b) (add b a)
+//eqnum (add a b) (add b a)
+
+//case (((add b) (S c))) of {Z  : (False ); S d : ((eqnum ((add c) b)) d);}
+((eqnum ((add x) (S y))) ((add y) (S x)))
 
 where
 

@@ -1,0 +1,5 @@
+even - 3 cycles for supercompiled program
+revert - 4 cycles for supercompiled program
+plus x y = plus y x - 2 cycles for supercompiled program
+
+synapse - a bit tricky

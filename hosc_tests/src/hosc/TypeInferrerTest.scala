@@ -3,7 +3,7 @@ package hosc
 import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
-import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch => B, Pattern => P,
+import EnrichedLambdaCalculus.{Application => A, Variable => V, CaseExpression => CE, Branch => B, Pattern => P,
   Constructor => C, LambdaAbstraction => L, _}
 import TypeInferrer._
 import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
@@ -13,7 +13,7 @@ import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
 class TypeInferrerTest {
 
   @Test def simpleApplications(): Unit = {
-    val ti = new TypeInferrer(null)
+    val ti = new TypeInferrer(Nil)
     val v = L(V("b"), L(V("a"), V("b")))
     val v0 = L(V("a"), V("a"))
     val v1 = L(V("a"), L(V("b"),A(V("a"), V("b"))))
@@ -32,12 +32,12 @@ class TypeInferrerTest {
   }
   
   @Test def simpleLambda(): Unit = {
-    val ti = new TypeInferrer(null)
+    val ti = new TypeInferrer(Nil)
     val v = L(V("x"), L(V("x"), V("x")))
     val r = ti.tc(TypeEnv(Nil), v)
     println(r)
   }
-  
+  /*
   @Test def simpleConstructors(): Unit = {
     val programResult = TestUtils.programResultFromFile("hl/type_inferrer/rev1.hl")
     assertTrue(programResult.successful)
@@ -231,5 +231,5 @@ class TypeInferrerTest {
   
     println
   
-  }
+  }*/
 }

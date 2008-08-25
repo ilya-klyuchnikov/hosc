@@ -1,0 +1,23 @@
+// supercompiled version of eqnum (plus x y) (plus y x)
+// supercompilation was without free variables
+
+number  :: Z  | S number;
+boolean  :: TRUE  | FALSE ;
+( letrec
+  if79 = %iv80 {
+    %iv81 {
+      case  iv80  of {
+        S i65 : ((if79 i65) (S iv81));
+        Z :
+          case  iv80  of {
+            S iv53 :
+              leq iv53 iv81; 
+            Z : TRUE;
+          };
+      }
+    }
+  }
+in 
+  ((if79 y66) p))
+
+

@@ -1,0 +1,21 @@
+/*
+number  :: Z  | S number;
+letrec 
+ g = %x { %y {
+ 	case x of{
+ 		Z: y;
+ 		S x1: g x1 (S y);
+ 	}
+ }}
+ in g n Z
+ */
+ 
+list $a :: Nil  | Cons $a (list $a);
+tree $b :: Leaf $b | Node (tree $b) (tree $b);
+( letrec g = %t1 { %x2 { case  t1  of { Leaf v1 : x2; Node v y1 : ((g v) ((g y1) x2)); } } }
+in 
+  ((g t)
+    ( letrec f = %r1 { %s1 { case  r1  of { Leaf x1 : (Cons x1 s1); Node w z : ((f z) ((f w) s1)); } } }
+    in 
+      ((f t) l))))	 
+  

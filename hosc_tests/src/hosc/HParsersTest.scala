@@ -133,6 +133,11 @@ class HParsersTest {
       
   }
   
+  @Test def typeArrow(): Unit = {
+    testSType("$a -> $b", Arr(TV("$a"), TV("$b")));
+    testSType("$a -> $b -> $c", Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
+  }
+  
   @Test def simpleProgram(): Unit = {
     val goal = A(V("rev"), V("x"))
     val listT = TCD("list", TV("$a") :: Nil, DC("Nil", Nil) :: DC("Cons", TV("$a") :: TC("list", TV("$a") :: Nil) :: Nil) :: Nil)
@@ -194,6 +199,11 @@ class HParsersTest {
         "duplicate var z should be reported");
     testVal("hl/validator/err17.hl",
         "non exhaustive should be reported");
+  }
+  
+  @Test def caseError(): Unit = {
+    testVal("hl/parser/case.hl",
+        "missing ; should be reported")
   }
   
   @Test def parserErrors(): Unit = {

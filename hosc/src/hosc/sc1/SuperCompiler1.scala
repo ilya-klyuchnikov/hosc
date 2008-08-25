@@ -5,6 +5,7 @@ import ProcessTree1._
 import TermAlgebra1._
 import MSG1._
 import HE1._
+import sc2.HE2
 import LangUtils._
 
 class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
@@ -13,6 +14,8 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
   def superCompile(): (ProcessTree1, Program1) = {
     val p = ProcessTree1(program.expr)
     while (!p.isClosed) {
+      //println(p)
+      //println("==============")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -22,13 +25,15 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
             case None => {
               beta.ancestors find instanceTest(bTerm) match {
                 case Some(alpha1) => {
-                  println("INSTANCE!!")
+                  println("NOT GENERALIZING FROM SCP1")
+                  //beta.instance = true
                   makeAbstraction(p, beta, alpha1)
                 } 
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
                     case Some(alpha) => {
                       println("GENERALIZING FROM SCP1")
+                      //beta.instance = true
                       makeAbstraction(p, alpha, beta)
                     }
                     case None => drive(p, beta)
@@ -56,9 +61,9 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
     val g = msg(alphaTerm, betaTerm)
     var generalizedTerm = g.term
     var subs = g.sub1
-    //println(form(can(alphaTerm)))
+    //println(format(canonize1(alphaTerm)))
     //println()
-    //println(form(can(betaTerm)))
+    //println(format(canonize1(betaTerm)))
     var resSub = List[Substitution]()
     var set = Set[Variable1]()
     // eliminate letrecs mapping
@@ -71,8 +76,8 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
     
     val let = LetExpression1(resSub, generalizedTerm) 
     //println(g)
-    //println(form(let))
-    //println("=======================")
+    //println(format(let))
+    println("=======================")
     tree.replace(alpha, let)
   }
   
@@ -87,9 +92,29 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
   }
 
   private def heByCouplingTest(bTerm: Term1)(aNode: Node1): Boolean = aNode.expr match {
-    case aTerm: Term1 => /*sameRedex(aTerm, bTerm) &&*/ heByCoupling(aTerm, bTerm);
-    case _ => false
+  case aTerm: Term1 => {
+    /*sameRedex(aTerm, bTerm) &&*/ 
+      val he1 = heByCoupling(aTerm, bTerm)
+      val he3 = heByCoupling(bTerm, aTerm)
+      val he2 = HE2.heByCoupling(aTerm, bTerm)
+      if (he1 == false && he2 == true) {
+        //println("HE2!!!!!!!!!!!")
+        //println(format(canonize1(aTerm)))
+        //println("***************")
+        //println(format(canonize1(bTerm)))
+        //println("***************")
+      }
+      if (he3 == true) {
+        //println("HE2!!!!!!!!!!!")
+        //println(format(canonize1(aTerm)))
+        //println("***************")
+        //println(format(canonize1(bTerm)))
+        //println("***************")
+      }
+      he1
   }
+  case _ => false
+}
   
   private def canBeEnhanced_?(t: Term1) = decompose1(t) match {
     case c: Context1 => c.redex match { 
@@ -98,6 +123,7 @@ class SuperCompiler1(val program: Program1, varsUtil: VarGen1) {
       //case _: RedexCaseVarApp1 => true
       case _: RedexLetRec1 => true
       case _ => false
+      //case _ => true
     }
     case _: Observable1 => false
   }

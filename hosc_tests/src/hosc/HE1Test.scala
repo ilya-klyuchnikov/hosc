@@ -2,8 +2,8 @@ package hosc;
 import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
-import TermAlgebra1._
-import HE1.he
+import sc1.TermAlgebra1._
+import sc1.HE1.he
 import HLanguage1.{Application1 => A, Variable1 => V, CaseExpression1 => CE, Branch1 => B, Pattern1 => P,
   Constructor1 => C, LambdaAbstraction1 => LA, LetRecExpression1 => LR, _}
 

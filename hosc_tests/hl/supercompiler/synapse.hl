@@ -30,9 +30,18 @@ loop = %state {
     }
   }
 }
-
+/*
 add = %x {
   %y {
+    case y of {
+      Z   : x;
+      S n : S (add x n);
+    }
+  }
+}*/
+
+add = %y {
+  %x {
     case y of {
       Z   : x;
       S n : S (add x n);

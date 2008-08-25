@@ -1,7 +1,7 @@
 number :: Z | S number;
 boolean :: True | False;
 
-even (double n Z)
+even (double n z)
 
 
 where

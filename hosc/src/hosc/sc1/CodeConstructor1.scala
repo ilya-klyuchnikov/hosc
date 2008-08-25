@@ -7,14 +7,18 @@ import MSG1._
 
 class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
   
-  def constructProgram(node: Node1): Program1 = Program1(program.ts, construct(node))
+  val  freeVarsInLetrec = false
   
-  private def construct(node: Node1): Term1 = node.expr match {
-    /*
-    case LetExpression1(bindings, _) => {
-      construct(node.children.head)/Map(bindings:_*)
-    }
-    */
+  def constructProgram(node: Node1): Program1 = {
+    //println(node)
+    Program1(program.ts, construct(node))
+  }
+  
+  private def construct(node: Node1): Term1 = 
+    if (node.outs.isEmpty && node.repeatedOf == null) {
+      node.expr.asInstanceOf[Term1]
+    } else 
+    node.expr match {
     case LetExpression1(bs, t) => {
       val node0 = node.outs.head.child
       val nodes = node.outs.tail map {edge => edge.child}
@@ -31,7 +35,12 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
       case context: Context1 => context.redex match {
         case rc: RedexCall1 => throw new IllegalArgumentException("unexpected term: " + term.toString)
         case RedexLamApp1(lam, app) => construct(node.children.head)
-        case RedexCaseCon1(c, ce) => construct(node.children.head)
+        case RedexCaseCon1(c, ce) => {
+          if (node.repeatedOf!=null){
+            println()
+          }
+          construct(node.children.head)
+        }
         case RedexCaseVar1(v, CaseExpression1(sel, bs)) => {
           node.repeatedOf match {
             case null => {
@@ -42,13 +51,14 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
                   CaseExpression1(selector, branches)
                 }
                 case repeatNodes => {
-                  var vars = Set[Variable1]()                  
+                  var vars = Set[Variable1]() 
+                  if (freeVarsInLetrec){
                   for (n <- repeatNodes) {
                     val repeatTerm = n.expr.asInstanceOf[Term1]
                     val msg = strongMsg(term, repeatTerm)
                     val args0 = msg.sub2 map {p => p._1}
                     vars = vars ++ args0
-                  }                  
+                  }} else {vars = getFreeVars(term)}
                   val fargs = getVarsOrdered(term) filter {vars.contains(_)}
                   val appHead = createFVar
                   node.signature = constructApplication1(appHead, fargs)                  
@@ -86,13 +96,15 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
                   construct(node.children.head)
                 }
                 case repeatNodes => {
-                  var vars = Set[Variable1]()                  
+                  
+                  var vars = Set[Variable1]()
+                  if (freeVarsInLetrec){                                    
                   for (n <- repeatNodes) {
                     val repeatTerm = n.expr.asInstanceOf[Term1]
                     val msg = strongMsg(term, repeatTerm)
                     val args0 = msg.sub2 map {p => p._1}
                     vars = vars ++ args0
-                  }                  
+                  } } else {vars = getFreeVars(term)}               
                   val fargs = getVarsOrdered(term) filter {vars.contains(_)}
                   val appHead = createFVar()//varsUtil.createFreshLetrecVar()
                   node.signature = constructApplication1(appHead, fargs)

@@ -30,8 +30,9 @@ object HE2 {
       binders: List[Tuple2[Variable1, Variable1]], letrecs: Map[Variable1, Variable1]): Boolean = {
     term2 match {
       case Constructor1(_, args) => args exists (he(term1, _, binders, letrecs))
-      case LambdaAbstraction1(v, t) => he(term1, t, (null, v)::binders, letrecs)
-      case a: Application1 => lineApp(a) exists (he(term1, _, binders, letrecs))
+      case LambdaAbstraction1(v, t) => he(term1, t, binders, letrecs)
+      case Application1(head, arg) => //lineApp(a) exists (he(term1, _, binders, letrecs))
+                                        he(term1, head, binders, letrecs) || he(term1, arg, binders, letrecs)
       case CaseExpression1(sel, bs) => he(term1, sel, binders, letrecs) || 
         (bs exists {b => he(term1, b.term, binders, letrecs)})
       case LetRecExpression1((v, t), e) => he(term1, e, binders, letrecs) || he(term1, t, binders, letrecs)

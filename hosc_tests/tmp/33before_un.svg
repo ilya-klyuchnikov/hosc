@@ -1,0 +1,12 @@
+<svg:svg width="3122" height="30" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke:black;stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="3082" height="30" y="0" x="20"></svg:rect><svg:text y="15" x="1561">letrec [f$14]=%v$27260 {case (v$27260) of {S v$24920 : ([f$14] v$24920); Z : case (y) of {S v$24931 : letrec [f$7]=%v$25933 {case (v$25933) of {S v$25014 : ([f$7] v$25014); Z : case (z) of {S v$25059 : letrec [f$6]=%v$25928 {case (v$25928) of {S v$25105 : ([f$6] v$25105); Z : (True );}} in ([f$6] v$25059); Z : (True );};}} in ([f$7] v$24931); Z : case (z) of {S v$24966 : letrec [f$8]=%v$25938 {case (v$25938) of {S v$24994 : ([f$8] v$24994); Z : (True );}} in ([f$8] v$24966); Z : (True );};};}} in ([f$14] x)</svg:text>
+    
+    </svg:svg>

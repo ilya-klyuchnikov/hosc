@@ -3,6 +3,7 @@ package hosc.sc0
 import HLanguage._
 import TermAlgebra0._
 import ProcessTree0._
+import LangUtils._
 
 class SuperCompiler0(program: Program){
   val emptyMap = Map[Variable, Term]()
@@ -42,6 +43,8 @@ class SuperCompiler0(program: Program){
   def buildProcessTree(e: BaseExpression): ProcessTree0 = {
     val p = ProcessTree0(e)
     while (!p.isClosed) {
+      println(p)
+      println("==========")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -53,7 +56,10 @@ class SuperCompiler0(program: Program){
                 case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
-                    case Some(alpha) => makeAbstraction(p, alpha, beta)
+                    case Some(alpha) => {
+                      println("GENERALIZATION FROM SC0")
+                      makeAbstraction(p, alpha, beta)
+                    }
                     case None => drive(p, beta)
                   }
                 }
@@ -85,15 +91,15 @@ class SuperCompiler0(program: Program){
   def canBeEnhanced_?(t: Term) = decompose(t) match {
     case c: Context => c.redex match { 
       case r: RedexCall => true
-      //case r: RedexCaseVar => true
-      //case r: RedexCaseVarApp => true
+      case r: RedexCaseVar => true
+      case r: RedexCaseVarApp => true
       case _ => false
     }
     case _ => false
   }
   
   def sameRedex(t1: Term, t2: Term) : Boolean = (decompose(t1), decompose(t2)) match {
-    case (c1: Context, c2: Context) => c1.redex.getClass() == c2.redex.getClass()
+    case (c1: Context, c2: Context) => true//c1.redex.getClass() == c2.redex.getClass()
     case _ => false
   }
   
@@ -102,12 +108,17 @@ class SuperCompiler0(program: Program){
   }
   
   def makeAbstraction(t: ProcessTree0, alpha: Node, beta: Node): Unit = {
-    val g = msg(alpha.expr.asInstanceOf[Term], beta.expr.asInstanceOf[Term])
+    val aTerm = alpha.expr.asInstanceOf[Term]
+    val bTerm = beta.expr.asInstanceOf[Term]
+    val g = msg(aTerm, bTerm)
     if (g.sub1.isEmpty){
       t.replace(alpha, g.term)
     } else {
+      println(format(canonize(aTerm)))
+      println(format(canonize(bTerm)))
       var term = g.term
       var subs = g.sub1
+      println(format((LetExpression(g.sub1, g.term))))
       t.replace(alpha, LetExpression(g.sub1, g.term))
     }    
   }

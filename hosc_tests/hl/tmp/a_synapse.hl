@@ -18,6 +18,9 @@ state :: State number number number | Stop;
 boolean :: True | False;
 list $a :: Nil | Cons $a (list $a);
 
+loop (State (S x) Z Z) t
+
+where
 
 loop = %state { 
    %acts {

@@ -1,0 +1,70 @@
+number  :: Z  | S number;
+boolean  :: True  | False ;
+( letrec
+  f = %p4 {
+    %r4 {
+      case  p4  of {
+        Z :
+          ( letrec
+            g = %s4 {
+              %t4 {
+                case  t4  of {
+                  Z : case  s4  of { Z : case  x  of { Z : True; S t2 : False; }; S z4 : False; };
+                  S w :
+                    case  s4  of {
+                      Z :
+                        ( letrec
+                          h = %x5 {
+                            %y5 {
+                              case  x5  of {
+                                Z : False;
+                                S v2 :
+                                  case  y5  of { Z : case  v2  of { Z : True; S u4 : False; }; S u2 : ((h v2) u2); };
+                              }
+                            }
+                          }
+                        in 
+                          ((h x) w));
+                      S y2 : ((g y2) w);
+                    };
+                }
+              }
+            }
+          in 
+            ((g r4) y));
+        S y4 :
+          case  r4  of {
+            Z :
+              ( letrec
+                f1 = %z5 {
+                  %u5 {
+                    case  z5  of {
+                      Z : False;
+                      S v2 :
+                        case  u5  of {
+                          Z :
+                            ( letrec
+                              g1 = %v5 {
+                                %w5 {
+                                  case  w5  of {
+                                    Z : case  v5  of { Z : True; S t : False; };
+                                    S x4 : case  v5  of { Z : False; S v1 : ((g1 v1) x4); };
+                                  }
+                                }
+                              }
+                            in 
+                              ((g1 v2) y));
+                          S x1 : ((f1 v2) x1);
+                        };
+                    }
+                  }
+                }
+              in 
+                ((f1 x) y4));
+            S s2 : ((f y4) s2);
+          };
+      }
+    }
+  }
+in 
+  ((f x) y))

@@ -174,7 +174,7 @@ object TermAlgebra1 {
     case LetRecExpression1(binding, expr) => getBoundedVars(binding._2) ++ getBoundedVars(expr)
   }
   
-  def instanceOf(t1: Term1, t2: Term1): Boolean = equivalent(msg(t1, t2).term, t1)
+  def instanceOf(t1: Term1, t2: Term1): Boolean = HE1.heByCoupling(t1, t2) && equivalent(msg(t1, t2).term, t1)
   
   // During unfolding we always rename functions 
   // in a way that bound vars (in lambda absractions and case expressions) are refreshed.

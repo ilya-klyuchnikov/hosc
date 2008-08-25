@@ -1,23 +1,19 @@
 list $a :: Nil | Cons $a (list $a);
+number :: Z | S number;
+boolean :: True | False;
 
-case  x  of {
-      Nil : Nil;
-      Cons s1 u1 :
-          ((g (f u1)) s1);
-    }
+leq x (plus x (S (S y)))
 
 where
 
-g = %x1 {
-            %y1 {
-              case  x1  of { Nil : (Cons y1 Nil); Cons p z : (Cons p ((g z) y1)); }
-            }
-          }
-          
-  f = %t {
-    case  t  of {
-      Nil : Nil;
-      Cons s u :
-          ((g (f u)) s);
-    }
+plus = %x{ %y {
+  case x of {Z: y; S x1: plus x1 (S y);}
+}}
+
+leq = %x {%y{
+  case x of {
+    Z: True;
+    S x1: case y of {Z: False; S y1: leq x1 y1;};
   }
+
+}}

@@ -55,7 +55,7 @@ object SuperCompiler0App {
     } 
     scala.xml.XML.save(outFileName, svg)
     
-    val g = new CodeConstructor0(program, pt, true)
+    val g = new CodeConstructor0(program, pt, false)
     val p = g.generateProgram()
     val doc = p.toDoc
     val slFile = new java.io.File(outProgramFileName)

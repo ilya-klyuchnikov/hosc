@@ -1,0 +1,23 @@
+list $a :: Nil  | Cons $a (list $a);
+( letrec
+  f = %x2 {
+    %y2 {
+      %z2 {
+        case  x2  of {
+          Nil :
+            case  y2  of {
+              Cons p1 y :
+                (Cons
+                  p1
+                  ( letrec g = %u2 { %v2 { case  u2  of { Nil : v2; Cons r p : (Cons r ((g p) v2)); } } }
+                  in 
+                    ((g y) z2)));
+              Nil : z2;
+            };
+          Cons v1 t : (((f t) (Cons v1 y2)) z2);
+        }
+      }
+    }
+  }
+in 
+  (((f xs) Nil) ys))

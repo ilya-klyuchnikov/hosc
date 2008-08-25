@@ -1,0 +1,10 @@
+number :: Z | S number;
+
+letrec 
+ f = %x { %g {
+ 	case x of{
+ 		Z: g Z;
+ 		S x1: f x1 (% a {g (S a)});
+ 	}
+ }}
+ in f n (% b{b})

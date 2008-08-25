@@ -1,0 +1,22 @@
+letrec
+  [f] = %u1 {
+    %v1 {
+      case  u1  of {
+        Z :
+          case  v1  of {
+            Z : True;
+            S r :
+              case  r  of {
+                Z : False;
+                S z :
+                  letrec [g] = %w1 { case  w1  of { Z : True; S x1 : case  x1  of { Z : False; S w : ([g] w); }; } }
+                  in 
+                    ([g] z);
+              };
+          };
+        S y1 : (([f] y1) (S (S v1)));
+      }
+    }
+  }
+in 
+  (([f] n) x)

@@ -6,19 +6,22 @@ import java.io.{BufferedReader, File, FileReader}
 import org.junit.Test
 import org.junit.Assert._
 import HLanguage._
+import sc0.HParsers0
+import sc0.Validator0
+import sc0.Postprocessor0
 
 object TestUtils {
   def termResultFromString(input: String) =
-    HParsers.parseTerm(new CharArrayReader(input.toCharArray))
+    HParsers0.parseTerm(new CharArrayReader(input.toCharArray))
     
   def typeExprResultFromString(input: String) =
-    HParsers.parseType(new CharArrayReader(input.toCharArray))
+    HParsers0.parseType(new CharArrayReader(input.toCharArray))
     
   def termFromString(input: String) = 
     termResultFromString(input).get
     
   def programResultFromString(input: String) =
-    HParsers.parseProgram(new CharArrayReader(input.toCharArray))
+    HParsers0.parseProgram(new CharArrayReader(input.toCharArray))
     
   def programResultFromFile(fileName: String) = {
     val file = new File(fileName)
@@ -33,6 +36,18 @@ object TestUtils {
       }
     } while (str != null)
     in.close();
-    HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+  }
+  
+  def termFromString(input: String, program: Program) = {
+    val pr = HParsers0.parseTerm(new CharArrayReader(input.toCharArray))
+    if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
+    val term = pr.get
+    Validator0.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    Postprocessor0.process(term, globals)
+    val ti = new TypeInferrer(program.ts)
+    //ti.tcTerm(term)
+    term
   }
 }

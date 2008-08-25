@@ -1,0 +1,27 @@
+boolean  :: TRUE  | FALSE ;
+number  :: Z  | S number;
+case  x  of {
+  Z : TRUE;
+  S p :
+    ( letrec
+      f = %t1 {
+        %x2 {
+          %y2 {
+            case  t1  of {
+              Z :
+                ( letrec
+                  g = %z2 {
+                    %u2 {
+                      case  z2  of { Z : TRUE; S p1 : case  u2  of { Z : FALSE; S r1 : ((g p1) r1); }; }
+                    }
+                  }
+                in 
+                  ((g y2) x2));
+              S w : (((f w) (S x2)) y2);
+            }
+          }
+        }
+      }
+    in 
+      (((f y) p) p));
+}

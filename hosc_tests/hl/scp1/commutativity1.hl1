@@ -1,0 +1,3 @@
+number  :: Z  | S number;
+boolean  :: True  | False ;
+letrec fs8=%s100 {case (s100) of {S s61 : (fs8 s61); Z : (True );}} in (fs8 yy)

@@ -3,6 +3,8 @@ package hosc
 import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
+
+import sc0.Interpreter0
 import HLanguage._
 import TestUtils._
 
@@ -18,7 +20,7 @@ class InterpreterTest {
   }  
   
   def testInt(fileName: String, expectedOutput: String): Unit = {
-    val in = new Interpreter(fileName)
+    val in = new Interpreter0(fileName)
     val expected = termFromString(expectedOutput)
     val actual = in.eval()
     assertEquals(expected, actual)

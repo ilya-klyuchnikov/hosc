@@ -1,0 +1,12 @@
+<svg:svg width="794" height="30" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke:black;stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="754" height="30" y="0" x="20"></svg:rect><svg:text y="15" x="397">letrec [f$1]=%v$634 {%v$635 {case (v$634) of {S v$588 : (([f$1] v$588) (S v$635)); Z : (d (S v$635));}}} in (([f$1] x) (Z ))</svg:text>
+    
+    </svg:svg>

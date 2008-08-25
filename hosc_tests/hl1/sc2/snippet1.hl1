@@ -1,0 +1,33 @@
+number  :: Z  | S number;
+boolean  :: True  | False ;
+case 
+( letrec af147 = %av148 { case  av148  of { S z2 : (S (af147 z2)); Z : y; } } in  (af147 x))
+ of {
+  S a170 :
+    ( letrec
+      af151 = %av152 {
+        %av153 {
+          case  av152  of {
+            S a272 :
+              case  av153  of {
+                S av128 : ((af151 a272) av128);
+                Z : case  a272  of { S av140 : False; Z : True; };
+              };
+            Z : False;
+          }
+        }
+      }
+    in 
+      ((af151
+          ( letrec af149 = %av150 { case  av150  of { S av61 : (S (af149 av61)); Z : x; } }
+          in 
+            (af149 y)))
+        a170));
+  Z :
+    case 
+    ( letrec af154 = %av155 { case  av155  of { S av63 : (S (af154 av63)); Z : x; } } in  (af154 y))
+     of {
+      S a231 : False;
+      Z : True;
+    };
+}

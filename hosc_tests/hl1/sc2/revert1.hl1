@@ -1,0 +1,26 @@
+// supercompiled version of naive revert function
+// supercompilation was with free variables in letrec
+
+list $a :: Nil  | Cons $a (list $a);
+
+( letrec
+  f = %w1 {
+    case  w1  of {
+      Nil : Nil;
+      Cons p v :
+        case  (f v)  of {
+          Cons x1 t :
+            (Cons
+              x1
+              ( letrec
+                g = %p1 {
+                  case  p1  of { Nil : (Cons p Nil); Cons z1 u1 : (Cons z1 (g u1)); }
+                }
+              in 
+                (g t)));
+          Nil : (Cons p Nil);
+        };
+    }
+  }
+in 
+  (f x))
