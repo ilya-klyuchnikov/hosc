@@ -14,12 +14,11 @@ import HLanguage._
 import Util._
 
 object SuperCompiler0App {
-  val help = """usage: hosc.SuperCompilerApp [-si sinput_file | -i input_file] -t tree_output_file -p program_output_file
+  val help = """usage: hosc.SuperCompilerApp [-si sinput_file] -t tree_output_file -p program_output_file
   |Where:
-  |sinput_file           path to input file where code is written using syntactic sugar
-  |input_file            path to input file where code is written using standard syntax
+  |sinput_file           path to input file (code in hl0 language)
   |tree_output_file      path to file where process tree will be placed (in SVG format)
-  |program_output_file   path to file where residual program will be placed
+  |program_output_file   path to file where residual program will be placed (in hl1 language)
   |""".stripMargin
   def main(args : Array[String]) : Unit = {
     var fileName: String = null
