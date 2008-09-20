@@ -153,7 +153,7 @@ class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
   
   private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
   private val fNames = Array('f', 'g', 'h');
-  private var fUsed = Set[String]()
+  private var fUsed = Set[String]() ++ (getAllVars1(program.expr) map {v => v.name})
   
   private def varFor(j: Int) = {
     if (j < 10) 

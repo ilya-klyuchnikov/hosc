@@ -167,7 +167,9 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
   
   private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
   private val fNames = Array('f', 'g', 'h');
-  private var fUsed = Set[String]()
+  
+  // set of already used variables
+  private var fUsed = Set[String]() ++ (getAllVars(originalProgram.goal) map {v => v.name})
   
   private def varFor(j: Int) = {
     if (j < 10) 
