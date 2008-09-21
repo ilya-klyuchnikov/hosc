@@ -1,0 +1,39 @@
+// Wadler "Comprehending Monads"
+// prove that
+// compose (map f) join = compose join (map (map f))
+
+list $a :: Nil | Cons $a (list $a);
+
+(compose (map f) join) xs 
+
+where
+
+map = %f {
+  %list {
+    case list of {
+      Nil : Nil;
+      Cons x xs : Cons (f x) (map f xs);
+    }
+  } 
+}
+
+compose = %f {%g { %x { f (g x)}}}
+
+unit = %x {Cons x Nil}
+
+join = %xs {
+	case xs of {
+		Nil : Nil;
+		Cons x1 xs1 : app x1 (join xs1);
+	}
+
+}
+
+app = %xs {
+  %ys {
+    case xs of {
+      Nil : ys;
+      Cons z zs : Cons z (app zs ys);
+    }
+  }
+}
