@@ -1,6 +1,7 @@
 // Wadler "Comprehending Monads"
 // prove that
 // compose (map f) join = compose join (map (map f))
+// this fact can be proved without generalization at all
 
 list $a :: Nil | Cons $a (list $a);
 
