@@ -6,6 +6,7 @@ import org.junit.Assert._
 import HLanguage.{Application => A, _}
 import sc0.TermAlgebra0._
 import sc0.HE0._
+import sc0.MSG0._
 import TestUtils._
 import Util._
 

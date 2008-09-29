@@ -4,6 +4,7 @@ import org.junit.Test
 import org.junit.Assert._
 import sc0.TermAlgebra0._
 import sc0.HE0._
+import sc0.MSG0._
 import TestUtils._
 import hosc.LangUtils.{canonize => can}
 
