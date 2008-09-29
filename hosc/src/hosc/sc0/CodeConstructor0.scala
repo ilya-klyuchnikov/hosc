@@ -4,6 +4,7 @@ import HLanguage._
 import HLanguage1._
 import LangUtils._
 import ProcessTree0._
+import MSG0._
 import TermAlgebra0._
 import sc1.TermAlgebra1._
 
