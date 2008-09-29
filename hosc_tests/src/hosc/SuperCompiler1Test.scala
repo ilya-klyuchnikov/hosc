@@ -69,4 +69,8 @@ class SuperCompiler1Test {
         "-t", "output/hl1/sc1/snippet1.svg",
         "-p", "output/hl1/sc1/snippet1.hl1"));
   }
+  
+  @Test def challenge__leq_add(): Unit = {    
+    SuperCompiler1App.main(Array("-i", "challenge/i/leq_add.hl1", "-t", "challenge/o/add_leq1.svg", "-p", "challenge/o/add_leq1.hl1"));
+  }
 }

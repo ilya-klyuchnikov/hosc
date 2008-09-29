@@ -1,0 +1,36 @@
+// Program Optimizations and Transformations in Calculation Form
+
+list $a :: Nil | Cons $a (list $a);
+boolean :: True | False;
+number :: Z | S number;
+
+// note that hd < isort (homeomorphic embedding!)
+
+hd (isort lessOrEq xs) // this will be the minimal element
+
+where
+
+hd = %xs {
+	case xs of {
+		Nil: Z;
+		Cons x1 xs1: x1;
+	}
+}
+
+isort = %lessOrEq { %xs {
+	case xs of {
+		Nil: Nil;
+		Cons x1 xs1: insert lessOrEq x1 (isort lessOrEq xs1);
+	}
+}}
+
+insert = %lessOrEq{ %x{ %xs{
+	case xs of {
+		Nil: Cons x Nil;
+		Cons x1 xs1:
+			case lessOrEq x x1 of {
+				True: Cons x (Cons x1 xs1);
+				False: Cons x1 (insert lessOrEq x xs1); 
+			};
+	}
+}}}

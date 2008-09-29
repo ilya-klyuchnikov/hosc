@@ -5,12 +5,16 @@ import org.junit.Ignore
 import sc0.SuperCompiler0App
 
 class SuperCompiler0Test {
+  @Test def app2(): Unit ={    
+    SuperCompiler0App.main(Array("-si", "hl0/2app.hl0",
+        "-t", "output/hl0/2app.svg",
+        "-p", "output/hl0/2app.hl1"));
+  }
+  
   @Test def app_rev1(): Unit ={    
     SuperCompiler0App.main(Array("-si", "hl0/app_rev1.hl0",
         "-t", "output/hl0/app_rev1.svg",
         "-p", "output/hl0/app_rev1.hl1"));
-    
-  
   }
   
   @Test def app_rev2(): Unit ={    

@@ -303,4 +303,25 @@ class MSG1Test {
     println(equivalent(t1, t2))
   }
   
+  @Test def WWW2(): Unit = {
+    val (t1String, t2String)=
+    (""" case  p1  of {
+        Z : True;
+        S r :  LEQ r x2;
+     }""",
+     """case  p  of {
+         Z : True;
+         S v :
+           case  v  of {
+             Z : True;
+             S w :  LEQ w v2;
+           };
+     }""");
+    
+    val t1 = can(TestUtils1.termFromString(t1String))
+    val t2 = can(TestUtils1.termFromString(t2String))
+    //println(form(t1))
+    println(msg(t1, t2))
+  }
+  
 }

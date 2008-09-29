@@ -8,7 +8,7 @@ public class AllHoscTests {
 
 	public static Test suite() {
 		TestSuite suite = new TestSuite("Tests for HOSC");
-		
+		// $JUnit-BEGIN$
 		suite.addTest(new JUnit4TestAdapter(hosc.HParsersTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.TypeInferrerTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.GraphAnalysisTest.class));
@@ -22,7 +22,8 @@ public class AllHoscTests {
 		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompiler0Test.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompiler1Test.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompiler2Test.class));
-		
+		suite.addTest(new JUnit4TestAdapter(hosc.TasksTest.class));
+		// $JUnit-END$
 		return suite;
 	}
 

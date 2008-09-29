@@ -1,6 +1,7 @@
 package hosc.sc0
 
 import HLanguage._
+import HE0._
 import TermAlgebra0._
 import ProcessTree0._
 import LangUtils._

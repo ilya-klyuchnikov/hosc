@@ -1,0 +1,28 @@
+list $a :: Nil | Cons $a (list $a);
+
+//case  (rev x)  of { Cons v3 v4 : (Cons v3 ((app v4) (rev y))); Nil  : (rev y); } //a-node equals via supercompilation to b-node // not true
+// case  (rev ((app v9) x))  of { Cons v19 v20 : (Cons v19 ((app v20) (Cons v8 Nil))); Nil  : (Cons v8 Nil); }
+
+app (rev x) (rev y) //!
+
+//rev (app (Cons y Nil) xs)
+
+//rev (Cons x xs)
+
+where
+
+rev = %xs {
+  case xs of {
+    Nil : Nil;
+    Cons z  zs : app (rev zs) (Cons z Nil);
+  }
+}
+
+app = %xs {
+  %ys {
+    case xs of {
+      Nil : ys;
+      Cons z zs : Cons z (app zs ys);
+    }
+  }
+}
