@@ -25,7 +25,7 @@ class TasksTest {
   
   @Test def task05_app_rev(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/05a_app_rev.hl0", "-t", "tasks/output/05a_app_rev.svg", "-p", "tasks/output/05a_app_rev.hl1"));
-    //SuperCompiler0App.main(Array("-si", "tasks/input/05b_app_rev.hl0", "-t", "tasks/output/05b_app_rev.svg", "-p", "tasks/output/05b_app_rev.hl1"));
+    SuperCompiler0App.main(Array("-si", "tasks/input/05b_app_rev.hl0", "-t", "tasks/output/05b_app_rev.svg", "-p", "tasks/output/05b_app_rev.hl1"));
   }
   
   @Test def task06_app_rev(): Unit = {    
@@ -35,7 +35,7 @@ class TasksTest {
   
   @Test def task07_eqnum_plus(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/07a_eqnum_plus.hl0", "-t", "tasks/output/07a_eqnum_plus.svg", "-p", "tasks/output/07a_eqnum_plus.hl1"));
-    //SuperCompiler0App.main(Array("-si", "tasks/input/07b_eqnum_plus.hl0", "-t", "tasks/output/07b_eqnum_plus.svg", "-p", "tasks/output/07b_eqnum_plus.hl1"));
+    SuperCompiler0App.main(Array("-si", "tasks/input/07b_eqnum_plus.hl0", "-t", "tasks/output/07b_eqnum_plus.svg", "-p", "tasks/output/07b_eqnum_plus.hl1"));
   }
   
   @Test def task08_eureka(): Unit = {    
