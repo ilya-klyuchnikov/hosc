@@ -10,7 +10,9 @@ object ProcessTree0 {
     override def toString = toString("")
     var signature: (String, List[Variable]) = null
     var repeatedOf: Node = null
-      
+    var instanceOf: Node = null
+    var embedderOf: Node = null
+    
     def toString(indent: String): String = {
       val sb = new StringBuilder(indent + "|__" + expr)
       for (edge <- outs) {
@@ -24,7 +26,7 @@ object ProcessTree0 {
 
     def ancestors(): List[Node] = if (in == null) Nil else in.parent :: in.parent.ancestors
 
-    def isProcessed: Boolean = (repeatedOf != null || 
+    def isProcessed: Boolean = (repeatedOf != null || instanceOf != null || embedderOf != null || 
       (expr match {
       case Constructor(_, Nil) => true
       case v : Variable if v.global == false => true

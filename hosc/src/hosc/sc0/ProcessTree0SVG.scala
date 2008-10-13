@@ -13,7 +13,7 @@ class ProcessTree0SVG(tree: ProcessTree0) {
     rect {fill: none;stroke: black; stroke-width: 1;}
     text {text-anchor: middle; font-family: monospace; font-size: 10px;}
     line {stroke: black; stroke-width: 1}
-    path {fill:none; stroke:black;stroke-width:1;stroke-dasharray: 4,4;}]]></svg:style>
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}]]></svg:style>
     </svg:defs>
     {nodeToSVG(tree.rootNode,0, 0)}
     {repeatEdges()}
@@ -22,7 +22,16 @@ class ProcessTree0SVG(tree: ProcessTree0) {
   def repeatEdges() : scala.xml.NodeBuffer = {
     val edges = new scala.xml.NodeBuffer
     for (n <- tree.leafs) {
-      val pn = n.getRepParent
+      val (pn, style) = 
+        if (n.repeatedOf != null) {
+          (n.repeatedOf, "stroke:black;")
+        } else  if (n.instanceOf != null) {
+          (n.instanceOf, "stroke:green;")
+        } else if (n.embedderOf != null) {
+          (n.embedderOf, "stroke:red;")
+        }else {
+          (null, null)
+        }
       if (pn != null) {
         val (cx, cy, cw, ctw) = map(n)
         val (px, py, pw, ptw) = map(pn)
@@ -31,7 +40,7 @@ class ProcessTree0SVG(tree: ProcessTree0) {
                 " C " + (px + s*ptw/2) + ", " + cy + " " + 
                 (px + s*ptw/2) + ", " + py + " " +
                 (px + s*pw/2) + ", " + py;
-        edges += <svg:path d={d}/>        
+        edges += <svg:path d={d} style={style} />        
       }
     }
     edges
