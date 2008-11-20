@@ -3,7 +3,7 @@ package bootstrap.liftweb
 import net.liftweb.util.Full
 import net.liftweb.http.{ResponseInfo, LiftRules, S}
 import net.liftweb.sitemap.{Menu, SiteMap, Loc}
-import net.liftweb.sitemap.Loc.{strToLink, strToLinkText, Hidden}
+import net.liftweb.sitemap.Loc._
  
 /**
   * A class that's instantiated early and run.  It allows the application
@@ -26,11 +26,11 @@ class Boot {
     LiftRules.addToPackages("hosc")     
 
     // Build SiteMap
-    val entries = Menu(Loc("Home", "/", "Home")) :: 
-                  Menu(Loc("sc0", "/sc0", "SC0")) ::
-                  Menu(Loc("sc0_result", "/sc0_result", "sc0_result", Hidden)) ::
-                  Menu(Loc("sc1", "/sc1", "SC1")) ::
-                  Menu(Loc("sc1_result", "/sc1_result", "sc1_result", Hidden)) ::
+    val entries = Menu(Loc("Home", Nil, "Home")) :: 
+                  Menu(Loc("sc0", "sc0" :: Nil, "SC0")) ::
+                  Menu(Loc("sc0_result", "sc0_result" :: Nil, "sc0_result", Hidden)) ::
+                  Menu(Loc("sc1", "sc1" :: Nil, "SC1")) ::
+                  Menu(Loc("sc1_result", "sc1_result" :: Nil, "sc1_result", Hidden)) ::
                   Nil 
     LiftRules.setSiteMap(SiteMap(entries:_*))
   }
