@@ -1,10 +1,13 @@
 number :: Z | S number;
 boolean :: True | False;
 
-eqnum (plus (S x) y) (plus x (S y))
+//eqnum  (plus (S x) (S y)) (plus (S y) (S x))
+
+//eqnum  (plus x1 y1) (plus x2 y2)
+
+eqnum (plus x2 (S(S y2))) (plus y2 (S(S x2)))
 
 where
-
 
 
 plus = %x2{ 
@@ -16,6 +19,13 @@ plus = %x2{
 	}
 }
 
+eqnum = %x3 { %y3 {
+	case x3 of {
+		Z : case y3 of {Z: True; S y4: False;};
+		S x5: case y3 of {Z: False; S y5: eqnum x5 y5;};
+	}
+}}
+
 plusa = %x2{ 
 	%y2 {
   		case x2 of {
@@ -24,25 +34,3 @@ plusa = %x2{
   		}
 	}
 }
-
-eqnum = %x3 { %y3 {
-	case x3 of {
-		Z : case y3 of {Z: True; S y4: False;};
-		S x5: case y3 of {Z: False; S y5: eqnum x5 y5;};
-	}
-}}
-
-id  = %x {
-	case x of {Z: Z; S x1: S (id x1);}
-
-}
-
-g = %f { %x { %y{
-	case x of {
-		Z : f y;
-		S x1 : S (g f x1 y);
-	}
-}}}
-
-id1 = %x {x}
-s = %x {S x}

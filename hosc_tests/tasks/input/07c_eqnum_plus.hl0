@@ -1,0 +1,31 @@
+number :: Z | S number;
+boolean :: True | False;
+
+//eqnum (plus (S x) y) (plus (S x) y)
+
+eqnum (plus (S x) y) z
+
+//plus2 (S z)
+
+where
+
+plus = %x{ 
+	%y {
+  		case x of {
+  			Z: y; 
+  			S x1: S (plus x1 y);
+  		}
+	}
+}
+
+
+eqnum = %x3 { %y3 {
+	case x3 of {
+		Z : case y3 of {Z: True; S y4: False;};
+		S x5: case y3 of {Z: False; S y5: eqnum x5 y5;};
+	}
+}}
+
+id  = %x {
+	case x of {Z: Z; S x1: S (id x1);}
+}

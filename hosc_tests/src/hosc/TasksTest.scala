@@ -5,6 +5,11 @@ import org.junit.Ignore
 import sc0.SuperCompiler0App
 
 class TasksTest {
+  @Test def task01_app(): Unit = {    
+    SuperCompiler0App.main(Array("-si", "tasks/input/01a_app.hl0", "-t", "tasks/output/01a_app.svg", "-p", "tasks/output/01a_app.hl1"));
+    SuperCompiler0App.main(Array("-si", "tasks/input/01b_plusxyz.hl0", "-t", "tasks/output/01b_plusxyz.svg", "-p", "tasks/output/01b_plusxyz.hl1"));
+  }
+  
   @Test def task02_map_comp(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/02a_map_comp.hl0", "-t", "tasks/output/02a_map_comp.svg", "-p", "tasks/output/02a_map_comp.hl1"));
     SuperCompiler0App.main(Array("-si", "tasks/input/02b_map_comp.hl0", "-t", "tasks/output/02b_map_comp.svg", "-p", "tasks/output/02b_map_comp.hl1"));
@@ -35,7 +40,10 @@ class TasksTest {
   
   @Test def task07_eqnum_plus(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/07a_eqnum_plus.hl0", "-t", "tasks/output/07a_eqnum_plus.svg", "-p", "tasks/output/07a_eqnum_plus.hl1"));
-    SuperCompiler0App.main(Array("-si", "tasks/input/07b_eqnum_plus.hl0", "-t", "tasks/output/07b_eqnum_plus.svg", "-p", "tasks/output/07b_eqnum_plus.hl1"));
+    //SuperCompiler0App.main(Array("-si", "tasks/input/07b_eqnum_plus.hl0", "-t", "tasks/output/07b_eqnum_plus.svg", "-p", "tasks/output/07b_eqnum_plus.hl1"));
+    
+    SuperCompiler0App.main(Array("-si", "tasks/input/07c_eqnum_plus.hl0", "-t", "tasks/output/07c_eqnum_plus.svg", "-p", "tasks/output/07c_eqnum_plus.hl1"));
+    SuperCompiler0App.main(Array("-si", "tasks/input/07d_eqnum_plus.hl0", "-t", "tasks/output/07d_eqnum_plus.svg", "-p", "tasks/output/07d_eqnum_plus.hl1"));
   }
   
   @Test def task08_eureka(): Unit = {    
@@ -47,6 +55,11 @@ class TasksTest {
   @Test def task09(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/09a.hl0", "-t", "tasks/output/09a.svg", "-p", "tasks/output/09a.hl1"));
     SuperCompiler0App.main(Array("-si", "tasks/input/09b.hl0", "-t", "tasks/output/09b.svg", "-p", "tasks/output/09b.hl1"));
+  }
+  
+  @Test def task11_rev(): Unit = {    
+    SuperCompiler0App.main(Array("-si", "tasks/input/11a_rev.hl0", "-t", "tasks/output/11a_rev.svg", "-p", "tasks/output/11a_rev.hl1"));
+    //SuperCompiler0App.main(Array("-si", "tasks/input/11b_rev.hl0", "-t", "tasks/output/11b_rev.svg", "-p", "tasks/output/11b_rev.hl1"));
   }
   
   @Test def leq_add(): Unit = {    

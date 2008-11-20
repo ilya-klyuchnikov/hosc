@@ -1,6 +1,6 @@
 list $a :: Nil | Cons $a (list $a);
 
-map (compose a b)
+append xs (append ys zs)
 
 where
 
@@ -15,12 +15,12 @@ compose = %f {%g { %x { f (g x)}}}
 
 unit = %x {Cons x Nil}
 
-join = %x { %xs {
-	case xs of {
-		Nil: x;
-		Cons x1 xs1: case x of {Nil: join x1 xs1; Cons x2 xs2 : Cons x2 (join xs2 xs);};
-	}
-}}
+join = %xs {
+    case xs of {
+        Nil: Nil;
+        Cons x1 xs1: append x1 (join xs1);
+    }
+}
 
 append = %xs { %ys {
     case xs of {

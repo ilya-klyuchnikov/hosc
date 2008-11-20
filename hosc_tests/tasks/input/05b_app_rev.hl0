@@ -1,8 +1,12 @@
 list $a :: Nil | Cons $a (list $a);
+bool :: T | F;
 
-//rev (app y x) Nil //!
 
-app (rev xs ys) zs
+//eql f (app (rev x Nil) y) (rev x y) 
+
+//rev xs (app ys zs)
+
+app (Cons x xs) ys
 
 where
 
@@ -20,4 +24,29 @@ app = %xs {
       Cons z zs : Cons z (app zs ys);
     }
   }
+}
+
+eql = %f {%xs { %ys {
+	case xs of {
+		Nil: 
+			case ys of {Nil: T; Cons y1 ys1: F;};
+		Cons x1 xs1: 
+			case ys of {
+				Nil: T; 
+				Cons y1 ys1: 
+					case f x1 y1 of {
+						F: F;
+						T: eql f xs ys;
+					}; 
+			};
+	}
+
+}}}
+
+id = % xs {
+	case xs of {
+		Nil: Nil;
+		Cons x1 xs1 : Cons x1 xs1;
+	}
+
 }

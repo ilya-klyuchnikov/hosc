@@ -5,6 +5,8 @@ boolean :: True | False;
 
 isort pr xs
 
+//insert pr x (isort pr xs)
+
 where
 
 isort = %pred { %xs {
