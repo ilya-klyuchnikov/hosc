@@ -1,0 +1,2 @@
+case  (join xs)  of { Cons v10 v11 : (Cons (f v10) ((map f) v11)); Nil  : Nil; }
+case  ((append v20) (join v21))  of { Cons v10 v11 : (Cons (f v10) ((map f) v11)); Nil  : Nil; }
