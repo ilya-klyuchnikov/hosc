@@ -10,6 +10,12 @@ class SuperCompiler0Test {
         "-t", "output/hl0/2app.svg",
         "-p", "output/hl0/2app.hl1"));
   }
+
+  @Test def rev(): Unit ={    
+    SuperCompiler0App.main(Array("-si", "hl0/rev.hl0",
+        "-t", "output/hl0/rev.svg",
+        "-p", "output/hl0/rev.hl1"));
+  }
   
   @Test def app_rev1(): Unit ={    
     SuperCompiler0App.main(Array("-si", "hl0/app_rev1.hl0",
