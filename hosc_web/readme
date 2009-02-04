@@ -1,24 +1,15 @@
-This project is developed under Eclipse using 
-Web Tools Platform (http://www.eclipse.org/webtools/).
+This project is developed under Eclipse using Web Tools Platform (http://www.eclipse.org/webtools/) 
+and Eclipse Scala Plugin v2.7.3 (http://www.scala-lang.org/node/94)
+
+You need to register Apache Tomcat 5.5 Server under name "tomcat5.5"
 
 This small web demonstration is powered by 
 lift framework (http://liftweb.net).
 
-Since lift is changed dramatically from release to release 
-you should use the lift version mentioned in this file.
-
 You need to register Apache Tomcat 5.5 Server under name "tomcat5.5"
 (Window>Preferences>Server>Installed Runtimes)
 
-In order to develop/build this project using Eclipse 
-you following third party libraries (jar-files) are placed
-into /hosc_web/WebContent/WEB-INF/lib:
-
-lift-webkit-0.9.jar           (http://scala-tools.org/repo-releases/net/liftweb/lift-webkit/0.9/)
-log4j-1.2.15.jar              (http://logging.apache.org/log4j/)
-commons-fileupload-1.2.1.jar  (http://commons.apache.org/fileupload/)
-
-Since new scala plugin (2.7.2RC1) supports projects dependencies 
+Since new scala plugin supports projects dependencies 
 and eclipse web tools can export project as war file the recommended way to
 package this project is to export it as war-file. 
 Select project in project explorer, Export>Web>War file. All dependencies
@@ -26,4 +17,4 @@ Select project in project explorer, Export>Web>War file. All dependencies
 
 Please note that scala libraries will be taken from scala plugin.
 
-build.xml is considered to be obsolete.
+build.xml is for internal use only.
