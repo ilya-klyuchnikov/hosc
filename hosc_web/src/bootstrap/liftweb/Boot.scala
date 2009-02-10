@@ -33,6 +33,9 @@ class Boot {
                   Menu(Loc("sc1_result", "sc1_result" :: Nil, "sc1_result", Hidden)) ::
                   Nil 
     LiftRules.setSiteMap(SiteMap(entries:_*))
+    
+    // web-service for appengine
+    LiftRules.dispatch.append(hosc.service.AppService.dispatcher)
   }
 }
 
