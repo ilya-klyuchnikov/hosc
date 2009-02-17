@@ -56,7 +56,7 @@ object LangUtils {
         expr = LetExpression0(bs, expr)
       }
     }
-    println(format(expr))
+    //println(format(expr))
     expr
   }
   
