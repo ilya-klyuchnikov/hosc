@@ -1,22 +1,22 @@
-list $a :: Nil | Cons $a (list $a);
-boolean :: True | False;
+data List a = Nil | Cons a (List a);
+data Boolean = True | False;
 
 app (Cons True Nil) (Cons False Nil)
 
 where
 
-rev = %xs {
+rev = \xs -> (
   case xs of {
-    Nil : Nil;
-    Cons z  zs : app (rev zs) (Cons z Nil);
+    Nil -> Nil;
+    Cons z  zs -> app (rev zs) (Cons z Nil);
   }
-}
+)
 
-app = %xs {
-  %ys {
+app = \xs -> (
+  \ys -> (
     case xs of {
-      Nil : ys;
-      Cons z zs : Cons z (app zs ys);
+      Nil -> ys;
+      Cons z zs -> Cons z (app zs ys);
     }
-  }
-}
+  )
+)
