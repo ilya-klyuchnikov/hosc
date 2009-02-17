@@ -1,1 +1,0 @@
-Loop: case ($225) of {Z : letrec [f$3]=%$412 {case ($412) of {Z : (True ); S $361 : case ($361) of {Z : (False ); S $363 : ([f$3] $363);};}} in ([f$3] $75); S $248 : Repeat: case ((([double] $248) (S (S (S (S $75)))))) of {S $251 : case ($251) of {S $252 : ([even] $252); Z : (False );}; Z : (True );};}
