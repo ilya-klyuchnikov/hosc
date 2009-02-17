@@ -8,6 +8,8 @@ import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch 
 import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
   TypeConstructorDefinition => TCD, DataConstructor => DC}
 
+import hosc.sc0.HParsers0
+
 class HParsersTest {
   @Test def application(): Unit = {
     testSTerm(
@@ -114,33 +116,33 @@ class HParsersTest {
   
   @Test def caseExpression(): Unit = {
     testSTerm(
-        "case x of {Nil : Nil;}", 
+        "case x of {Nil -> Nil;}", 
         CE(V("x"), List(B(P("Nil", Nil), C("Nil", Nil))))) ; 
   }
   
   @Test def lambdaAbstraction(): Unit = {
     testSTerm(
-        "%x {%y {Cons x y}}", 
+        "\\x -> (\\y -> (Cons x y))", 
         L(V("x"), L(V("y"), C("Cons", List(V("x"), V("y")))))) ; 
   }
   
   @Test def typeConstructor(): Unit = {
-      // tc1 tc2 $a tc2 $a = tc1 (tc2) $a (tc2) $a
+      // TC1 TC2 a TC2 a = TC1 (tC2) a (TC2) a
       testSType(
-          "tc1 tc2 $a tc2 $a", 
-          TC("tc1", TC("tc2", Nil) :: TV("$a") :: TC("tc2", Nil) :: TV("$a") :: Nil ));
-      testEType("(tc1 tc2) $a tc2 $a")
+          "TC1 TC2 a TC2 a", 
+          TC("TC1", TC("TC2", Nil) :: TV("a") :: TC("TC2", Nil) :: TV("a") :: Nil ));
+      testEType("(TC1 TC2) a TC2 a")
       
   }
   
   @Test def typeArrow(): Unit = {
-    testSType("$a -> $b", Arr(TV("$a"), TV("$b")));
-    testSType("$a -> $b -> $c", Arr(TV("$a"), Arr(TV("$b"), TV("$c"))));
+    testSType("a -> b", Arr(TV("a"), TV("b")));
+    testSType("a -> b -> c", Arr(TV("a"), Arr(TV("b"), TV("c"))));
   }
   
   @Test def simpleProgram(): Unit = {
     val goal = A(V("rev"), V("x"))
-    val listT = TCD("list", TV("$a") :: Nil, DC("Nil", Nil) :: DC("Cons", TV("$a") :: TC("list", TV("$a") :: Nil) :: Nil) :: Nil)
+    val listT = TCD("List", TV("a") :: Nil, DC("Nil", Nil) :: DC("Cons", TV("a") :: TC("List", TV("a") :: Nil) :: Nil) :: Nil)
     val revF = Function("rev", L(V("xs"), 
         CE(V("xs"),
             B(P("Nil", Nil), C("Nil", Nil)) :: 
@@ -165,56 +167,70 @@ class HParsersTest {
   }
   
   @Test def validator(): Unit = {
-    testVal("hl/validator/err01.hl",
+    assertValidationError("hl/validator/err01.hl",
         "duplicate type definition should be reported")
-    testVal("hl/validator/err02.hl",
+    assertValidationError("hl/validator/err02.hl",
         "undefined var should be reported")
-    testVal("hl/validator/err03.hl",
+    assertValidationError("hl/validator/err03.hl",
         "wrong numbers of type parameters should be reported")
-    testVal("hl/validator/err04.hl",
+    assertValidationError("hl/validator/err04.hl",
         "wrong numbers of type parameters should be reported")
-    testVal("hl/validator/err05.hl",
-        "undefined var should be reported")
-    testVal("hl/validator/err06.hl",
-        "unknown type list2 should be reported")
-    testVal("hl/validator/err07.hl",
+    assertValidationError("hl/validator/err05.hl",
+        "undefined constructors should be reported")
+    assertValidationError("hl/validator/err06.hl",
+        "unknown type List2 should be reported")
+    assertValidationError("hl/validator/err07.hl",
         "duplicate data constructor Cons should be reported")
-    testVal("hl/validator/err08.hl",
-        "duplicate type var $a should be reported")
-    testVal("hl/validator/err09.hl",
-        "useless type type var $b should be reported");
-    testVal("hl/validator/err10.hl",
+    assertValidationError("hl/validator/err08.hl",
+        "duplicate type var a should be reported")
+    assertValidationError("hl/validator/err09.hl",
+        "useless type type var b should be reported");
+    assertValidationError("hl/validator/err10.hl",
         "unbound var x should be reported");
-    testVal("hl/validator/err11.hl",
+    assertValidationError("hl/validator/err11.hl",
         "wrong number of parameters for constructor Cons should be reported");
-    testVal("hl/validator/err12.hl",
+    assertValidationError("hl/validator/err12.hl",
         "undefined constructor Cons2 should be reported");
-    testVal("hl/validator/err13.hl",
+    assertValidationError("hl/validator/err13.hl",
         "undefined constructor Nil2 should be reported");
-    testVal("hl/validator/err14.hl",
+    assertValidationError("hl/validator/err14.hl",
         "undefined (for type list) constructor Cons2 should be reported");
-    testVal("hl/validator/err15.hl",
+    assertValidationError("hl/validator/err15.hl",
         "wrong number of parameters for constructor Cons should be reported");
-    testVal("hl/validator/err16.hl",
+    assertValidationError("hl/validator/err16.hl",
         "duplicate var z should be reported");
-    testVal("hl/validator/err17.hl",
+    assertValidationError("hl/validator/err17.hl",
         "non exhaustive should be reported");
   }
   
   @Test def caseError(): Unit = {
-    testVal("hl/parser/case.hl",
-        "missing ; should be reported")
+    assertSyntaxError("hl/parser/case.hl", "missing ; should be reported")
   }
   
   @Test def parserErrors(): Unit = {
-    testVal("parser_input/err01.hl", "")
+    assertSyntaxError("parser_input/err01.hl", "")
   }
   
-  def testVal(fileName: String, msg: String)  = {
+  def assertValidationError(fileName: String, msg: String)  = {
     println(fileName)
     val r = TestUtils.programResultFromFile(fileName)  
     println(r)
     assertFalse(msg, r.successful)
+    r match {
+      case x : HParsers0.HError => ()
+      case _ => fail("validation error is expected: " + msg)
+    }
+  }
+  
+  def assertSyntaxError(fileName: String, msg: String)  = {
+    println(fileName)
+    val r = TestUtils.programResultFromFile(fileName)  
+    println(r)
+    assertFalse(msg, r.successful)
+    r match {
+      case x : HParsers0.HError => fail("syntax error is expected")
+      case _ => 
+    }
   }
   
   def testSTerm(input: String, expected: Term): Unit = {

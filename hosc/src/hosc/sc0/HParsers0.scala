@@ -6,9 +6,10 @@ import HLanguage._
 
 object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversions {
   
-  lexical.delimiters += ("(", ")", ",", "=", ";", ":", "%", "{", "}", "::", "|", "->")
-  lexical.reserved += ("case", "of", "where")
+  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
+  lexical.reserved += ("case", "of", "where", "data")
   
+  def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strongRep1(function)|success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
   
   def term: Parser[Term] = p(tr2 | appl) | err("term is expected")
@@ -22,29 +23,28 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
   private def variable = p(lident ^^ Variable)  
-  private def lambdaAbstraction = p("%" ~> c(variable) ~ (c("{") ~> term <~ c("}")) ^^ LambdaAbstraction)    
+  private def lambdaAbstraction = p("\\" ~> c(variable) ~ (c("->") ~> c("(") ~> term <~ c(")")) ^^ LambdaAbstraction)    
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
-  private def branch = p(pattern ~ (c(":") ~> c(term) <~ c(";")) ^^ Branch)  
+  private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
   def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))  
   
   def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition)  
-  private def typeConstrDefinition = p(lident ~ (typeVariable*) ~ ("::" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
+  private def typeConstrDefinition = p(("data" ~> uident) ~ (typeVariable*) ~ ("=" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
     TypeConstructorDefinition)
   
-  private def tp1: Parser[Type] = p(lident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")"))
-  private def tp2: Parser[Type] = p(typeVariable | lident ~ (tp1*) ^^ TypeConstructor)
+  private def tp1: Parser[Type] = p(uident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")"))
+  private def tp2: Parser[Type] = p(typeVariable | uident ~ (tp1*) ^^ TypeConstructor)
   private def tp3: Parser[Type] = p(tp2 |  ("(" ~> `type` <~ ")"))
   private def `type` = {
     val c = {(x: Type, y: Type) => if (y == null) x else Arrow(x, y)}
     chainr1(tp3, "->" ^^^ c, c, null)
   }
   private def arrow: Parser[Arrow] = p(tp2 ~ ("->" ~> `type`) ^^ Arrow) | ("(" ~> arrow <~ ")") 
-  private def typeVariable = p(sident ^^ TypeVariable)  
+  private def typeVariable = p(lident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
-  def program = (typeConstrDefinition*) ~ (term <~ "where") ~ (strongRep1(function)) ^^ Program
   def parseType(r: Reader[Char]) = strong(`type`) (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program) (new lexical.Scanner(r))))
   
@@ -66,6 +66,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
     lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
   }
   
+  /* customized error: validation error */
   case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
     override def toString = "[" + pos.pos +"] error: "+msg+"\n\n"+pos.pos.longString
   }

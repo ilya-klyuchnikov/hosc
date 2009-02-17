@@ -20,8 +20,8 @@ object EnrichedLambdaCalculus {
      }  
    }
    case class LambdaAbstraction(v: Variable, t: Expression) extends Expression {
-     override def toString = "%" + v.name + " {" + t + "}" 
-     def toDoc = "%" :: v.toDoc :: " {" :: nest(2, ED :/: t.toDoc) :/: "}" :: ED 
+     override def toString = "\\" + v.name + " -> (" + t + ")" 
+     def toDoc = "\\" :: v.toDoc :: " -> (" :: nest(2, ED :/: t.toDoc) :/: ")" :: ED 
    }
    case class Application(head: Expression, arg: Expression) extends Expression {
      override def toString = "(" + head + " " + arg + ")"
@@ -45,8 +45,8 @@ object EnrichedLambdaCalculus {
            :/: "in " :: nest(2, ED :/: expr.toDoc))
    }   
    case class Branch(pattern: Pattern, term: Expression) {
-     override def toString = pattern + " : " + term + ";"
-     def toDoc: Document = group(pattern.toDoc :: " :" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
+     override def toString = pattern + " -> " + term + ";"
+     def toDoc: Document = group(pattern.toDoc :: " ->" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
    }
    case class Pattern(name: String, args: List[Variable]) {
      override def toString = name + " " + args.mkString(" ")

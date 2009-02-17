@@ -1,10 +1,12 @@
-list $a :: Nil | Cons $a list2 $a;
+data List a = Nil | Cons a (List2 a);
 
-app = %xs {
-  %ys {
+x where
+
+app = \xs -> (
+  \ys -> (
     case xs of {
-      Nil : ys;
-      Cons z zs : Cons z (app zs xs);
+      Nil -> ys;
+      Cons z zs -> Cons z (app zs xs);
     }
-  }
-}
+  )
+)

@@ -40,8 +40,8 @@ object HLanguage {
    case class LambdaAbstraction(v: Variable, t: Term) extends Term {
      type termType = LambdaAbstraction
      def \\(s: Map[Variable, Variable]) = LambdaAbstraction(v\\s, t\\s)
-     override def toString = "%" + v.name + " {" + t + "}" 
-     def toDoc = "%" :: v.toDoc :: " {" :: nest(2, ED :/: t.toDoc) :/: "}" :: ED 
+     override def toString = "\\" + v.name + " -> (" + t + ")" 
+     def toDoc = "\\" :: v.toDoc :: " -> (" :: nest(2, ED :/: t.toDoc) :/: ")" :: ED 
    }
    case class Application(head: Term, arg: Term) extends Term {
      type termType = Application
@@ -74,8 +74,8 @@ object HLanguage {
    
    case class Branch(pattern: Pattern, term: Term) extends Positional {
      def \\(s: Map[Variable, Variable]) = Branch(pattern\\s, term\\s)
-     override def toString = pattern + " : " + term + ";"
-     def toDoc: Document = group(pattern.toDoc :: " :" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
+     override def toString = pattern + " -> " + term + ";"
+     def toDoc: Document = group(pattern.toDoc :: " ->" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
    }
    case class Pattern(name: String, args: List[Variable]) extends Positional {
      def \\(s: Map[Variable, Variable]) = Pattern(name, args map {_\\s})

@@ -19,7 +19,7 @@ abstract sealed class TypeDefinition extends Positional {
 }
 case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
   extends TypeDefinition {
-  override def toString = name + " " + args.mkString(" ") + " :: " + cons.mkString(" | ") + ";";     
+  override def toString = "data " + name + " " + args.mkString(" ") + " = " + cons.mkString(" | ") + ";";     
 }
 case class ArrowDefinition(name: String, ac: Arrow) extends TypeDefinition
 case class DataConstructor(name: String, args: List[Type]) extends Positional {
