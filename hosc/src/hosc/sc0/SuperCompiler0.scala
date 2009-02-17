@@ -45,8 +45,8 @@ class SuperCompiler0(program: Program){
   def buildProcessTree(e: BaseExpression): ProcessTree0 = {
     val p = ProcessTree0(e)
     while (!p.isClosed) {
-      println(p)
-      println("==========")
+      //println(p)
+      //println("==========")
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
@@ -59,7 +59,7 @@ class SuperCompiler0(program: Program){
                 case None => { 
                   beta.ancestors find heByCouplingTest(bTerm) match {
                     case Some(alpha) => {
-                      println("GENERALIZATION FROM SC0")
+                      //println("GENERALIZATION FROM SC0")
                       makeAbstraction(p, alpha, beta)
                     }
                     case None => drive(p, beta)
@@ -116,11 +116,11 @@ class SuperCompiler0(program: Program){
     if (g.sub1.isEmpty){
       t.replace(alpha, g.term)
     } else {
-      println(format(canonize(aTerm)))
-      println(format(canonize(bTerm)))
+      //println(format(canonize(aTerm)))
+      //println(format(canonize(bTerm)))
       var term = g.term
       var subs = g.sub1
-      println(format((LetExpression(g.sub1, g.term))))
+      //println(format((LetExpression(g.sub1, g.term))))
       t.replace(alpha, LetExpression(g.sub1, g.term))
     }    
   }
