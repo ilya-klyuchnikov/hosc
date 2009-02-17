@@ -169,24 +169,24 @@ class TermAlgebraTest {
     val input1 = 
       """
         |case rev x of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev b1) (Cons aa1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev b1) (Cons aa1 Nil);
         |}
       """.stripMargin;
       
     val input2 = 
       """
         |case x of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev (rev b1)) (Cons a1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev (rev b1)) (Cons a1 Nil);
         |}
       """.stripMargin;     
     
     val expectedMsgInput = 
       """
         |case y of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev z) (Cons aa1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev z) (Cons aa1 Nil);
         |}
       """.stripMargin;
     val term1 = termFromString(input1, program)
@@ -219,24 +219,24 @@ class TermAlgebraTest {
     val input1 = 
       """
         |case rev x of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev b1) (Cons aa1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev b1) (Cons aa1 Nil);
         |}
       """.stripMargin;
       
     val input2 = 
       """
         |case x of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev (rev b1)) (Cons a1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev (rev b1)) (Cons a1 Nil);
         |}
       """.stripMargin;     
     
     val expectedMsgInput = 
       """
         |case y of {
-        |  Nil : Nil;
-        |  Cons a1 b1 : app (rev z) (Cons aa1 Nil);
+        |  Nil -> Nil;
+        |  Cons a1 b1 -> app (rev z) (Cons aa1 Nil);
         |}
       """.stripMargin;
     val term1 = termFromString(input1, program)
