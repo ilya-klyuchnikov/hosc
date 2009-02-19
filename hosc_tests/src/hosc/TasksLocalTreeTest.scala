@@ -23,4 +23,9 @@ class TasksLocalTreeTest {
     LocalTreeBuilder0App.main(Array("-i", "tasks_lt/input/04a_plusxx.hl0", "-t", "tasks_lt/output/04a_plusxx.svg"));
     LocalTreeBuilder0App.main(Array("-i", "tasks_lt/input/04b_plusxyz.hl0", "-t", "tasks_lt/output/04b_plusxyz.svg"));
   }
+  
+  @Test def task05_map_compose(): Unit = {    
+    LocalTreeBuilder0App.main(Array("-i", "tasks_lt/input/05a_map_compose.hl0", "-t", "tasks_lt/output/05a_map_compose.svg"));
+    LocalTreeBuilder0App.main(Array("-i", "tasks_lt/input/05b_map_compose.hl0", "-t", "tasks_lt/output/05b_map_compose.svg"));
+  }
 }

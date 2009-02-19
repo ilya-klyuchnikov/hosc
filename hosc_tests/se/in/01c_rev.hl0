@@ -1,0 +1,21 @@
+list $a :: Nil | Cons $a (list $a);
+
+case  ((app (rev v24)) (Cons v23 Nil))  of { Cons v9 v10 : (Cons v9 ((app v10) (Cons v2 Nil))); Nil  : (Cons v2 Nil); }
+
+where
+
+rev = %xs {
+  case xs of {
+    Nil : Nil;
+    Cons z  zs : app (rev zs) (Cons z Nil);
+  }
+}
+
+app = %xs {
+  %ys {
+    case xs of {
+      Nil : ys;
+      Cons z zs : Cons z (app zs ys);
+    }
+  }
+}

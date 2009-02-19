@@ -57,6 +57,12 @@ class TasksTest {
     SuperCompiler0App.main(Array("-si", "tasks/input/09b.hl0", "-t", "tasks/output/09b.svg", "-p", "tasks/output/09b.hl1"));
   }
   
+  @Test def task10_len_rev(): Unit = {    
+    SuperCompiler0App.main(Array("-si", "tasks/input/10a_len_rev.hl0", "-t", "tasks/output/10a_len_rev.svg", "-p", "tasks/output/10a_len_rev.hl1"));
+    //SuperCompiler0App.main(Array("-si", "tasks/input/10b_len_rev.hl0", "-t", "tasks/output/10b_len_rev.svg", "-p", "tasks/output/10b_len_rev.hl1"));
+    //SuperCompiler0App.main(Array("-si", "tasks/input/10c_len_rev.hl0", "-t", "tasks/output/10c_len_rev.svg", "-p", "tasks/output/10c_len_rev.hl1"));
+  }
+  
   @Test def task11_rev(): Unit = {    
     SuperCompiler0App.main(Array("-si", "tasks/input/11a_rev.hl0", "-t", "tasks/output/11a_rev.svg", "-p", "tasks/output/11a_rev.hl1"));
     //SuperCompiler0App.main(Array("-si", "tasks/input/11b_rev.hl0", "-t", "tasks/output/11b_rev.svg", "-p", "tasks/output/11b_rev.hl1"));
