@@ -1,0 +1,35 @@
+boolean :: T | F;
+number :: Z | S number;
+
+fib1 n (fib p) (fib (S p)) 
+
+where
+
+eq = %x { %y {
+	case x of {
+		Z : case y of {Z: T; S y1: F;};
+		S x1: case y of {Z: F; S y1: eq x1 y1;};
+	}
+}}
+
+plus = %x{ %y {
+  case x of { Z: y; S x1: S (plus x1 y);}
+}}
+
+fib = %n{
+	case n of {
+		Z: Z;
+		S n1:
+			case n1 of {
+				Z: S Z;
+				S n2: plus (fib n1) (fib n2);
+			};
+	}
+}
+
+fib1 = %n{ %x{ %y{
+	case n of {
+		Z: x;
+		S n1: fib1 n1 y (plus x y);
+	}
+}}}
