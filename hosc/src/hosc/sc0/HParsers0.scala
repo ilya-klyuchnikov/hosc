@@ -10,7 +10,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   lexical.reserved += ("case", "of", "where", "data")
   
   def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strongRep1(function)|success(Nil)) ^^ Program
-  def function = p(lident ~ ("=" ~> lambdaAbstraction) ^^ Function)
+  def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
   
   def term: Parser[Term] = p(tr2 | appl) | err("term is expected")
   def appl = chainl1(tr0, tr1, success(Application(_: Term, _: Term)))
@@ -23,7 +23,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
   private def variable = p(lident ^^ Variable)  
-  private def lambdaAbstraction = p("\\" ~> c(variable+) ~ ((c("->") ~> term <~ c(";"))) ^^ desugarLambda)    
+  private def lambdaAbstraction = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda)    
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)

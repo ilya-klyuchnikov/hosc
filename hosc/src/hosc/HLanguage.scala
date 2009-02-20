@@ -40,8 +40,8 @@ object HLanguage {
    case class LambdaAbstraction(v: Variable, t: Term) extends Term {
      type termType = LambdaAbstraction
      def \\(s: Map[Variable, Variable]) = LambdaAbstraction(v\\s, t\\s)
-     override def toString = "\\" + v.name + " -> " + t + ";" 
-     def toDoc = "\\" :: v.toDoc :: "->" :: nest(2, ED :/: t.toDoc) :: ";" :: ED 
+     override def toString = "\\" + v.name + " -> " + t 
+     def toDoc = "\\" :: v.toDoc :: "->" :: nest(2, ED :/: t.toDoc) :: ED 
    }
    case class Application(head: Term, arg: Term) extends Term {
      type termType = Application
@@ -84,7 +84,7 @@ object HLanguage {
    }
    
    case class Function(name: String, lam: LambdaAbstraction) extends Positional {
-     def toDoc = text(name) :: text(" = ") :: lam.toDoc
+     def toDoc = text(name) :: text(" = ") :: lam.toDoc :: ";" :: ED
    }
    
    case class Program(ts: List[TypeConstructorDefinition], goal: Term, fs: List[Function]) {
