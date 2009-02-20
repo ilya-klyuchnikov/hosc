@@ -7,8 +7,8 @@ import scala.text.Document._
 object HLanguage1 {
    val ED: scala.text.Document = empty
    sealed abstract class Label 
-   case class Loop extends Label
-   case class Repeat extends Label
+   case class Loop() extends Label
+   case class Repeat() extends Label
    
    sealed abstract class Expression1 extends Positional {
      def toDoc: Document
@@ -53,8 +53,8 @@ object HLanguage1 {
      type termType = LambdaAbstraction1
      def \\(s: Map[Variable1, Variable1]) = {val l1=LambdaAbstraction1(v\\s, t\\s);l1.label=label;l1}
      def / (s: Map[Variable1, Term1]) = {val l1=LambdaAbstraction1(v, t/s);l1.label=label;l1}
-     override def toString = labelToString + "%" + v.name + " {" + t + "}";
-     def toDoc = "%" :: v.toDoc :: " {" :: nest(2, ED :/: t.toDoc) :/: "}" :: ED 
+     override def toString = labelToString + "\\" + v.name + " ->" + t;
+     def toDoc = "\\" :: v.toDoc :: " -> " :: t.toDoc :: ED 
    }
    
    case class Application1(head: Term1, arg: Term1) extends Term1 {
@@ -73,11 +73,11 @@ object HLanguage1 {
        c1.label=label;c1
      }
      override def toString = labelToString + "case (" + selector + ") of " + branches.mkString("{", " ", "}")
-     def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
+     def toDoc = group( group("case" :/: selector.toDoc :/: "of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
    }
    
-   case class LetRecExpression1(binding: Pair[Variable1, Term1], expr: Term1) extends Term1 {
+   case class LetRecExpression1(binding: (Variable1, Term1), expr: Term1) extends Term1 {
      type termType = LetRecExpression1
      def \\(s: Map[Variable1, Variable1]) = {
        val l1=LetRecExpression1((binding._1\\s, binding._2\\s), expr\\s);
@@ -88,12 +88,12 @@ object HLanguage1 {
        l1.label=label;l1
      }
      override def toString = labelToString + "letrec " + (binding._1 + "=" + binding._2) + " in " + expr;
-     def toDoc = group("( letrec" :: 
-         nest(2, group (ED :/: binding._1.toDoc :: " = " :: binding._2.toDoc))
-         :/: "in " :: nest(2, ED :/: expr.toDoc) :: ")" :: ED)
+     def toDoc = group("(letrec" :: 
+         nest(2, group (ED :/: binding._1.toDoc :: "=" :: binding._2.toDoc))
+         :/: "in" :: nest(2, ED :/: expr.toDoc) :: ")" :: ED)
    }
    
-   case class LetExpression1(bs: List[Pair[Variable1, Term1]], expr: Term1) extends Expression1 {
+   case class LetExpression1(bs: List[(Variable1, Term1)], expr: Term1) extends Expression1 {
      def \\(s: Map[Variable1, Variable1]) = LetExpression1(bs map {b => ((b._1\\s).asInstanceOf[Variable1],
          (b._2\\s).asInstanceOf[Term1])}, expr\\s);
      def isLoop = false
@@ -105,8 +105,8 @@ object HLanguage1 {
    
    case class Branch1(pattern: Pattern1, term: Term1) {
      def \\(s: Map[Variable1, Variable1]) = Branch1(pattern\\s, term\\s)
-     override def toString = pattern + " : " + term + ";"
-     def toDoc: Document = group(pattern.toDoc :: " :" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
+     override def toString = pattern + " -> " + term + ";"
+     def toDoc: Document = group(pattern.toDoc :: " ->" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
    }
    
    case class Pattern1(name: String, args: List[Variable1]) {
