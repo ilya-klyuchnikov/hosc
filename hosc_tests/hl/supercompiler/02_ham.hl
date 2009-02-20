@@ -1,17 +1,14 @@
-list $a :: Nil  | Cons $a (list $a);
+data List a = Nil  | Cons a (List a);
 
 case (case (vs) of {
-             Nil     : Cons x2 Nil;
-             Cons y ys :  Cons y (g ys x2);}
+             Nil     -> Cons x2 Nil;
+             Cons y ys ->  Cons y (g ys x2);}
     ) of {
-    Nil : Cons x1 Nil;
-    Cons x xs :  Cons x (g xs x1);
+    Nil -> Cons x1 Nil;
+    Cons x xs ->  Cons x (g xs x1);
 }
 
 where
 
-g = %p1 {
-  %r1 {
-    case  p1  of { Nil  : (Cons r1 Nil); Cons u x1 : (Cons u ((g x1) r1)); }
-  }
-}
+g = \p1 r1 ->
+    case  p1  of { Nil  -> (Cons r1 Nil); Cons u x1 -> (Cons u ((g x1) r1)); };

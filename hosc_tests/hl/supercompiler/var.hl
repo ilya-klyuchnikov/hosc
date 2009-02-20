@@ -1,12 +1,11 @@
-num :: Z | S num;
+data Num = Z | S Num;
 
 h a b
 
 where
 
-h = %x { %y {
+h = \x y ->
   case x of {
-     Z : y;
-     S a : h a y;
-  }
-}}
+     Z -> y;
+     S a -> h a y;
+  };

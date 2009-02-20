@@ -1,8 +1,6 @@
-list $a :: Nil | Cons $a (list $a);
-boolean :: True | False;
+data List a = Nil | Cons a (List a);
+data Boolean = True | False;
 
 f x where
 
-f = %x {
-  f x
-}
+f = \x -> f x;

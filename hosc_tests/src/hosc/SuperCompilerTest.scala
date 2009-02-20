@@ -15,6 +15,7 @@ class SuperCompilerTest {
         "-t", "output/01_loop.svg",
         "-p", "output/01_loop.hl"));
     }
+  @Ignore
   @Test def loop(): Unit = {
     SuperCompiler0App.main(Array("-si", "hl/supercompiler/loop.hl",
         "-t", "output/loop.svg",
@@ -191,42 +192,6 @@ class SuperCompilerTest {
     SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_1.hl",
         "-t", "output/rev_11.svg",
         "-p", "output/rev_11.hl"));
-    }
-  
-  @Test def rev_step(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_step.hl",
-        "-t", "output/rev_step.svg",
-        "-p", "output/rev_step.hl"));
-    }
-  
-  @Test def rev_test(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_test.hl",
-        "-t", "output/rev_test.svg",
-        "-p", "output/rev_test.hl"));
-    }
-  
-  @Test def rev_test2(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_test2.hl",
-        "-t", "output/rev_test2.svg",
-        "-p", "output/rev_test2.hl"));
-    }
-  
-  @Test def rev_step2(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_step2.hl",
-        "-t", "output/rev_step2.svg",
-        "-p", "output/rev_step2.hl"));
-    }
-  
-  @Test def rev_step3(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/rev_step3.hl",
-        "-t", "output/rev_step3.svg",
-        "-p", "output/rev_step3.hl"));
-    }
-  
-  @Test def superster(): Unit = {
-    SuperCompiler0App.main(Array("-si", "hl/supercompiler/superstep.hl",
-        "-t", "output/superstep.svg",
-        "-p", "output/superstep.hl"));
     }
   
   @Test def even1(): Unit = {

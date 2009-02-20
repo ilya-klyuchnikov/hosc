@@ -1,17 +1,16 @@
-list $a :: Nil | Cons $a (list $a);
+data List a = Nil  | Cons a (List a);
 
 case a of {
-Nil: Nil;
-Cons x xs: f xs x Nil;
+Nil -> Nil;
+Cons x xs -> f xs x Nil;
 }
 
 
 
 where
 
-f = %ys{ %x { %v{
+f = \ys x v ->
   case ys of{
-   Nil       : Cons x v;
-   Cons y1 ys1 : f ys1 y1 (Cons x v);
-  }
-}}}
+   Nil       -> Cons x v;
+   Cons y1 ys1 -> f ys1 y1 (Cons x v);
+  };

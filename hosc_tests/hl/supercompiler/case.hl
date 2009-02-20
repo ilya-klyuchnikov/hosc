@@ -1,34 +1,26 @@
-number :: Z | S number;
+data Num = Z | S Num;
 
-//h u
-
-
-g %x{case x of {
-    Z : r;
-    S y : m ;
-}}t
-
-
-//g a
+g (\x -> case x of {
+    Z -> r;
+    S y -> m ;
+}) t
 
 where
 
-f1 = %x {S x}
+f1 = \x -> S x;
 
-g1 = %x {
+g1 = \x ->
   case f1 x of {
-    Z : Z;
-    S y : g2 (g1 y);
-  }
-}
+    Z -> Z;
+    S y -> g2 (g1 y);
+  };
 
-g2 = %x {
+g2 = \x ->
   case f1 x of {
-    Z : Z;
-    S y : g1 x;
-  }
-}
+    Z -> Z;
+    S y -> g1 x;
+  };
 
 
 
-g = %x {g (g x)}
+g = \x -> g (g x);
