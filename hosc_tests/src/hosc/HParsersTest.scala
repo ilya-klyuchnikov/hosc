@@ -122,7 +122,7 @@ class HParsersTest {
   
   @Test def lambdaAbstraction(): Unit = {
     testSTerm(
-        "\\x -> (\\y -> (Cons x y))", 
+        "\\x -> (\\y -> (Cons x y););", 
         L(V("x"), L(V("y"), C("Cons", List(V("x"), V("y")))))) ; 
   }
   

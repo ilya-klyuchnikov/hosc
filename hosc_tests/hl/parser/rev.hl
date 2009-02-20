@@ -5,16 +5,12 @@ rev x
 where
 
 
-rev = \xs -> (
-  case xs of {
+rev = \xs -> case xs of {
     Nil -> Nil;
     Cons z  zs -> app (rev zs) (Cons z Nil);
-  }
-)
+  };
 
-app = \xs -> (\ys -> (
-    case xs of {
+app = \xs ys -> case xs of {
       Nil -> ys;
       Cons z zs -> Cons z (app zs ys);
-    }
-))
+    };

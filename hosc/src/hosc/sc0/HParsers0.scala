@@ -23,7 +23,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
   private def variable = p(lident ^^ Variable)  
-  private def lambdaAbstraction = p("\\" ~> c(variable) ~ (c("->") ~> c("(") ~> term <~ c(")")) ^^ LambdaAbstraction)    
+  private def lambdaAbstraction = p("\\" ~> c(variable+) ~ ((c("->") ~> term <~ c(";"))) ^^ desugarLambda)    
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
@@ -62,12 +62,20 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   
   def c[T](p: => Parser[T]): Parser[T] = commit(p)
   
-  def error(msg: String, pos: Positional) = {
-    lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
+  def desugarLambda(vs: List[Variable], e: Term): LambdaAbstraction = {
+    def desugarLambda_(vs_ : List[Variable]) : Term = vs_ match {
+      case Nil => e;
+      case v :: vv => LambdaAbstraction(v, desugarLambda_(vv))
+    }
+    LambdaAbstraction(vs.head, desugarLambda_(vs.tail))
   }
   
   /* customized error: validation error */
   case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
     override def toString = "[" + pos.pos +"] error: "+msg+"\n\n"+pos.pos.longString
+  }
+  
+  def error(msg: String, pos: Positional) = {
+    lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
   }
 }
