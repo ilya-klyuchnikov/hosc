@@ -211,7 +211,7 @@ object TermAlgebra0 {
     case LetExpression(bs, expr) =>
       getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
     case LetRecExpression(bs, expr) =>
-      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
+      getAllVars(expr) ++ (Set[Variable]() /: (bs :: Nil)) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
   }
   
 }

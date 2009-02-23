@@ -23,8 +23,8 @@ object LangUtils {
           bs map {b => Branch(Pattern(b.pattern.name, b.pattern.args map {v => Variable(v.name)}), hl0ToELC(b.term))})
     case LetExpression0(bs, lexpr) => 
       LetExpression(bs map {b => (Variable(b._1.name), hl0ToELC(b._2))}, hl0ToELC(lexpr))
-    case LetRecExpression0(bs, lexpr) => 
-      LetRecExpression(bs map {b => (Variable(b._1.name), hl0ToELC(b._2))}, hl0ToELC(lexpr))
+    case LetRecExpression0(b, lexpr) => 
+      LetRecExpression((Variable(b._1.name), hl0ToELC(b._2)) :: Nil, hl0ToELC(lexpr))
   }
   
   def hl1ToELC(expr: Expression1): Expression = expr match {
@@ -51,7 +51,8 @@ object LangUtils {
     for (scc <- sccs){
       val bs = scc.vs.toList map (x => (Variable0(x.name), fs(x.name).lam))
       if (scc.recursive){
-        expr = LetRecExpression0(bs, expr)
+        // TODO:
+        expr = null //LetRecExpression0(bs, expr)
       } else {
         expr = LetExpression0(bs, expr)
       }
@@ -67,8 +68,7 @@ object LangUtils {
     case Application0(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression0(sel, bs) => 
       getFreeVars(sel) ++ (Set[Variable0]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
-    case LetRecExpression0(bs, expr) => 
-      ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
+    case LetRecExpression0(bs, expr) => getFreeVars(expr) ++ getFreeVars(bs._2) - bs._1
     case LetExpression0(bs, expr) => 
       ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
   }

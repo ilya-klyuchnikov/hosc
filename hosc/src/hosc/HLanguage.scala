@@ -64,12 +64,12 @@ object HLanguage {
            nest(2, bs.foldLeft(ED){(y, b) => y :/: group (b._1.toDoc :: " = " :: b._2.toDoc)})
            :/: "in " :: nest(2, ED :/: expr.toDoc))
    }
-   case class LetRecExpression(bs: List[(Variable, Expression)], expr: Expression) extends Expression {
-     def \\(s: Map[Variable, Variable]) = LetRecExpression(bs map {b => (b._1\\s, b._2\\s)}, expr\\s);
-     override def toString = "(letrec " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr + ")"
-     def toDoc = group("letrec" :: 
-           nest(2, bs.foldLeft(ED){(y, b) => y :/: group (b._1.toDoc :: "=" :: b._2.toDoc)})
-           :/: "in" :: nest(2, ED :/: expr.toDoc))
+   case class LetRecExpression(binding: (Variable, Expression), expr: Expression) extends Expression {
+     def \\(s: Map[Variable, Variable]) = LetRecExpression((binding._1\\s, binding._2\\s), expr\\s);
+     override def toString = "(letrec " + (binding._1 + "=" + binding._2) + "\n in " + expr + ")"
+     def toDoc = group("(letrec" :: 
+         nest(2, group (ED :/: binding._1.toDoc :: "=" :: binding._2.toDoc))
+         :/: "in" :: nest(2, ED :/: expr.toDoc) :: ")" :: ED)
    }
    
    case class Branch(pattern: Pattern, term: Term) extends Positional {
