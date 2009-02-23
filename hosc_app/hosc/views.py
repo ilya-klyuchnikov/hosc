@@ -37,10 +37,13 @@ class SupercompilationResult(object):
 def supercompileProgram(code):
     form_fields = {'program': code}
     form_data = urllib.urlencode(form_fields)
-    result = urlfetch.fetch(url=RUN_URL,
-                            payload=form_data,
-                            method=urlfetch.POST,
-                            headers={'Content-Type': 'application/x-www-form-urlencoded'})   
+    try:
+        result = urlfetch.fetch(url=RUN_URL,
+                                payload=form_data,
+                                method=urlfetch.POST,
+                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    except:
+        return SupercompilationResult(NETWORK_ERROR)  
     if result.status_code == 200:
         xmlresponse = result.content
         doc = minidom.parseString(xmlresponse)
@@ -113,8 +116,8 @@ class Supercompiler(webapp.RequestHandler):
         if validationResult.status == TYPE_ERROR:
             self.display_errors(code_error=validationResult.message, code_line=validationResult.code_line)
             return
-        if validationResult == NETWORK_ERROR:
-            self.display_errors(code_error=validationResult.message)
+        if validationResult.status == NETWORK_ERROR:
+            self.display_errors(network_error=True, code_error=validationResult.message)
             return
         
         action = self.request.get('action')
@@ -182,6 +185,12 @@ class Edit(webapp.RequestHandler):
         scp_result = supercompileProgram(code)
         if scp_result.status == PARSE_ERROR:
             self.display_errors(code_error=scp_result.message, code_line=scp_result.code_line)
+            return
+        if scp_result.status == TYPE_ERROR:
+            self.display_errors(code_error=scp_result.message, code_line=scp_result.code_line)
+            return
+        if scp_result.status == NETWORK_ERROR:
+            self.display_errors(network_error=True, code_error=scp_result.message)
             return
         action = self.request.get('action')
         if action == 'Preview':
@@ -254,13 +263,14 @@ class Edit(webapp.RequestHandler):
                 self.redirect('/')
         except db.BadKeyError:
             self.redirect('/') 
-    def display_errors(self, code_error=None, code_line=None, empty_name=False):
+    def display_errors(self, code_error=None, code_line=None, empty_name=False, network_error=False):
         template_values = {
                         'user': users.get_current_user(),
                         'sign_in': users.create_login_url(self.request.uri),
                         'sign_out': users.create_logout_url(self.request.uri),
                         'code_error': code_error,
                         'code_line': code_line,
+                        'network_error': network_error,
                         'code' : self.request.get('code'),
                         'name' : self.request.get('name'),
                         'summary' : self.request.get('summary'),

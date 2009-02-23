@@ -11,6 +11,9 @@
     	{% if code_line %}<nobr><b>{{code_line}}</b></nobr>{% endif %}
     	</div></td></tr>
     	{% endif %}
+    	{% if network_error %}
+    	<tr><td><div class="error">Network error occured. Try again.</div></td></tr>
+    	{% endif %}
     	<tr><td><input value="Supercompile" type="submit" name="action"/></td><td></td></tr>
     	{% if scp_code %}
     	<tr><td>Supercompiled code:</td></tr>

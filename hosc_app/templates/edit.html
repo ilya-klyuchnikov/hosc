@@ -12,6 +12,9 @@
     	<nobr><b>{{code_line}}</b></nobr>
     	</div></td></tr>
     	{% endif %}
+    	{% if network_error %}
+    	<tr><td><div class="error">Network error occured. Try again.</div></td></tr>
+    	{% endif %}
     	<tr><td>Name:</td>
     	<tr><td><input id="name" name="name" type="text" value="{{name}}"/></td></tr>
     	{% if empty_name %}
