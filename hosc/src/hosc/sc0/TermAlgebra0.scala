@@ -184,13 +184,6 @@ object TermAlgebra0 {
   
   def instanceOf(t1: Term, t2: Term): Boolean = equivalent(msg(t1, t2).term, t1)
   
-  def isConV(t: Term): Boolean = t match {
-    case v: Variable => true //v.global 
-    //case Application(h, _) => isConV(h)
-    //case CaseExpression(sel, _) => isConV(sel)
-    case _ => false
-  }
-  
   def extractAppArgs(term: Term): List[Term] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
