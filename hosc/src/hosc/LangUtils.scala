@@ -51,8 +51,7 @@ object LangUtils {
     for (scc <- sccs){
       val bs = scc.vs.toList map (x => (Variable0(x.name), fs(x.name).lam))
       if (scc.recursive){
-        // TODO:
-        expr = null //LetRecExpression0(bs, expr)
+        expr = bs.foldRight(expr){(b, e) => LetRecExpression0(b, e)}
       } else {
         expr = LetExpression0(bs, expr)
       }
