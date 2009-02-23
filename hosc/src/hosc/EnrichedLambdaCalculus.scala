@@ -32,13 +32,13 @@ object EnrichedLambdaCalculus {
      def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
    }
-   case class LetExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression {
+   case class LetExpression(bs: List[(Variable, Expression)], expr: Expression) extends Expression {
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr 
      def toDoc = group("let" :: 
            nest(2, bs.foldLeft(ED){(y, b) => y :/: group (b._1.toDoc :: " = " :: b._2.toDoc)})
            :/: "in " :: nest(2, ED :/: expr.toDoc))
    }
-   case class LetRecExpression(bs: List[Pair[Variable, Expression]], expr: Expression) extends Expression {
+   case class LetRecExpression(bs: List[(Variable, Expression)], expr: Expression) extends Expression {
      override def toString = "(letrec " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr + ")"
      def toDoc = group("letrec" :: 
            nest(2, bs.foldLeft(ED){(y, b) => y :/: group (b._1.toDoc :: " = " :: b._2.toDoc)})
