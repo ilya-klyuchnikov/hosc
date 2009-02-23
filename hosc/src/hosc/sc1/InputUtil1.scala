@@ -31,6 +31,7 @@ object InputUtil1 {
       val canProgram = Program1(program.ts, canExpr)
       Postprocessor1.postprocess(canProgram)
       val elcExpr = LangUtils.hl1ToELC(canExpr)
+      println(elcExpr)
       val typeInferrer = new TypeInferrer(canProgram.ts)
       typeInferrer.inferType(elcExpr)
       canProgram

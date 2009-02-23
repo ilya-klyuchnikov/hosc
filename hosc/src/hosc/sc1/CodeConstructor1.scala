@@ -7,7 +7,7 @@ import MSG1._
 
 class CodeConstructor1(program: Program1, tree: ProcessTree1, varGen: VarGen1) {
   
-  val  freeVarsInLetrec = false
+  val  freeVarsInLetrec = true
   
   def constructProgram(node: Node1): Program1 = {
     //println(node)

@@ -1,10 +1,10 @@
 number :: Z | S number;
-
-letrec 
- f = %x { %g {
- 	case x of{
- 		Z: g Z;
- 		S x1: f x1 (% a {g (S a)});
- 	}
- }}
- in f n (% b{b})
+list $a :: Nil  | Cons $a (list $a);
+(letrec
+  f=%y1 { case y1 of {
+    Nil : (letrec g=%z1 { case z1 of { Nil : z; Cons r p : (Cons r (g p)); }} in (g y));
+    Cons u s : (Cons u (f s));
+  }
+  }
+in
+  (f x))
