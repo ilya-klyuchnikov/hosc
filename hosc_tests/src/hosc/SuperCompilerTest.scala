@@ -205,4 +205,10 @@ class SuperCompilerTest {
         "-t", "output/exp.svg",
         "-p", "output/exp.hl"));
     }
+  
+  @Test def letrec(): Unit = {
+    SuperCompiler0App.main(Array("-si", "hl/supercompiler/letrec.hs",
+        "-t", "output/letrec.svg",
+        "-p", "output/letrec.hs"));
+    }
 }
