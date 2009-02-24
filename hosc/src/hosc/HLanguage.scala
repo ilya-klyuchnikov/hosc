@@ -52,6 +52,7 @@ object HLanguage {
    }
    case class LetExpression(bs: List[(Variable, Expression)], expr: Expression) extends Expression {
      type termType = LetExpression
+     // we need asInstanceOf due to http://lampsvn.epfl.ch/trac/scala/ticket/252
      def \\(s: Map[Variable, Variable]) = LetExpression(bs map {b => ((b._1\\s).asInstanceOf[Variable], (b._2\\s).asInstanceOf[Expression])}, expr\\s);
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr 
      def toDoc = group("let" :: 

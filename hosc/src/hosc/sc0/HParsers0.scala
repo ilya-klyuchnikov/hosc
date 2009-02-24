@@ -7,7 +7,7 @@ import HLanguage._
 object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
-  lexical.reserved += ("case", "of", "where", "data")
+  lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
   
   def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strongRep1(function)|success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
@@ -16,7 +16,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
     
   // head of application
-  private def tr0: Parser[Expression] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")"))
+  private def tr0: Parser[Expression] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")")) | letrec
   // argument of or application constructor
   private def tr1 = p(tr0 | uident ^^ {x => Constructor(x, Nil)} | ("(" ~> term <~ ")"))
   // top constructor; cannot be head of application
@@ -25,6 +25,8 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   private def variable = p(lident ^^ Variable)  
   private def lambdaAbstraction = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda)    
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
+  private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ 
+                       {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
