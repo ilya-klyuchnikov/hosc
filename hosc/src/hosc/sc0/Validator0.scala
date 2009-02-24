@@ -79,7 +79,7 @@ object Validator0 {
     throw ValidatorError(error(msg, pos))
   }
   
-  def valTerm(boundedVars: Set[String], term: Term, p: Program): Unit = term match{
+  def valTerm(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
     case v: Variable => 
       if (!(boundedVars contains v.name)) err("unbounded variable " + v.name, v)
     case c: Constructor => {
@@ -129,7 +129,7 @@ object Validator0 {
     }
   }
   
-  def valTermWithFreeVars(boundedVars: Set[String], term: Term, p: Program): Unit = term match{
+  def valTermWithFreeVars(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
     case v: Variable => 
     case c: Constructor => {
       p.getDataConstructor(c.name) match {

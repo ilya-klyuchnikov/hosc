@@ -3,10 +3,10 @@ package hosc.sc0
 import HLanguage._
 
 object ProcessTree0 {
-  def apply(expr: BaseExpression) = 
+  def apply(expr: Expression) = 
     new ProcessTree0(new Node(expr, null, Nil))
   
-  class Node(var expr: BaseExpression, val in: Edge, var outs: List[Edge]) {
+  class Node(var expr: Expression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
     var signature: (String, List[Variable]) = null
     var repeatedOf: Node = null
@@ -46,13 +46,13 @@ object ProcessTree0 {
     def sub(map: Map[Variable, Variable]): Unit = {
       expr = expr\\map        
       for (e <- outs) {
-        e.substitution = Map(e.substitution.toList.map({p => Pair[Variable, Term](p._1\\map, p._2\\map)}):_*)
+        e.substitution = Map(e.substitution.toList.map({p => Pair[Variable, Expression](p._1\\map, p._2\\map)}):_*)
         e.child.sub(map)
       }
     }
   }
   
-  class Edge(val parent: Node, var child: Node, var substitution: Map[Variable, Term]) {
+  class Edge(val parent: Node, var child: Node, var substitution: Map[Variable, Expression]) {
     override def toString = "Edge("+ substitution + ", " + child + ")"
   }
   
@@ -71,7 +71,7 @@ class ProcessTree0 {
   
   def leafs = leafs_
   
-  def addChildren(node: Node, children: List[Pair[Term, Map[Variable, Term]]]) = {
+  def addChildren(node: Node, children: List[Pair[Expression, Map[Variable, Expression]]]) = {
     assume(leafs_.contains(node))
     leafs_ = leafs_.remove(_ == node)
     val edges = new scala.collection.mutable.ListBuffer[Edge]
@@ -85,7 +85,7 @@ class ProcessTree0 {
     node.outs = edges.toList
   }
   
-  def replace(node: Node, exp: BaseExpression): Node = {
+  def replace(node: Node, exp: Expression): Node = {
     // the node can be not leaf - but from any part of tree
     leafs_ = leafs_.remove(_ == node)
     leafs_ = leafs_.remove(_.ancestors.contains(node))

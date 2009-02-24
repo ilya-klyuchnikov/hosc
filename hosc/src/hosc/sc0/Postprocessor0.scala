@@ -11,7 +11,7 @@ object Postprocessor0 {
     process(program.goal, globals)
   }
   
-  def process(t: Term, globals: Set[Variable]): Unit = t match {
+  def process(t: Expression, globals: Set[Variable]): Unit = t match {
     case v: Variable => v.global = (globals contains v)
     case Constructor(_, args) => for (a <- args) process(a, globals)
     case LambdaAbstraction(v, t) => process(t, globals)

@@ -8,14 +8,14 @@ import ProcessTree0._
 import LangUtils._
 
 class LocalTreeBuilder0(program: Program){
-  val emptyMap = Map[Variable, Term]()
+  val emptyMap = Map[Variable, Expression]()
   
-  def driveExp(expr: BaseExpression): List[Pair[Term, Map[Variable, Term]]] = expr match {
+  def driveExp(expr: Expression): List[Pair[Expression, Map[Variable, Expression]]] = expr match {
     case LetExpression(bs, t) => {
-      (t.asInstanceOf[Term], Map[Variable, Term](bs map {p => (p._1, p._2.asInstanceOf[Term])} :_*)) :: 
-        (bs map {b => (b._2.asInstanceOf[Term], emptyMap)}) 
+      (t, Map[Variable, Expression](bs map {p => (p._1, p._2)} :_*)) :: 
+        (bs map {b => (b._2, emptyMap)}) 
     }
-    case t: Term => decompose(t) match {
+    case t => decompose(t) match {
       case ObservableVar(_) => Nil
       case ObservableCon(c) => c.args map {a => (a, emptyMap)}
       case ObservableVarApp(_, app) => extractAppArgs(app) map {a => (a, emptyMap)}
@@ -38,7 +38,7 @@ class LocalTreeBuilder0(program: Program){
           }
         case RedexCaseCon(c, ce) => {
           val b = ce.branches.find(_.pattern.name == c.name).get
-          val sub = Map[Variable, Term]() ++ (b.pattern.args zip c.args)
+          val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
           (context.replaceHole(applySubstitution(b.term, sub)), emptyMap) :: Nil          
         }
         case RedexCaseVar(v, CaseExpression(sel, bs)) =>
@@ -51,13 +51,14 @@ class LocalTreeBuilder0(program: Program){
     }
   }  
   
-  def buildProcessTree(e: BaseExpression): ProcessTree0 = {
+  def buildProcessTree(e: Expression): ProcessTree0 = {
     val p = ProcessTree0(e)
     while (!p.isClosed) {
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
       beta.expr match {
-        case bTerm: Term if canBeEnhanced_?(bTerm) => {
+        case LetExpression(_, _) => drive(p, beta)
+        case bTerm if canBeEnhanced_?(bTerm) => {
           beta.ancestors find equivalenceTest(bTerm) match {
             case Some(alpha) => beta.repeatedOf = alpha; 
             case None => {
@@ -81,22 +82,22 @@ class LocalTreeBuilder0(program: Program){
     renameVars(p)
   }
   
-  private def instanceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
-    case aTerm: Term => sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
-    case _ => false
+  private def instanceTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+    case LetExpression(_, _) => false
+    case aTerm => sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
   }
   
-  private def equivalenceTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
-    case aTerm: Term => equivalent(aTerm, bTerm);
-    case _ => false
+  private def equivalenceTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+    case LetExpression(_, _) => false
+    case aTerm => equivalent(aTerm, bTerm);
   }
   
-  private def heByCouplingTest(bTerm: Term)(aNode: Node): Boolean = aNode.expr match {
-    case aTerm: Term => sameRedex(aTerm, bTerm) && heByCoupling(aTerm, bTerm);
-    case _ => false
+  private def heByCouplingTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+    case LetExpression(_, _) => false
+    case aTerm => sameRedex(aTerm, bTerm) && heByCoupling(aTerm, bTerm);
   }
   
-  def canBeEnhanced_?(t: Term) = decompose(t) match {
+  def canBeEnhanced_?(t: Expression) = decompose(t) match {
     case c: Context => c.redex match { 
       case r: RedexCall => true
       //case r: RedexCaseVar => true
@@ -106,7 +107,7 @@ class LocalTreeBuilder0(program: Program){
     case _ => false
   }
   
-  def sameRedex(t1: Term, t2: Term) : Boolean = (decompose(t1), decompose(t2)) match {
+  def sameRedex(t1: Expression, t2: Expression) : Boolean = (decompose(t1), decompose(t2)) match {
     case (c1: Context, c2: Context) => true && c1.redex.getClass() == c2.redex.getClass()
     case _ => false
   }
@@ -150,7 +151,8 @@ class LocalTreeBuilder0(program: Program){
   private def isUnprocessed(beta: Node) : Boolean = beta.expr match {
       case Constructor(_, Nil) => false
       case v : Variable if v.global == false => false
-      case bTerm :Term if canBeEnhanced_?(bTerm) => {
+      case LetExpression(_, _) => false
+      case bTerm if canBeEnhanced_?(bTerm) => {
         beta.ancestors.find(equivalenceTest(bTerm)).isEmpty && 
           beta.ancestors.find(instanceTest(bTerm)).isEmpty && 
             beta.ancestors.find(heByCouplingTest(bTerm)).isEmpty

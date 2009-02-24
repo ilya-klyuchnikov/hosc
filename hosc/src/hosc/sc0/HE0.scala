@@ -4,16 +4,16 @@ import HLanguage._
 import TermAlgebra0._
 
 object HE0 {
-  def he(term1: Term, term2: Term): Boolean = he(term1, term2, Nil)
+  def he(term1: Expression, term2: Expression): Boolean = he(term1, term2, Nil)
   
-  def heByCoupling(term1: Term, term2: Term): Boolean = heByCoupling(term1, term2, Nil)
+  def heByCoupling(term1: Expression, term2: Expression): Boolean = heByCoupling(term1, term2, Nil)
   
-  def strictHe(term1: Term, term2: Term) = heByDiving(term1, term2, Nil)
+  def strictHe(term1: Expression, term2: Expression) = heByDiving(term1, term2, Nil)
   
-  private def he(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def he(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
     heByVar(term1, term2, binders) || heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
   
-  private def heByVar(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def heByVar(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
     (term1, term2) match {
     case (v1: Variable, v2: Variable) => (v1.global == true && v2.global == true && v1.name == v2.name) ||
       (v1.global == false && v2.global == false) && 
@@ -21,7 +21,7 @@ object HE0 {
     case _ => false
   }
   
-  private def heByDiving(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = { 
+  private def heByDiving(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = { 
     val term1Vars = getFreeVars(term1)
     for (p <- binders) if (term1Vars contains p._1) return false
     term2 match {
@@ -33,7 +33,7 @@ object HE0 {
     }
   }
   
-  private def heByCoupling(term1: Term, term2: Term, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def heByCoupling(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
     (term1, term2) match {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2, binders))

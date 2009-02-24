@@ -12,7 +12,15 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
   def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
   
   private def construct(node: Node): Term1 = node.expr match {
-    case t: Term => decompose(t) match {
+    case LetExpression(bs, t) => {
+      val node0 = node.outs.head.child
+      val nodes = node.outs.tail map {edge => edge.child}
+      val ts = nodes map construct
+      val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
+          {pair => (Variable1(pair._1._1.name), pair._2)})
+      construct(node0)/subs
+    }
+    case t => decompose(t) match {
       case ObservableVar(v) => Variable1(v.name)
       case ObservableCon(c) => Constructor1(c.name, node.children map construct)
       case ObservableVarApp(v, app) => constructApplication1(Variable1(v.name), node.children map construct)
@@ -23,14 +31,14 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
         case RedexCaseVar(v, CaseExpression(sel, bs)) => {
           if (node.getRepParent != null) {
             val alphaNode: Node = node.getRepParent()
-            val alphaT = alphaNode.expr.asInstanceOf[Term]
+            val alphaT = alphaNode.expr
             
             val (appHead, args) = alphaNode.signature
             val z = constructApplication(Variable(appHead), args)
             
             val msg = strongMsg(alphaT, t)
             // after substitution:
-            val sub = Map[Variable, Term]() ++ msg.sub2
+            val sub = Map[Variable, Expression]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
             val z2 = hlToHl1(z1)
             z2
@@ -47,7 +55,7 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                 if (freeVarsInLetrecs){
                   vars = Set[Variable]()
                   for (n <- repeatNodes) {
-                    val betaT = n.expr.asInstanceOf[Term]
+                    val betaT = n.expr
                     val msg = strongMsg(t, betaT)
                     val args0 = msg.sub2 map {p => p._1}
                     vars = vars ++ args0
@@ -85,14 +93,14 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
         case RedexCall(f) => {
           if (node.getRepParent != null) {
             val alphaNode: Node = node.getRepParent()
-            val alphaT = alphaNode.expr.asInstanceOf[Term]
+            val alphaT = alphaNode.expr
             
             val (appHead, args) = alphaNode.signature
             val z = constructApplication(Variable(appHead), args)
             
             val msg = strongMsg(alphaT, t)
             // after substitution:
-            val sub = Map[Variable, Term]() ++ msg.sub2
+            val sub = Map[Variable, Expression]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
             val z2 = hlToHl1(z1)
             z2
@@ -108,7 +116,7 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                 if (freeVarsInLetrecs){
                   vars = Set[Variable]()
                   for (n <- repeatNodes) {
-                    val betaT = n.expr.asInstanceOf[Term]
+                    val betaT = n.expr
                     val msg = strongMsg(t, betaT)
                     val args0 = msg.sub2 map {p => p._1}
                     vars = vars ++ args0
@@ -133,14 +141,6 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
           }
         }
       }
-    }
-    case LetExpression(bs, t) => {
-      val node0 = node.outs.head.child
-      val nodes = node.outs.tail map {edge => edge.child}
-      val ts = nodes map construct
-      val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
-          {pair => (Variable1(pair._1._1.name), pair._2)})
-      construct(node0)/subs
     }
   }
   

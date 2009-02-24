@@ -5,13 +5,14 @@ import TermAlgebra0._
 
 object MSG0 {
   
-  type Substitution = Tuple2[Variable, Term]
-  type DoubleSubstitution = Tuple3[Variable, Term, Term]
-  case class Generalization(term: Term, sub1: List[Substitution], sub2: List[Substitution])
-  case class Generalization2(term: Term, dSub: List[DoubleSubstitution])
+  type Substitution = Tuple2[Variable, Expression]
+  type DoubleSubstitution = Tuple3[Variable, Expression, Expression]
+  case class Generalization(term: Expression, sub1: List[Substitution], sub2: List[Substitution])
+  case class Generalization2(term: Expression, dSub: List[DoubleSubstitution])
   
-  def msg(term1: Term, term2: Term): Generalization = {
-    def msg_(term1: Term, term2: Term): Generalization2 = {
+  def msg(term1: Expression, term2: Expression): Generalization = {
+    null
+    def msg_(term1: Expression, term2: Expression): Generalization2 = {
       val initialVar = newVar()
       var g = Generalization2(initialVar, List((initialVar, term1, term2)))
       var exp = g.term
@@ -23,14 +24,14 @@ object MSG0 {
       g
     }
     val g = msg_(term1, term2)
-    def f(t1: Term, t2: Term): Boolean = (t1, t2) match {
+    def f(t1: Expression, t2: Expression): Boolean = (t1, t2) match {
       case (v1: Variable, v2: Variable) => v1.name == v2.name
       case _ => false
     }
     
     val evidentSub = g.dSub filter (tr => f(tr._2, tr._3))
     val residualSub = g.dSub remove (tr => f(tr._2, tr._3))
-    val evidentMap = Map[Variable, Term]() ++ (evidentSub map (tr => (tr._1, tr._2)))
+    val evidentMap = Map[Variable, Expression]() ++ (evidentSub map (tr => (tr._1, tr._2)))
     val term = applySubstitution(g.term, evidentMap)
     val s1 = residualSub.map(triple => (triple._1, triple._2))
     val s2 = residualSub.map(triple => (triple._1, triple._3))
@@ -73,8 +74,8 @@ object MSG0 {
           val bsR = for(bs <- bs1s zip bs2s) yield {
             val newPVars = bs._1.pattern.args map (arg => newVar)//binders!!
             val rp = Pattern(bs._1.pattern.name, newPVars)
-            val rt1 = applySubstitution(bs._1.term, Map[Variable, Term]() ++ (bs._1.pattern.args zip newPVars))            
-            val rt2 = applySubstitution(bs._2.term, Map[Variable, Term]() ++ (bs._2.pattern.args zip newPVars))
+            val rt1 = applySubstitution(bs._1.term, Map[Variable, Expression]() ++ (bs._1.pattern.args zip newPVars))            
+            val rt2 = applySubstitution(bs._2.term, Map[Variable, Expression]() ++ (bs._2.pattern.args zip newPVars))
             (rp, rt1, rt2)
           }
           val bVars = bs1s.map(b => newVar())
@@ -106,11 +107,11 @@ object MSG0 {
     g.dSub.foldRight((List[DoubleSubstitution](), List[DoubleSubstitution]()))(f1) match {
       case (Nil, _) => g
       case ((s @ (v, _, _)) :: o1, o2) => 
-        Generalization2(o1.foldRight(g.term)((ds, t) => applySubstitution(t, Map[Variable, Term](ds._1 -> v))), s :: o2)
+        Generalization2(o1.foldRight(g.term)((ds, t) => applySubstitution(t, Map[Variable, Expression](ds._1 -> v))), s :: o2)
     }
   }
   // term1 is equivalent with msg
-  def strongMsg(term1: Term, term2: Term): Generalization = {
+  def strongMsg(term1: Expression, term2: Expression): Generalization = {
     val g = msg(term1, term2)
     var term = g.term
     for (s <- g.sub1) term = applySubstitution(term, Map(s))

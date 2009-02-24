@@ -10,37 +10,37 @@ object TermAlgebra0 {
     Variable("$" + i) 
   }
   
-  sealed abstract class TermDecomposition
+  sealed abstract class ExpressionDecomposition
   
-  sealed abstract class Observable(val term: Term) extends TermDecomposition
+  sealed abstract class Observable(val term: Expression) extends ExpressionDecomposition
   case class ObservableVar(v: Variable) extends Observable(v)
   case class ObservableVarApp(v: Variable, app: Application) extends Observable(app)
   case class ObservableCon(c: Constructor) extends Observable(c)
   case class ObservableLam(l: LambdaAbstraction) extends Observable(l)
   
-  sealed abstract class Redex(val term : Term)
+  sealed abstract class Redex(val term : Expression)
   case class RedexCall(v: Variable) extends Redex(v)
   case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
   case class RedexCaseVarApp(a: Application, ce: CaseExpression) extends Redex(ce)
   case class RedexCaseVar(v: Variable, ce: CaseExpression) extends Redex(ce)  
   case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
   
-  sealed abstract class Context(val redex: Redex) extends TermDecomposition {
-    def replaceHole(t: Term): Term
+  sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
+    def replaceHole(t: Expression): Expression
   }  
   case class ContextHole(override val redex: Redex) extends Context(redex) {
-    def replaceHole(t: Term) = t
+    def replaceHole(t: Expression) = t
   }
   // app = con e 
   case class ContextApp(head: Context, app: Application) extends Context(head.redex) {
-    def replaceHole(t: Term) = Application(head.replaceHole(t), app.arg)
+    def replaceHole(t: Expression) = Application(head.replaceHole(t), app.arg)
   }
   // ce = case selector of ....
   case class ContextCase(selector: Context, ce: CaseExpression) extends Context(selector.redex) {
-    def replaceHole(t: Term) = CaseExpression(selector.replaceHole(t), ce.branches)
+    def replaceHole(t: Expression) = CaseExpression(selector.replaceHole(t), ce.branches)
   }  
   
-  def decompose(t: Term): TermDecomposition = t match {
+  def decompose(t: Expression): ExpressionDecomposition = t match {
     // observable
     case c: Constructor => ObservableCon(c)
     case l: LambdaAbstraction => ObservableLam(l)
@@ -50,7 +50,7 @@ object TermAlgebra0 {
     case t => createContext(t)
   }
   
-  def createContext(t: Term): Context = t match {
+  def createContext(t: Expression): Context = t match {
     case v: Variable if (v.global) => ContextHole(RedexCall(v))
     case app @ Application(l: LambdaAbstraction, arg) => ContextHole(RedexLamApp(l, app))
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
@@ -68,7 +68,7 @@ object TermAlgebra0 {
     case _ => null
   }
   
-  def applySubstitution(term: Term, s: Map[Variable, Term]): Term = term match {
+  def applySubstitution(term: Expression, s: Map[Variable, Expression]): Expression = term match {
     case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
     case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
     case LambdaAbstraction(v, t) => 
@@ -79,7 +79,7 @@ object TermAlgebra0 {
           bs map {b => Branch(b.pattern, applySubstitution(b.term, s))})
   }
   
-  private def getBoundedVars(t: Term): Set[Variable] = t match {
+  private def getBoundedVars(t: Expression): Set[Variable] = t match {
     case v: Variable => Set()
     case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getBoundedVars(term)}
     case LambdaAbstraction(x, term) => getBoundedVars(term) + x
@@ -88,7 +88,7 @@ object TermAlgebra0 {
       getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
   }
   
-  def getFreeVars(t: Term): Set[Variable] = t match {
+  def getFreeVars(t: Expression): Set[Variable] = t match {
     case v: Variable => if (v.global) Set() else Set(v)
     case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
     case LambdaAbstraction(x, term) => getFreeVars(term) - x
@@ -99,12 +99,12 @@ object TermAlgebra0 {
   
   def compareB(b1: Branch, b2: Branch) = b1.pattern.name.compareTo(b2.pattern.name) < 0
   
-  def getCoreLocalHead(app: Application): Term = app.head match {
+  def getCoreLocalHead(app: Application): Expression = app.head match {
     case a: Application => getCoreLocalHead(a)
     case h => h
   }
   
-  def constructApplication(head: Term, args: List[Term]): Term = {
+  def constructApplication(head: Expression, args: List[Expression]): Expression = {
     var res = head
     var list = args
     while (!list.isEmpty) {
@@ -117,10 +117,10 @@ object TermAlgebra0 {
   // During unfolding we always rename functions 
   // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
   // This method assumes that binders always have different names.
-  def equivalent(term1: Term, term2: Term): Boolean = {
+  def equivalent(term1: Expression, term2: Expression): Boolean = {
     val map1to2 = scala.collection.mutable.Map[Variable, Variable]()
     val map2to1 = scala.collection.mutable.Map[Variable, Variable]()
-    def eq1(t1: Term, t2: Term): Boolean = (t1, t2) match {
+    def eq1(t1: Expression, t2: Expression): Boolean = (t1, t2) match {
       case (v1: Variable, v2: Variable) if v1.global == true && v2.global == true =>
         v1.name == v2.name
       case (v1: Variable, v2: Variable) if v1.global == false && v2.global == false => 
@@ -154,7 +154,7 @@ object TermAlgebra0 {
     eq1(term1, term2)
   }
   
-  def freshBinders(term: Term): Term = term match {
+  def freshBinders(term: Expression): Expression = term match {
     case Constructor(name, args) => Constructor(name, args map (freshBinders(_)))
     case Application(h, a) => Application(freshBinders(h), freshBinders(a))
     case LambdaAbstraction(v, t) => {
@@ -169,11 +169,11 @@ object TermAlgebra0 {
     val args = b.pattern.args
     val newVars = args map {x => newVar()}
     Branch(Pattern(b.pattern.name, newVars), 
-        applySubstitution(freshBinders(b.term), Map[Variable, Term]() ++ (args zip newVars)))
+        applySubstitution(freshBinders(b.term), Map[Variable, Expression]() ++ (args zip newVars)))
   }
 
   // replace all occurrences of t1 in term by t2 
-  def replaceTerm(term: Term, t1: Term, t2: Term): Term = if (term == t1) t2 else term match {
+  def replaceTerm(term: Expression, t1: Expression, t2: Expression): Expression = if (term == t1) t2 else term match {
     case v: Variable => v
     case Constructor(n, args) => Constructor(n, args map {a => replaceTerm(a, t1, t2)})
     case Application(h, a) => Application(replaceTerm(h, t1, t2), replaceTerm(a, t1, t2))
@@ -182,14 +182,14 @@ object TermAlgebra0 {
       CaseExpression(replaceTerm(sel, t1, t2), bs map {b => Branch(b.pattern, replaceTerm(b.term, t1, t2))})
   }
   
-  def instanceOf(t1: Term, t2: Term): Boolean = equivalent(msg(t1, t2).term, t1)
+  def instanceOf(t1: Expression, t2: Expression): Boolean = equivalent(msg(t1, t2).term, t1)
   
-  def extractAppArgs(term: Term): List[Term] = term match {
+  def extractAppArgs(term: Expression): List[Expression] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
   }
   
-  def lineApp(term: Term): List[Term] = term match {
+  def lineApp(term: Expression): List[Expression] = term match {
     case Application(h, a) => lineApp(h) ::: (a:: Nil)
     case t => t :: Nil
   }

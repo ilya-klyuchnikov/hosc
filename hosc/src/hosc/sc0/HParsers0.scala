@@ -12,11 +12,11 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strongRep1(function)|success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
   
-  def term: Parser[Term] = p(tr2 | appl) | err("term is expected")
-  def appl = chainl1(tr0, tr1, success(Application(_: Term, _: Term)))
+  def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")
+  def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
     
   // head of application
-  private def tr0: Parser[Term] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")"))
+  private def tr0: Parser[Expression] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")"))
   // argument of or application constructor
   private def tr1 = p(tr0 | uident ^^ {x => Constructor(x, Nil)} | ("(" ~> term <~ ")"))
   // top constructor; cannot be head of application
@@ -62,8 +62,8 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   
   def c[T](p: => Parser[T]): Parser[T] = commit(p)
   
-  def desugarLambda(vs: List[Variable], e: Term): LambdaAbstraction = {
-    def desugarLambda_(vs_ : List[Variable]) : Term = vs_ match {
+  def desugarLambda(vs: List[Variable], e: Expression): LambdaAbstraction = {
+    def desugarLambda_(vs_ : List[Variable]) : Expression = vs_ match {
       case Nil => e;
       case v :: vv => LambdaAbstraction(v, desugarLambda_(vv))
     }

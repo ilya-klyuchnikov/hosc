@@ -3,7 +3,7 @@ package hosc;
 import EnrichedLambdaCalculus._
 import GraphAnalysis._
 import HLanguage.{Application => Application0, Variable => Variable0, CaseExpression => CaseExpression0, 
-  Branch => Branch0, Pattern => Pattern0, Term => Term0, Function=>Function0,
+  Branch => Branch0, Pattern => Pattern0, Function=>Function0,
   Constructor => Constructor0, LambdaAbstraction => LambdaAbstraction0, 
   LetExpression => LetExpression0, LetRecExpression => LetRecExpression0, Expression => Expression0, Program => Program0, _}
 import HLanguage1._
@@ -75,7 +75,7 @@ object LangUtils {
   def hl0ToELC(p: Program0): Expression = hl0ToELC(normalize(p))
   
   // converts hlanguage to hlanguage1
-  def hlToHl1(term: Term0): Term1 = term match {
+  def hlToHl1(term: Expression0): Term1 = term match {
     case v @ Variable0(n) => val v1 = Variable1(n); v1.call = v.global; v1
     case Constructor0(n, args) => Constructor1(n, args map hlToHl1)
     case LambdaAbstraction0(v, e) => LambdaAbstraction1(Variable1(v.name), hlToHl1(e))
@@ -89,7 +89,7 @@ object LangUtils {
     Pattern1(p.name, p.args map {v => Variable1(v.name)})
   }
   
-  def hl1ToHl(e1: Term1, p: ListBuffer[Function0]): Term0 = e1 match {
+  def hl1ToHl(e1: Term1, p: ListBuffer[Function0]): Expression0 = e1 match {
     case Variable1(n) => Variable0(n)
     case Constructor1(n, args) => Constructor0(n, args map {e => hl1ToHl(e, p)})
     case LambdaAbstraction1(v, e) => LambdaAbstraction0(Variable0(v.name), hl1ToHl(e, p))
@@ -100,7 +100,7 @@ object LangUtils {
     case lr: LetRecExpression1 => letrecToHl(lr, p)
   }
   
-  def letrecToHl(letrec: LetRecExpression1, p: ListBuffer[Function0]): Term0 = { 
+  def letrecToHl(letrec: LetRecExpression1, p: ListBuffer[Function0]): Expression0 = { 
     Function0(letrec.binding._1.name, hl1ToHl(letrec.binding._2, p).asInstanceOf[LambdaAbstraction0]) +: p
     hl1ToHl(letrec.expr, p)
   }
@@ -123,7 +123,7 @@ object LangUtils {
     writer.toString
   }
    
-  def canonize(tt: Term0):Term0 = tt match {
+  def canonize(tt: Expression0):Expression0 = tt match {
     case v: Variable0 => v
     case c@Constructor0(name, args) => {
       Constructor0(name, args map canonize)

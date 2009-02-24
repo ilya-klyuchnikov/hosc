@@ -233,7 +233,7 @@ class HParsersTest {
     }
   }
   
-  def testSTerm(input: String, expected: Term): Unit = {
+  def testSTerm(input: String, expected: Expression): Unit = {
     val r = TestUtils.termResultFromString(input)
     println(r)
     assertTrue(r.successful)
