@@ -145,7 +145,9 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       val lv = TypeVariable(v.name)
       te = te.install(lv, ts)
     }
-    tc(te, expr).t
+    val r =tc(te, expr).t
+    println(r)
+    r
   }
   
   private def getFreeVars(expr: Expression): Set[Variable] = expr match {

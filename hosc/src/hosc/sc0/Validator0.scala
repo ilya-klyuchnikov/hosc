@@ -146,6 +146,7 @@ object Validator0 {
     }
     case a: Application => {valTermWithFreeVars(boundedVars, a.head, p); valTermWithFreeVars(boundedVars, a.arg, p);}
     case c: CaseExpression => valCaseWithFreeVars(boundedVars, c, p)
+    case LetRecExpression((v, e), e0) => {valTermWithFreeVars(boundedVars, e, p);valTermWithFreeVars(boundedVars, e0, p)}
   }
   
   def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {

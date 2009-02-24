@@ -72,7 +72,11 @@ object LangUtils {
       ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
   }
   
-  def hl0ToELC(p: Program0): Expression = hl0ToELC(normalize(p))
+  def hl0ToELC(p: Program0): Expression = {
+    val r = hl0ToELC(normalize(p))
+    println(r)
+    r
+  }
   
   // converts hlanguage to hlanguage1
   def hlToHl1(term: Expression0): Term1 = term match {
