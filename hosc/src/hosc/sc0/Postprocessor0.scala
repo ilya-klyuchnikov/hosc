@@ -17,7 +17,7 @@ object Postprocessor0 {
     case LambdaAbstraction(v, t) => process(t, globals)
     case Application(h, a) => process(h, globals); process(a, globals)
     case CaseExpression(s, bs) => process(s, globals); for (b <- bs) process(b.term, globals)
-    case LetRecExpression((v, e), e0) => {process(e, globals); process(e0, globals)}                                                   
+    case LetRecExpression((v, e), e0) => {process(e, globals + v); process(e0, globals + v)}                                                   
   }
   
 }

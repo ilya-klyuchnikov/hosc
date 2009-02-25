@@ -95,6 +95,7 @@ object TermAlgebra0 {
     case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression(sel, bs) => 
       getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
+    case LetRecExpression((f, e), e0) => getFreeVars(e) ++ getFreeVars(e0) - f
   }
   
   def compareB(b1: Branch, b2: Branch) = b1.pattern.name.compareTo(b2.pattern.name) < 0
