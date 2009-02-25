@@ -25,15 +25,9 @@ class SC0 {
     val doc1 = p1.toDoc    
     val writer1 = new java.io.StringWriter()
     doc1.format(120, writer1)
-    val p = LangUtils.hl1ToHl(p1)
-    val doc = p.toDoc
-    val writer = new java.io.StringWriter()
-    doc.format(100, writer)
     <div>
     <h2>Supercompiled Expression</h2>
     <div><pre>{writer1.toString}</pre></div>
-    <h2>Supercompiled Expression Ensugared</h2>
-    <div><pre>{writer.toString}</pre></div>
     <h2>Partial Process Tree</h2>
     <div>{svg}</div>
     </div>

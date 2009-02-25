@@ -136,6 +136,10 @@ class SuperCompilerTest {
     SuperCompiler0App.main(Array("-si", "hl/supercompiler/synapse.hl",
         "-t", "output/synapse.svg",
         "-p", "output/synapse.hl"));
+    /*
+    SuperCompiler0App.main(Array("-si", "hl/supercompiler/synapse2.hl",
+        "-t", "output/synapse1.svg",
+        "-p", "output/synapse1.hl"));*/
   }
   
   @Test def regexp(): Unit = {

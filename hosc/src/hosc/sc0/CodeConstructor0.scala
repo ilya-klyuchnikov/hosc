@@ -1,30 +1,27 @@
 package hosc.sc0
 
 import HLanguage._
-import HLanguage1._
 import LangUtils._
 import ProcessTree0._
 import MSG0._
 import TermAlgebra0._
-import sc1.TermAlgebra1._
 
 class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, freeVarsInLetrecs: Boolean) {
-  def generateProgram() = Program1(originalProgram.ts, construct(tree.rootNode))
+  def generateProgram() = Program(originalProgram.ts, construct(tree.rootNode), Nil)
   
-  private def construct(node: Node): Term1 = node.expr match {
+  private def construct(node: Node): Expression = node.expr match {
     case LetExpression(bs, t) => {
       val node0 = node.outs.head.child
       val nodes = node.outs.tail map {edge => edge.child}
       val ts = nodes map construct
-      val subs = Map[Variable1, Term1]() ++ ((bs zip ts) map 
-          {pair => (Variable1(pair._1._1.name), pair._2)})
+      val subs = Map[Variable, Expression]() ++ ((bs zip ts) map {pair => (pair._1._1, pair._2)})
       construct(node0)/subs
     }
     case t => decompose(t) match {
-      case ObservableVar(v) => Variable1(v.name)
-      case ObservableCon(c) => Constructor1(c.name, node.children map construct)
-      case ObservableVarApp(v, app) => constructApplication1(Variable1(v.name), node.children map construct)
-      case ObservableLam(l) => LambdaAbstraction1(Variable1(l.v.name), construct(node.children.head))
+      case ObservableVar(v) => Variable(v.name)
+      case ObservableCon(c) => Constructor(c.name, node.children map construct)
+      case ObservableVarApp(v, app) => constructApplication(Variable(v.name), node.children map construct)
+      case ObservableLam(l) => LambdaAbstraction(Variable(l.v.name), construct(node.children.head))
       case context: Context => context.redex match {        
         case RedexLamApp(lam, app) => construct(node.children.head)
         case RedexCaseCon(c, ce) => construct(node.children.head)
@@ -40,15 +37,13 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
             // after substitution:
             val sub = Map[Variable, Expression]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
-            val z2 = hlToHl1(z1)
-            z2
+            z1
           } else {{
             tree.leafs.filter(n => n.repeatedOf == node) match {
               case Nil => {
-                val newBs = (bs zip node.children.tail) map 
-                  {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
+                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
                 val newSel = construct(node.children.head)
-                CaseExpression1(newSel, newBs)
+                CaseExpression(newSel, newBs)
               }
               case repeatNodes => {
                 var vars: Set[Variable] = null
@@ -65,30 +60,27 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                   vars = TermAlgebra0.getFreeVars(t)
                 }
                 val args0 = vars.toList 
-                val args = args0 map {hlToHl1(_)}
-                val newVars = args map {p => Variable1(createVar().name)}
-                val sub = Map[Variable1, Term1]() ++ 
-                  ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
+                val args = args0
+                val newVars = args map {p => createVar()}
+                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars) map {p => (Variable(p._1.name), p._2)})
                 node.signature = (createFName(), args0)
                 
-                val newBs = (bs zip node.children.tail) map 
-                 {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
+                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
                 val newSel = construct(node.children.head)
-                val ce = CaseExpression1(newSel, newBs)/sub
+                val ce = CaseExpression(newSel, newBs)/sub
                 
-                val lam = constructLambda1(newVars, ce)
-                val appHead = Variable1(node.signature._1)
-                appHead.call = true
-                LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
+                val lam = constructLambda(newVars, ce)
+                val appHead = Variable(node.signature._1)
+                appHead.global = true
+                LetRecExpression((appHead, lam), constructApplication(appHead, args))
               }
             }          
           }}
         }
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
-          val newBs = (bs zip node.children.tail) map 
-            {p => Branch1(hlToHl1(p._1.pattern), construct(p._2))}
+          val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
           val newSel = construct(node.children.head)
-          CaseExpression1(newSel, newBs)
+          CaseExpression(newSel, newBs)
         }
         case RedexCall(f) => {
           if (node.getRepParent != null) {
@@ -102,8 +94,7 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
             // after substitution:
             val sub = Map[Variable, Expression]() ++ msg.sub2
             val z1 = applySubstitution(z, sub)
-            val z2 = hlToHl1(z1)
-            z2
+            z1
           } else {
             tree.leafs.filter(n => n.repeatedOf == node) match {
               // call to this function does't result in recursive definition
@@ -126,16 +117,15 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                   vars = TermAlgebra0.getFreeVars(t)
                 }
                 val args0 = vars.toList 
-                val args = args0 map {hlToHl1(_)}
-                val newVars = args map {p => Variable1(createVar().name)}
-                val sub = Map[Variable1, Term1]() ++ 
-                  ((args0 zip newVars) map {p => (Variable1(p._1.name), p._2)})
+                val args = args0
+                val newVars = args map {p => createVar()}
+                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars))
                 node.signature = (createFName(), args0)
                 val expr = construct(node.children.head)/sub
-                val lam = constructLambda1(newVars, expr)
-                val appHead = Variable1(node.signature._1)
-                appHead.call = true
-                LetRecExpression1((appHead, lam), constructApplication1(appHead, args))
+                val lam = constructLambda(newVars, expr)
+                val appHead = Variable(node.signature._1)
+                appHead.global = true
+                LetRecExpression((appHead, lam), constructApplication(appHead, args))
               }
             }            
           }

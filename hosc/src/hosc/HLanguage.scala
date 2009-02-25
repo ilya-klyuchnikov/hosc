@@ -13,10 +13,12 @@ object HLanguage {
      def toDoc: Document
      type termType <: Expression
      def \\(s: Map[Variable, Variable]): termType
+     def / (s: Map[Variable, Expression]): Expression
    }
    case class Variable(name: String) extends Expression {
      type termType = Variable
      def  \\(s: Map[Variable, Variable]) = s.get(this) match {case Some(t) => t; case None => this}
+     def / (s: Map[Variable, Expression]) = s.get(this) match {case Some(t) => t; case None => this}
      var global = false // global var is call
      override def toString = name
      def toDoc = text(name)
@@ -24,6 +26,7 @@ object HLanguage {
    case class Constructor(name: String, args: List[Expression]) extends Expression {
      type termType = Constructor
      def \\(s: Map[Variable, Variable]) = Constructor(name, args map {_\\s})
+     def / (s: Map[Variable, Expression]) = Constructor(name, args map {_/s})
      override def toString = "(" + name + " " + args.mkString(" ") + ")"
      def toDoc = args match {
        case Nil => text(name)
@@ -33,12 +36,14 @@ object HLanguage {
    case class LambdaAbstraction(v: Variable, t: Expression) extends Expression {
      type termType = LambdaAbstraction
      def \\(s: Map[Variable, Variable]) = LambdaAbstraction(v\\s, t\\s)
+     def / (s: Map[Variable, Expression]) = LambdaAbstraction(v, t/s)
      override def toString = "(\\" + v.name + " -> " + t + ")"
      def toDoc = "(\\" :: v.toDoc :: "->" :: nest(2, ED :/: t.toDoc) :: ")" :: ED 
    }
    case class Application(head: Expression, arg: Expression) extends Expression {
      type termType = Application
      def \\(s: Map[Variable, Variable]) = Application(head\\s, arg\\s)
+     def / (s: Map[Variable, Expression]) = Application(head/s, arg/s)
      pos = head.pos
      override def toString = "(" + head + " " + arg + ")"
      def toDoc = group("(" :: nest(2, head.toDoc :/: arg.toDoc ) :: ")" :: ED)
@@ -46,6 +51,7 @@ object HLanguage {
    case class CaseExpression(selector: Expression, branches: List[Branch]) extends Expression {
      type termType = CaseExpression
      def \\(s: Map[Variable, Variable]) = CaseExpression(selector\\s, branches map {_\\s})
+     def / (s: Map[Variable, Expression]) = CaseExpression(selector/s, branches map {b => Branch(b.pattern, b.term / s)})
      override def toString = "case (" + selector + ") of " + branches.mkString("{", " ", "}")
      def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
@@ -54,6 +60,7 @@ object HLanguage {
      type termType = LetExpression
      // we need asInstanceOf due to http://lampsvn.epfl.ch/trac/scala/ticket/252
      def \\(s: Map[Variable, Variable]) = LetExpression(bs map {b => ((b._1\\s).asInstanceOf[Variable], (b._2\\s).asInstanceOf[Expression])}, expr\\s);
+     def / (s: Map[Variable, Expression]) = LetExpression(bs map {b => (b._1, (b._2/s).asInstanceOf[Expression])}, expr/s)
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr 
      def toDoc = group("let" :: 
            nest(2, bs.foldLeft(ED){(y, b) => y :/: group (b._1.toDoc :: " = " :: b._2.toDoc)})
@@ -62,6 +69,7 @@ object HLanguage {
    case class LetRecExpression(binding: (Variable, Expression), expr: Expression) extends Expression {
      type termType = LetRecExpression
      def \\(s: Map[Variable, Variable]) = LetRecExpression((binding._1\\s, binding._2\\s), expr\\s);
+     def / (s: Map[Variable, Expression]) = LetRecExpression((binding._1, binding._2/s), expr/s)
      override def toString = "(letrec " + (binding._1 + "=" + binding._2) + "\n in " + expr + ")"
      def toDoc = group("(letrec" :: 
          nest(2, group (ED :/: binding._1.toDoc :: "=" :: binding._2.toDoc))
@@ -105,7 +113,14 @@ object HLanguage {
        None
      }
      def toDoc = (ED /: ts) {(doc, td) => doc :/: nest(0, text(td.toString))} :/: 
-                 ED :/: nest(0, goal.toDoc :/: text("where")) :/:
-                 (ED /: fs) {(doc, f) => doc :/: nest(0, f.toDoc)}
+                 ED :/: nest(0, goal.toDoc) :/: 
+                 (if (fs.isEmpty) ED else text("where") :/: (ED /: fs) {(doc, f) => doc :/: nest(0, f.toDoc)})
+     
+     def toDocString = {
+       val doc1 = toDoc    
+       val writer1 = new java.io.StringWriter()
+       doc1.format(120, writer1)
+       writer1.toString
+     }
    }
 }

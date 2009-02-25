@@ -28,7 +28,7 @@ object HE0 {
       case Constructor(_, args) => args exists (he(term1, _, binders))
       case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
       case a: Application => lineApp(a) exists (he(term1, _, binders))
-      case CaseExpression(sel, bs) => he(term1, sel, binders) //|| (bs exists {b => he(term1, b.term)})
+      case CaseExpression(sel, bs) => he(term1, sel, binders) || (bs exists {b => he(term1, b.term)})
       case _ => false
     }
   }

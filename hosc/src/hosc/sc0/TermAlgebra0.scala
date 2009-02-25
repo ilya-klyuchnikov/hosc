@@ -115,6 +115,14 @@ object TermAlgebra0 {
     res
   }
   
+  def constructLambda(vs: List[Variable], e: Expression): Expression = {
+    def constructLambda_(vs_ : List[Variable]) : Expression = vs_ match {
+      case Nil => e;
+      case v :: vv => LambdaAbstraction(v, constructLambda_(vv))
+    }
+    constructLambda_(vs)
+  }
+  
   // During unfolding we always rename functions 
   // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
   // This method assumes that binders always have different names.

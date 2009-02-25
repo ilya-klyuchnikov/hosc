@@ -67,7 +67,7 @@ object SuperCompiler0App {
     fw.flush();
     fw.close();
     
-    val doc1 = LangUtils.hl1ToHl(p).toDoc
+    val doc1 = p.toDoc
     
     val slFile1 = new java.io.File(outProgramFileName + "_")
     if (!slFile1.exists){
