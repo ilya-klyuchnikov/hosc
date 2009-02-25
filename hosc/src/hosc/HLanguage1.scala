@@ -53,8 +53,8 @@ object HLanguage1 {
      type termType = LambdaAbstraction1
      def \\(s: Map[Variable1, Variable1]) = {val l1=LambdaAbstraction1(v\\s, t\\s);l1.label=label;l1}
      def / (s: Map[Variable1, Term1]) = {val l1=LambdaAbstraction1(v, t/s);l1.label=label;l1}
-     override def toString = labelToString + "\\" + v.name + " ->" + t;
-     def toDoc = "\\" :: v.toDoc :: " -> " :: t.toDoc :: ED 
+     override def toString = labelToString + "(\\" + v.name + " ->" + t + ")";
+     def toDoc = "(\\" :: v.toDoc :: " -> " :: t.toDoc :: ")" :: ED 
    }
    
    case class Application1(head: Term1, arg: Term1) extends Term1 {

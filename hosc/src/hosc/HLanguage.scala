@@ -33,8 +33,8 @@ object HLanguage {
    case class LambdaAbstraction(v: Variable, t: Expression) extends Expression {
      type termType = LambdaAbstraction
      def \\(s: Map[Variable, Variable]) = LambdaAbstraction(v\\s, t\\s)
-     override def toString = "\\" + v.name + " -> " + t 
-     def toDoc = "\\" :: v.toDoc :: "->" :: nest(2, ED :/: t.toDoc) :: ED 
+     override def toString = "(\\" + v.name + " -> " + t + ")"
+     def toDoc = "(\\" :: v.toDoc :: "->" :: nest(2, ED :/: t.toDoc) :: ")" :: ED 
    }
    case class Application(head: Expression, arg: Expression) extends Expression {
      type termType = Application
