@@ -10,7 +10,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
   
   def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strongRep1(function)|success(Nil)) ^^ Program
-  def function = p(lident ~ ("=" ~> ((lambdaAbstraction <~ c(";")) | (("(") ~> lambdaAbstraction <~ ")" <~ c(";")))) ^^ Function)
+  def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
   
   def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
@@ -23,7 +23,7 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   private def tr2: Parser[Constructor] =  p(uident ~ (tr1*) ^^ Constructor | ("(" ~> tr2 <~ ")"))
   
   private def variable = p(lident ^^ Variable)  
-  private def lambdaAbstraction = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda)    
+  private def lambdaAbstraction:Parser[LambdaAbstraction] = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda) | "(" ~> lambdaAbstraction <~ ")"
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch+) <~ c("}")) ^^ CaseExpression)
   private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ 
                        {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
