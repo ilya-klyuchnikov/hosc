@@ -23,9 +23,10 @@ object Util {
     val pr = HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
     if (pr.successful) {
       val program = pr.get
-      val ti = new TypeInferrer(program.ts)
-      ti.inferType(hl0ToELC(program))
-      program
+      val program1 = LambdaLifting.lift(program)
+      val ti = new TypeInferrer(program1.ts)
+      ti.inferType(hl0ToELC(program1))
+      program1
     } else { 
       throw new IllegalArgumentException(pr.toString)
     }

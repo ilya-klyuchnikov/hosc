@@ -1,12 +1,9 @@
 data List a = Nil  | Cons a (List a);
-
+// app x (app y z)
 letrec
-  f= \xs1 -> 
-	  case xs1 of {
-	    Nil -> letrec g= \ys1 -> 
-	    		case u1 of { Nil -> zs; Cons y2 ys2 -> (Cons y2 (g ys2)); } 
-	    		in g ys;
-	    Cons x2 xs2 -> Cons x2 (f xs2);
-	  }
+  f=\w1 -> case w1 of {
+    Nil -> (letrec g=\p1 -> case p1 of { Nil -> z; Cons y1 t -> (Cons y1 (g t)); } in (g y));
+    Cons s u1 -> (Cons s (f u1));
+  }
 in
-  f xs
+  f x

@@ -14,6 +14,10 @@ class LambdaLiftingTest {
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
+    println("\n")
+    
+    val e = LambdaLifting.lift(p)
+    println(e)
   }
   
   @Test def letrec_rev(): Unit = {
@@ -21,5 +25,10 @@ class LambdaLiftingTest {
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
+    
+    println("\n")
+    
+    val e = LambdaLifting.lift(p)
+    println(e)
   }
 }
