@@ -146,7 +146,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       te = te.install(lv, ts)
     }
     val r =tc(te, expr).t
-    println(r)
+    //println(r)
     r
   }
   

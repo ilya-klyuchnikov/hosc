@@ -74,7 +74,7 @@ object LangUtils {
   
   def hl0ToELC(p: Program0): Expression = {
     val r = hl0ToELC(normalize(p))
-    println(r)
+    //println(r)
     r
   }
   

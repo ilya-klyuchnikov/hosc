@@ -20,9 +20,10 @@ object AppService {
         val result = HParsers0.parseProgram(new CharArrayReader(S.param("program").openOr("").toCharArray))
         val xml = result match {
           case Success(program, _) => {
-            findTypeErro(program) match {
+            val program1 = LambdaLifting.lift(program)
+            findTypeErro(program1) match {
               case None => {
-                val (residualCode, svg) = superCompile(program)
+                val (residualCode, svg) = superCompile(program1)
                 (<result status="ok"><code>{residualCode}</code><tree>{svg}</tree></result>)
               }
               case Some(typeError) => {

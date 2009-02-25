@@ -14,12 +14,13 @@ class SC0 {
   try
   {
     val program = Util.programFromString(S.param("program").openOr(""))
-    val ti = new TypeInferrer(program.ts)
-    ti.inferType(hl0ToELC(program))
-    val sc = new SuperCompiler0(program)
-    val pt = sc.buildProcessTree(program.goal)
+    val program1 = LambdaLifting.lift(program)
+    val ti = new TypeInferrer(program1.ts)
+    ti.inferType(hl0ToELC(program1))
+    val sc = new SuperCompiler0(program1)
+    val pt = sc.buildProcessTree(program1.goal)
     val svg = new ProcessTree0SVG(pt).treeToSVG
-    val g = new CodeConstructor0(program, pt, true)
+    val g = new CodeConstructor0(program1, pt, true)
     val p1 = g.generateProgram()
     val doc1 = p1.toDoc    
     val writer1 = new java.io.StringWriter()
