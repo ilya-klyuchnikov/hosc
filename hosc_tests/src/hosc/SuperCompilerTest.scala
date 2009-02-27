@@ -215,4 +215,10 @@ class SuperCompilerTest {
         "-t", "output/letrec.svg",
         "-p", "output/letrec.hs"));
     }
+  
+  @Test def filter(): Unit = {
+    SuperCompiler0App.main(Array("-si", "hl/supercompiler/filter.hs",
+        "-t", "output/filter.svg",
+        "-p", "output/filter.hs"));
+    }
 }
