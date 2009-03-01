@@ -1,7 +1,8 @@
 data List a = Nil | Cons a (List a);
 data Boolean = True | False;
 
-filter p (map f xs)
+map f (filter (compose p f) xs)
+
 
 where
 

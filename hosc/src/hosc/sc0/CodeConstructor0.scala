@@ -156,8 +156,8 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
     name
   }
   
-  private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
-  private val fNames = Array('f', 'g', 'h');
+  private val vNames = "xyzuvwprst".toArray
+  private val fNames = "fgh".toArray
   
   // set of already used variables
   private var fUsed = Set[String]() ++ (getAllVars(originalProgram.goal) map {v => v.name})

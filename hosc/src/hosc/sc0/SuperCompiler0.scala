@@ -159,7 +159,7 @@ class SuperCompiler0(program: Program){
     p
   }
   
-  private val vNames = Array('x', 'y', 'z', 'u', 'v', 'w', 'p', 'r', 's', 't');
+  private val vNames = "xyzuvwprst".toArray
   
   private def varFor(j: Int) = {
     if (j <= 9) 
