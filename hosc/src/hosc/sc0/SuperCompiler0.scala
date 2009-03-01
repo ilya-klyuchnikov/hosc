@@ -100,7 +100,19 @@ class SuperCompiler0(program: Program){
   }
   
   def canBeEnhanced_?(t: Expression) = decompose(t) match {
-    case c: Context => c.redex match { 
+    case c@ContextHole(_) => c.redex match { 
+      case r: RedexCall => true
+      case r: RedexCaseVar => true
+      case r: RedexCaseVarApp => true
+      case _ => false
+    }
+    case c@ContextApp(_, _) => c.redex match { 
+      case r: RedexCall => true
+      case r: RedexCaseVar => true
+      case r: RedexCaseVarApp => true
+      case _ => false
+    }
+    case c@ContextCase(_, _) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true
       case r: RedexCaseVarApp => true
