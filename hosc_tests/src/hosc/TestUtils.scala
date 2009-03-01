@@ -6,9 +6,6 @@ import java.io.{BufferedReader, File, FileReader}
 import org.junit.Test
 import org.junit.Assert._
 import HLanguage._
-import sc0.HParsers0
-import sc0.Validator0
-import sc0.Postprocessor0
 
 object TestUtils {
   def termResultFromString(input: String) =

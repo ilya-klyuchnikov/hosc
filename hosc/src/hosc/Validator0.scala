@@ -1,4 +1,4 @@
-package hosc.sc0
+package hosc
 
 import scala.util.parsing.input.Positional
 

@@ -2,9 +2,8 @@ package hosc.service
 
 import net.liftweb.http.{LiftRules, Req, PostRequest, S, XmlResponse}
 import net.liftweb.util.Full
-import hosc.sc0.HParsers0
 import hosc.sc0.ProcessTree0
-import hosc.sc0.HParsers0._
+import HParsers0._
 import hosc.sc0.SuperCompiler0
 import hosc.sc0.ProcessTree0SVG
 import hosc.sc0.CodeConstructor0

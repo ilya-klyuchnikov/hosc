@@ -8,8 +8,6 @@ import HLanguage.{Application => A, Variable => V, CaseExpression => CE, Branch 
 import hosc.{TypeConstructor => TC, TypeVariable => TV, Arrow => Arr,
   TypeConstructorDefinition => TCD, DataConstructor => DC}
 
-import hosc.sc0.HParsers0
-
 class HParsersTest {
   @Test def application(): Unit = {
     testSTerm(

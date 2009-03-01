@@ -4,7 +4,6 @@ import scala.util.parsing.input.{CharArrayReader, Reader}
 import java.io.{BufferedReader, File, FileReader}
 import HLanguage._
 import LangUtils._
-import sc0.HParsers0
 
 object Util {
   def programFromFile(fileName: String): Program = {
