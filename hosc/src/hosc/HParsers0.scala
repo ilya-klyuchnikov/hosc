@@ -4,6 +4,10 @@ import scala.util.parsing.input.{Positional, Reader}
 import scala.util.parsing.combinator.ImplicitConversions
 import HLanguage._
 
+import scala.util.parsing.syntax.StdTokens
+import scala.util.parsing.combinator.lexical.StdLexical
+import scala.util.parsing.combinator.syntactical.StdTokenParsers
+
 object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
@@ -80,4 +84,29 @@ object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversio
   def error(msg: String, pos: Positional) = {
     lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
   }
+}
+
+trait HTokens extends StdTokens {
+  case class LIdentifier(chars: String) extends Token
+  case class UIdentifier(chars: String) extends Token
+}
+
+class HLexical extends StdLexical with HTokens {
+  override def token: Parser[Token] = 
+    (upperCaseLetter ~ rep(letter | digit) ^^ { case first ~ rest => processUIdent(first :: rest mkString "") }
+    | lowerCaseLetter ~ rep(letter | digit) ^^ { case first ~ rest => processLIdent(first :: rest mkString "") }
+    | super.token)
+
+  protected def processLIdent(name: String) = if (reserved contains name) Keyword(name) else LIdentifier(name)
+  protected def processUIdent(name: String) = if (reserved contains name) Keyword(name) else UIdentifier(name)
+  def upperCaseLetter = elem("upper-case-letter", _.isUpperCase)
+  def lowerCaseLetter = elem("lower-case-letter", _.isLowerCase)
+}
+
+class HTokenParsers extends StdTokenParsers {
+  type Tokens = HTokens
+  val lexical = new HLexical
+  import lexical.{UIdentifier, LIdentifier}
+  def uident: Parser[String] = elem("identifier", _.isInstanceOf[UIdentifier]) ^^ (_.chars)
+  def lident: Parser[String] = elem("identifier", _.isInstanceOf[LIdentifier]) ^^ (_.chars)  
 }
