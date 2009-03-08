@@ -73,10 +73,10 @@ object MSG0 {
           // binders are refreshed and the same
           val bsR = for(bs <- bs1s zip bs2s) yield {
             val newPVars = bs._1.pattern.args map (arg => newVar)//binders!!
-            val rp = Pattern(bs._1.pattern.name, newPVars)
-            val rt1 = applySubstitution(bs._1.term, Map[Variable, Expression]() ++ (bs._1.pattern.args zip newPVars))            
-            val rt2 = applySubstitution(bs._2.term, Map[Variable, Expression]() ++ (bs._2.pattern.args zip newPVars))
-            (rp, rt1, rt2)
+            val freshPattern = Pattern(bs._1.pattern.name, newPVars)
+            val freshT1 = applySubstitution(bs._1.term, Map[Variable, Expression]() ++ (bs._1.pattern.args zip newPVars))            
+            val freshT2 = applySubstitution(bs._2.term, Map[Variable, Expression]() ++ (bs._2.pattern.args zip newPVars))
+            (freshPattern, freshT1, freshT2)
           }
           val bVars = bs1s.map(b => newVar())
           val selVar = newVar
