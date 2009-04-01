@@ -20,10 +20,9 @@ object Eq {
         val bs1s = bs1 sort compareB1
         val bs2s = bs2 sort compareB1
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){
-          eq1(sel1, sel2) && ((bs1s zip bs2s) forall {
-            b => ((b._1.pattern.args zip b._2.pattern.args) forall (args => eq1(args._1, args._2))) &&
-              eq1(b._1.term, b._2.term)
-          })
+          eq1(sel1, sel2) && List.forall2(bs1s, bs2s){
+            (b1, b2) => List.forall2(b1.pattern.args, b2.pattern.args)(eq1) && eq1(b1.term, b2.term)
+          }
         } else {
           false
         }
