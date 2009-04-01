@@ -5,7 +5,7 @@ import scala.util.parsing.input.Positional
 import HLanguage._
 import HParsers._
 
-object Validator0 {
+object Validator {
   case class ValidatorError(error: HError) extends Exception(error.toString) {}
   def validate(s: Success[Program]) =  {
     val p = s.get

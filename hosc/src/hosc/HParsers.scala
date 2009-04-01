@@ -56,7 +56,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def validate(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s @ Success(_, _) => Validator0.validate(s)
+    case s @ Success(_, _) => Validator.validate(s)
   }
   
   def postprocess(pr: ParseResult[Program]) = pr match {

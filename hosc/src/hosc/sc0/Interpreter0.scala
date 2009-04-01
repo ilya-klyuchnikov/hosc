@@ -18,7 +18,7 @@ class Interpreter0(program: Program) {
   
   def eval(): Expression = {
     // validate that term is ground
-    Validator0.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
     eval(program.goal)
   }
   

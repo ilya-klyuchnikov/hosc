@@ -40,7 +40,7 @@ object TestUtils {
     val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
     val term = pr.get
-    Validator0.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
+    Validator.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
     Postprocessor.process(term, globals)
     val ti = new TypeInferrer(program.ts)
