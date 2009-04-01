@@ -19,7 +19,7 @@ object Util {
       }
     } while (str != null)
     in.close();
-    val pr = HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    val pr = HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
     if (pr.successful) {
       val program = pr.get
       val program1 = LambdaLifting.lift(program)
@@ -32,7 +32,7 @@ object Util {
   }
   
   def programFromString(input: String): Program = {
-    val pr = HParsers0.parseProgram(new CharArrayReader(input.toCharArray))
+    val pr = HParsers.parseProgram(new CharArrayReader(input.toCharArray))
     if (pr.successful) {
       val program = pr.get
       val ti = new TypeInferrer(program.ts)
@@ -56,7 +56,7 @@ object Util {
       }
     } while (str != null)
     in.close();
-    val pr = HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    val pr = HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
     if (pr.successful) {
       pr.get
     } else { 

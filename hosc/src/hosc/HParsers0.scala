@@ -8,7 +8,7 @@ import scala.util.parsing.syntax.StdTokens
 import scala.util.parsing.combinator.lexical.StdLexical
 import scala.util.parsing.combinator.syntactical.StdTokenParsers
 
-object HParsers0 extends HTokenParsers with StrongParsers with ImplicitConversions {
+object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
   lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
   lexical.reserved += ("case", "of", "where", "data", "letrec", "in")

@@ -3,7 +3,7 @@ package hosc.service
 import net.liftweb.http.{LiftRules, Req, PostRequest, S, XmlResponse}
 import net.liftweb.util.Full
 import hosc.sc0.ProcessTree0
-import HParsers0._
+import HParsers._
 import hosc.sc0.SuperCompiler0
 import hosc.sc0.ProcessTree0SVG
 import hosc.sc0.CodeConstructor0
@@ -16,7 +16,7 @@ object AppService {
   val dispatcher: LiftRules.DispatchPF = {
     case Req(action::Nil, _, PostRequest) if action == "validate" || action == "run" => {
       () => {
-        val result = HParsers0.parseProgram(new CharArrayReader(S.param("program").openOr("").toCharArray))
+        val result = HParsers.parseProgram(new CharArrayReader(S.param("program").openOr("").toCharArray))
         val xml = result match {
           case Success(program, _) => {
             val program1 = LambdaLifting.lift(program)

@@ -215,7 +215,7 @@ class HParsersTest {
     println(r)
     assertFalse(msg, r.successful)
     r match {
-      case x : HParsers0.HError => ()
+      case x : HParsers.HError => ()
       case _ => fail("validation error is expected: " + msg)
     }
   }
@@ -226,7 +226,7 @@ class HParsersTest {
     println(r)
     assertFalse(msg, r.successful)
     r match {
-      case x : HParsers0.HError => fail("syntax error is expected")
+      case x : HParsers.HError => fail("syntax error is expected")
       case _ => 
     }
   }

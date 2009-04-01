@@ -9,16 +9,16 @@ import HLanguage._
 
 object TestUtils {
   def termResultFromString(input: String) =
-    HParsers0.parseTerm(new CharArrayReader(input.toCharArray))
+    HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     
   def typeExprResultFromString(input: String) =
-    HParsers0.parseType(new CharArrayReader(input.toCharArray))
+    HParsers.parseType(new CharArrayReader(input.toCharArray))
     
   def termFromString(input: String) = 
     termResultFromString(input).get
     
   def programResultFromString(input: String) =
-    HParsers0.parseProgram(new CharArrayReader(input.toCharArray))
+    HParsers.parseProgram(new CharArrayReader(input.toCharArray))
     
   def programResultFromFile(fileName: String) = {
     val file = new File(fileName)
@@ -33,11 +33,11 @@ object TestUtils {
       }
     } while (str != null)
     in.close();
-    HParsers0.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
   }
   
   def termFromString(input: String, program: Program) = {
-    val pr = HParsers0.parseTerm(new CharArrayReader(input.toCharArray))
+    val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
     val term = pr.get
     Validator0.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)

@@ -3,7 +3,7 @@ package hosc
 import scala.util.parsing.input.Positional
 
 import HLanguage._
-import HParsers0._
+import HParsers._
 
 object Validator0 {
   case class ValidatorError(error: HError) extends Exception(error.toString) {}
