@@ -61,7 +61,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   def postprocess(pr: ParseResult[Program]) = pr match {
     case n: NoSuccess => n;
-    case s @ Success(_, _) => Postprocessor0.postprocess(s.get); s
+    case s @ Success(_, _) => Postprocessor.postprocess(s.get); s
   }
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
@@ -109,4 +109,20 @@ class HTokenParsers extends StdTokenParsers {
   import lexical.{UIdentifier, LIdentifier}
   def uident: Parser[String] = elem("identifier", _.isInstanceOf[UIdentifier]) ^^ (_.chars)
   def lident: Parser[String] = elem("identifier", _.isInstanceOf[LIdentifier]) ^^ (_.chars)  
+}
+
+object Postprocessor {
+  def postprocess(program: Program) = {
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    for (f <- program.fs) process(f.lam,  globals)
+    process(program.goal, globals)
+  }
+  def process(t: Expression, globals: Set[Variable]): Unit = t match {
+    case v: Variable => v.global = (globals contains v)
+    case Constructor(_, args) => for (a <- args) process(a, globals)
+    case LambdaAbstraction(v, t) => process(t, globals)
+    case Application(h, a) => process(h, globals); process(a, globals)
+    case CaseExpression(s, bs) => process(s, globals); for (b <- bs) process(b.term, globals)
+    case LetRecExpression((v, e), e0) => {v.global = true; process(e, globals + v); process(e0, globals + v)}                                                   
+  }
 }

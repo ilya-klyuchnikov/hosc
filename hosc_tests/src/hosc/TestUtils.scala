@@ -42,7 +42,7 @@ object TestUtils {
     val term = pr.get
     Validator0.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
-    Postprocessor0.process(term, globals)
+    Postprocessor.process(term, globals)
     val ti = new TypeInferrer(program.ts)
     //ti.tcTerm(term)
     term
