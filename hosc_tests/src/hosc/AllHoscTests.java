@@ -15,6 +15,7 @@ public class AllHoscTests {
 		suite.addTest(new JUnit4TestAdapter(hosc.InterpreterTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.TermAlgebraTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompilerTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.EqTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.SuperCompiler0Test.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.TasksTest.class));
 		// $JUnit-END$
