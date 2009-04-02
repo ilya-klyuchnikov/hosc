@@ -10,30 +10,31 @@ object HE {
   
   def strictHe(term1: Expression, term2: Expression) = heByDiving(term1, term2, Nil)
   
-  private def he(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def he(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
     heByVar(term1, term2, binders) || heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
   
-  private def heByVar(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def heByVar(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
     (term1, term2) match {
     case (v1: Variable, v2: Variable) => (v1.global == true && v2.global == true && v1.name == v2.name) ||
       (v1.global == false && v2.global == false) && 
-        ((binders exists {p => p._1 == v1 && p._2 == v2}) || (binders forall {p => p._1 != v1 && p._2 != v2}))
+        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))
     case _ => false
   }
   
-  private def heByDiving(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = { 
+  private def heByDiving(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = { 
     val term1Vars = getFreeVars(term1)
     for (p <- binders) if (term1Vars contains p._1) return false
     term2 match {
       case Constructor(_, args) => args exists (he(term1, _, binders))
       case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
       case a: Application => lineApp(a) exists (he(term1, _, binders))
-      case CaseExpression(sel, bs) => he(term1, sel, binders) || (bs exists {b => he(term1, b.term, (b.pattern.args map {(null,_)}) ::: binders)})
+      case CaseExpression(sel, bs) => 
+        he(term1, sel, binders) || (bs exists {b => he(term1, b.term, (b.pattern.args map {(null,_)}) ::: binders)})
       case _ => false
     }
   }
   
-  private def heByCoupling(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]]): Boolean = 
+  private def heByCoupling(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
     (term1, term2) match {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2, binders))
