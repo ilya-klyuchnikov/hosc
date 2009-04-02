@@ -1,0 +1,72 @@
+{%extends "base.html"%}
+{%block title%}{{program.name}}{%endblock%}
+{%block content%}
+    {%if program%}
+    <div class="program">
+		<div class="summary">
+			<span class="program-name">{{program.name}}</span> by 
+			<a href ="/author?key={{program.author.key}}"/> {{ program.author.user.nickname }}</a> 
+			<span class="program-date">{{ program.date|date:"jS F Y H:i" }}</span> 
+		</div>
+	    <table>
+    	<tbody>
+    	<tr><td colspan="2">Types:</td></tr>
+    	<tr><td colspan="2"><pre class="code">{{ program.types }}</pre></td></tr>
+    	
+    	<tr>
+    	<td>Goal 1:</td>
+    	<td>Goal 2:</td>
+    	</tr>
+    	<tr>
+    	<td><pre class="code">{{ program.goal1 }}</pre></td>
+    	<td><pre class="code">{{ program.goal2 }}</pre></td>
+    	</tr>
+    	
+    	<tr><td colspan="2">Definitions:</td></tr>
+    	<tr><td colspan="2"><pre class="code">{{ program.defs }}</pre></td></tr>
+    	{% if eq %}
+    	<tr><td colspan="2"><div>EQUIVALENT!!</div></td></tr>
+    	{% endif %}
+    	
+    	{% if noteq %}
+    	<tr><td colspan="2"><div>CANNOT INFER EQUIVALENCE</div></td></tr>
+    	{% endif %}
+    	
+    	<tr><td colspan="2">Residual code 1:</td></tr>
+    	<tr><td colspan="2"><pre class="code">{{ program.scp_code1 }}</pre></td></tr>
+    	<tr><td colspan="2">Residual code 2:</td></tr>
+    	<tr><td colspan="2"><pre class="code">{{ program.scp_code2 }}</pre></td></tr>
+		</tbody>
+		</table>
+			
+			<div class="hidden-form">
+				<table>
+				<tr>
+	    		{% ifequal program.author.user user %}
+	    		<td>
+				<form action="/tedit">
+				<input name="key" type="hidden" value="{{ program.key }}"/>
+				<input type="submit" value="Edit" /></form>
+				</td>
+				<td>
+				<form action="/tdelete">
+				<input name="key" type="hidden" value="{{ program.key }}"/>
+				<input type="submit" value="Delete" /></form>
+				</td>
+	    		{% endifequal %}
+	    		<td>
+				<form action="/eq" method="post">
+				<input name="types" type="hidden" value="{{ program.types }}"/>
+				<input name="goal1" type="hidden" value="{{ program.goal1 }}"/>
+				<input name="goal2" type="hidden" value="{{ program.goal2 }}"/>
+				<input name="defs" type="hidden" value="{{ program.defs }}"/>
+				<input name="action" type="hidden" value="Test"/>
+				<input type="submit" value="Load Into Equivalence Tester" /></form>
+				</td>
+	    		</tr>
+	    		</table>
+	 		</div>
+		</div>
+	</div>
+    {% endif %}
+{%endblock%}

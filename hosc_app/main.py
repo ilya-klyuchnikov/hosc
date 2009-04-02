@@ -13,7 +13,12 @@ application = webapp.WSGIApplication(
                                       ('/svgpreview', views.SvgPreview),
                                       ('/authors', views.Authors),
                                       ('/author', views.Author),
-                                      ('/mine', views.Mine)]
+                                      ('/mine', views.Mine),
+                                      ('/eq', views.Eq),
+                                      ('/tests', views.Tests),
+                                      ('/tedit', views.TEdit),
+                                      ('/tdelete', views.TDelete),
+                                      ('/test', views.Test)]
                                      )
 
 def main():

@@ -20,6 +20,7 @@ TYPE_ERROR = 'typeError'
 NETWORK_ERROR = 'networkError'
 
 RUN_URL = 'http://hosc.ilyushkin.staxapps.net/run'
+EQ_URL = 'http://hosc.ilyushkin.staxapps.net/eq'
 SVG_INTRO = """<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/SVG/DTD/svg10.dtd">
 """
@@ -33,6 +34,14 @@ class SupercompilationResult(object):
         self.line = line
         self.column = column
         self.code_line = code_line
+        
+class EqResult(object):
+    def __init__(self, status, code1=None, code2=None, eq=None, message=None):
+        self.status = status
+        self.code1 = code1
+        self.code2 = code2
+        self.eq = eq
+        self.message = message
         
 def supercompileProgram(code):
     form_fields = {'program': code}
@@ -71,6 +80,37 @@ def supercompileProgram(code):
             return SupercompilationResult(status)
     else:
         return SupercompilationResult(NETWORK_ERROR)
+    
+def eq(types, goal1, goal2, defs):
+    form_fields = {'types': types, 'goal1': goal1, 'goal2': goal2, 'defs': defs}
+    form_data = urllib.urlencode(form_fields)
+    try:
+        result = urlfetch.fetch(url=EQ_URL,
+                                payload=form_data,
+                                method=urlfetch.POST,
+                                headers={'Content-Type': 'application/x-www-form-urlencoded'})
+    except:
+        return EqResult(NETWORK_ERROR)  
+    if result.status_code == 200:
+        xmlresponse = result.content
+        doc = minidom.parseString(xmlresponse)
+        status = doc.documentElement.getAttribute('status')
+        if status == OK:
+            codeElement1 = doc.documentElement.getElementsByTagName('code1')[0]
+            residualCode1 = codeElement1.firstChild.data
+            codeElement2 = doc.documentElement.getElementsByTagName('code2')[0]
+            residualCode2 = codeElement2.firstChild.data
+            equiv = doc.documentElement.getAttribute('eq') == 'true'
+            
+            return EqResult(OK, code1=residualCode1, code2=residualCode2, eq=equiv)
+        elif status == TYPE_ERROR:
+            details = doc.documentElement.getElementsByTagName('details')[0]
+            msg = details.getAttribute('message')
+            return EqResult(status, message=msg)
+        else:
+            return EqResult(status)
+    else:
+        return EqResult(NETWORK_ERROR)
 
 class Svg(webapp.RequestHandler):
     def get(self):
@@ -104,6 +144,21 @@ class All(webapp.RequestHandler):
                         'sign_out': users.create_logout_url(self.request.uri)
                         }
         self.response.out.write(template.render('templates/recent.html', template_values))
+        
+class Tests(webapp.RequestHandler):
+    def get(self):
+        order = self.request.get('order')
+        if order not in ['name', '-name', 'date', '-date', 'summary', '-summary', 'author', '-author', 'modified', '-modified']:
+            order = '-modified'
+        programs = models.Test.all().order(order)
+        template_values = {
+                        'order': order,
+                        'programs': programs,
+                        'user': users.get_current_user(),
+                        'sign_in': users.create_login_url(self.request.uri),
+                        'sign_out': users.create_logout_url(self.request.uri)
+                        }
+        self.response.out.write(template.render('templates/tests.html', template_values))
         
 class Supercompiler(webapp.RequestHandler):
     def post(self):
@@ -175,6 +230,63 @@ class Supercompiler(webapp.RequestHandler):
                         'empty_name': empty_name
                         }
         self.response.out.write(template.render('templates/supercompiler.html', template_values))
+        
+class Eq(webapp.RequestHandler):
+    def post(self):
+        
+        types = self.request.get('types')
+        goal1 = self.request.get('goal1')
+        goal2 = self.request.get('goal2')
+        defs = self.request.get('defs')
+
+        result = eq(types, goal1, goal2, defs)
+        if result.status == TYPE_ERROR:
+            self.display_errors(code_error=result.message)
+            return
+        if result.status == NETWORK_ERROR:
+            self.display_errors(network_error=True, code_error=result.message)
+            return
+        
+        action = self.request.get('action')
+        user = users.get_current_user()
+        name = self.request.get('name').strip()
+        empty_name = name == ''
+        if action == 'Test' or empty_name:
+            template_values = {
+                               'user': users.get_current_user(),
+                               'sign_in': users.create_login_url(self.request.uri),
+                               'sign_out': users.create_logout_url(self.request.uri),
+                               'types': types, 'goal1': goal1, 'goal2': goal2, 'defs': defs,
+                               'scp_code1' : result.code1, 'scp_code2' : result.code2,
+                               'eq': result.eq, 'noteq': not result.eq, 'empty_name': empty_name
+                               }
+            self.response.out.write(template.render('templates/eq.html', template_values))
+            return
+        author = models.get_author_for_user(user)
+        models.add_test_for_user(author.key(), name=name, summary=self.request.get('summary'), 
+                                    types=types, goal1=goal1, goal2=goal2, defs=defs, 
+                                    notes=self.request.get('notes'), scp_code1=result.code1,
+                                    scp_code2=result.code2, eq=result.eq)
+        self.redirect('/tests')
+    def get(self):
+        template_values = {
+            'user': users.get_current_user(),
+            'sign_in': users.create_login_url(self.request.uri),
+            'sign_out': users.create_logout_url(self.request.uri)
+            }
+        self.response.out.write(template.render('templates/eq.html', template_values))
+    def display_errors(self, network_error=False, code_error=None):
+        template_values = {
+                        'user': users.get_current_user(),
+                        'sign_in': users.create_login_url(self.request.uri),
+                        'sign_out': users.create_logout_url(self.request.uri),
+                        'code_error': code_error,
+                        'types': self.request.get('types'),
+                        'goal1': self.request.get('goal1'),
+                        'goal2': self.request.get('goal2'),
+                        'defs': self.request.get('defs')
+                        }
+        self.response.out.write(template.render('templates/eq.html', template_values))
         
 class Edit(webapp.RequestHandler):
     def post(self):
@@ -279,6 +391,105 @@ class Edit(webapp.RequestHandler):
                         'empty_name': empty_name
                         }
         self.response.out.write(template.render('templates/edit.html', template_values))
+        
+class TEdit(webapp.RequestHandler):
+    def post(self):
+        if not users.get_current_user():
+            self.redirect(users.create_login_url(self.request.uri))
+        code = self.request.get('code')
+        
+        types = self.request.get('types')
+        goal1 = self.request.get('goal1')
+        goal2 = self.request.get('goal2')
+        defs = self.request.get('defs')
+        
+        notes = self.request.get('notes')
+        summary = self.request.get('summary')
+
+        result = eq(types, goal1, goal2, defs)
+        if result.status == TYPE_ERROR:
+            self.display_errors(code_error=result.message)
+            return
+        if result.status == NETWORK_ERROR:
+            self.display_errors(network_error=True, code_error=result.message)
+            return
+        
+        action = self.request.get('action')
+        user = users.get_current_user()
+        name = self.request.get('name').strip()
+        empty_name = name == ''
+        if action == 'Preview' or empty_name:
+            template_values = {
+                               'user': users.get_current_user(),
+                               'sign_in': users.create_login_url(self.request.uri),
+                               'sign_out': users.create_logout_url(self.request.uri),
+                               'types': types, 'goal1': goal1, 'goal2': goal2, 'defs': defs,
+                               'scp_code1' : result.code1, 'scp_code2' : result.code2,
+                               'eq': result.eq, 'noteq': not result.eq, 'empty_name': empty_name, 'key': self.request.get('key'),
+                               'notes' :notes, 'summary': summary, 'name': name
+                               }
+            self.response.out.write(template.render('templates/tedit.html', template_values))
+            return
+        try:
+            key_name = self.request.get('key')
+            test = db.get(db.Key(key_name))
+            if test and users.get_current_user() == test.author.user:       
+                    test.name = name
+                    test.summary = summary
+                    test.notes = notes
+                    test.types = types
+                    test.goal1 = goal1
+                    test.goal2 = goal2
+                    test.scp_code1 = result.code1
+                    test.scp_code2 = result.code2
+                    test.eq = result.eq
+                    test.put()
+            self.redirect('/tests')
+        except db.BadKeyError:
+            self.redirect('/') 
+            return
+    def get(self):
+        if not users.get_current_user():
+            self.redirect(users.create_login_url(self.request.uri))
+            return
+        key_name = self.request.get('key')
+        try:
+            program = db.get(db.Key(key_name))
+            if program:
+                template_values = {
+                                   'user': users.get_current_user(),
+                                   'sign_in': users.create_login_url(self.request.uri),
+                                   'sign_out': users.create_logout_url(self.request.uri),
+                                   'key'  : program.key(),
+                                   'name' : program.name,
+                                   'notes' : program.notes,
+                                   'summary' : program.summary,
+                                   'types' : program.types,
+                                   'defs' : program.defs,
+                                   'goal1' : program.goal1,
+                                   'goal2' : program.goal2,
+                                   'scp_code1' : program.scp_code1,
+                                   'scp_code2' : program.scp_code2,
+                                   'eq' : program.eq, 'noteq' : not program.eq
+                                   }
+                self.response.out.write(template.render('templates/tedit.html', template_values))
+            else:
+                self.redirect('/tests')
+        except db.BadKeyError:
+            self.redirect('/tests') 
+    def display_errors(self, network_error=False, code_error=None):
+        template_values = {
+                        'user': users.get_current_user(),
+                        'sign_in': users.create_login_url(self.request.uri),
+                        'sign_out': users.create_logout_url(self.request.uri),
+                        'code_error': code_error,
+                        'types': self.request.get('types'),
+                        'goal1': self.request.get('goal1'),
+                        'goal2': self.request.get('goal2'),
+                        'defs': self.request.get('defs'),
+                        'key': self.request.get('key')
+                        }
+        self.response.out.write(template.render('templates/tedit.html', template_values))
 
 class Get(webapp.RequestHandler):
     def get(self):
@@ -320,6 +531,22 @@ class Get(webapp.RequestHandler):
                 self.redirect('/view?key=' + key_name)
         except db.BadKeyError:
             self.redirect('/')
+            
+class Test(webapp.RequestHandler):
+    def get(self):
+        key_name = self.request.get('key')
+        try:
+            program = models.Test.get(db.Key(key_name))
+            if program:
+                template_values = {
+                                   'program': program,
+                                   'user': users.get_current_user(),
+                                   'sign_in': users.create_login_url(self.request.uri),
+                                   'sign_out': users.create_logout_url(self.request.uri)
+                                   }
+                self.response.out.write(template.render('templates/test.html', template_values))
+        except db.BadKeyError:
+            self.redirect('/tests')
 
 class Delete(webapp.RequestHandler):
     def get(self):
@@ -331,6 +558,17 @@ class Delete(webapp.RequestHandler):
             self.redirect('/')
         except db.BadKeyError:
             self.redirect('/')
+            
+class TDelete(webapp.RequestHandler):
+    def get(self):
+        key_name = self.request.get('key')
+        try:
+            program = db.get(db.Key(key_name))
+            if program and users.get_current_user() == program.author.user:
+                program.delete()
+            self.redirect('/tests')
+        except db.BadKeyError:
+            self.redirect('/test')
             
 class Authors(webapp.RequestHandler):
     def get(self):

@@ -11,5 +11,5 @@ handlers:
   static_files: static/favicon.ico
   upload: static/favicon.ico
 
-- url: (/|/all|/view|/edit|/delete|/mine|/authors|/author|/svg|/supercompiler|/svgpreview)
+- url: (/|/all|/view|/edit|/delete|/mine|/authors|/author|/svg|/supercompiler|/svgpreview|/eq|/tests|/tedit|/tdelete|/test)
   script: main.py

@@ -1,0 +1,61 @@
+{%extends "base.html"%}
+{%block title%}Equivivalence tester{%endblock%}
+{%block content%}
+  	<form action="/eq" method="post">
+    <table>
+    	<tbody>
+    	<tr><td colspan="2">Types:</td></tr>
+    	<tr><td colspan="2"><textarea id="types" cols="100" rows="4" name="types">{{types}}</textarea></td></tr>
+    	
+    	<tr>
+    	<td>Goal 1:</td>
+    	<td>Goal 2:</td>
+    	</tr>
+    	<tr>
+    	<td><textarea id="goal1" cols="45" rows="4" name="goal1">{{goal1}}</textarea></td>
+    	<td><textarea id="goal2" cols="45" rows="4" name="goal2">{{goal2}}</textarea></td>
+    	</tr>
+    	
+    	<tr><td colspan="2">Definitions:</td></tr>
+    	<tr><td colspan="2"><textarea id="defs" cols="100" rows="10" name="defs">{{defs}}</textarea></td></tr>
+    	
+    	{% if code_error %}
+    	<tr><td colspan="2"><div class="error">Incorrect input: {{code_error}}<br/>
+    	{% endif %}
+    	
+    	{% if network_error %}
+    	<tr><td colspan="2"><div class="error">Network error occured. Try again.</div></td></tr>
+    	{% endif %}
+    	<tr><td colspan="2"><input value="Test" type="submit" name="action"/></td></tr>
+    	
+    	{% if eq %}
+    	<tr><td colspan="2"><div>EQUIVALENT!!</div></td></tr>
+    	{% endif %}
+    	
+    	{% if noteq %}
+    	<tr><td colspan="2"><div>CANNOT INFER EQUIVALENCE</div></td></tr>
+    	{% endif %}
+    	
+    	{% if scp_code1 %}
+    	<tr><td colspan="2">Residual code 1:</td></tr>
+    	<tr><td colspan="2"><div class="code"><pre class="code">{{ scp_code1 }}</pre></div></td></tr>
+    	<tr><td colspan="2">Residual code 2:</td></tr>
+    	<tr><td colspan="2"><div class="code"><pre class="code">{{ scp_code2 }}</pre></div></td></tr>
+    	
+    	{%if user%}
+    	<tr><td colspan="2">Name:</td></tr>
+    	<tr><td colspan="2"><input id="name" name="name" type="text" /><td></tr>
+    	{% if empty_name %}
+    	<tr><td colspan="2"><div class="error">Please provide name for your task</div></td></tr>
+    	{% endif %}
+    	<tr><td colspan="2">Summary:</td></tr>
+    	<tr><td colspan="2"><input id="summary" name="summary" type="text"/><td></tr>
+    	<tr><td colspan="2">Notes:</td></tr>
+    	<tr><td colspan="2"><textarea id="notes" cols="100" rows="5" name="notes" ></textarea></td></tr>
+    	<tr><td colspan="2"><input value="Save" type="submit" name="action"/></td></tr>
+    	{% endif %}
+    	{% endif %}
+    	</tbody>
+    </table>
+    </form>
+{%endblock%}

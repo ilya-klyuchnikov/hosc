@@ -15,6 +15,21 @@ class Program(db.Model):
     scp_code = db.TextProperty()
     svg_tree = db.TextProperty()
     
+class Test(db.Model):
+    name = db.StringProperty()
+    summary = db.StringProperty()
+    author = db.ReferenceProperty(Author) # ==parent
+    types = db.TextProperty()
+    goal1 = db.TextProperty()
+    goal2 = db.TextProperty()
+    defs = db.TextProperty()
+    date = db.DateTimeProperty(auto_now_add=True) #creation date
+    modified = db.DateTimeProperty(auto_now=True)
+    scp_code1 = db.TextProperty()
+    scp_code2 = db.TextProperty()
+    eq = db.BooleanProperty()
+    notes = db.TextProperty()
+    
 class Comment(db.Model):
     program = db.ReferenceProperty(Program, collection_name='comments')
     text = db.TextProperty()
@@ -44,6 +59,24 @@ def _add_program_for_author(author_key, name=None, summary=None, code=None, note
     program.svg_tree = svg_tree
     program.put()
     author.put()
+    
+def add_test_for_user(author_key, name=None, summary=None, 
+                        types=None, goal1=None, goal2=None, defs=None, 
+                        scp_code1=None, scp_code2=None, eq=None, notes=None):
+    author = db.get(author_key)
+    test = Test(parent=author)
+    test.name = name
+    test.summary = summary
+    test.author = author
+    test.types = types
+    test.goal1 = goal1
+    test.goal2 = goal2
+    test.defs = defs
+    test.scp_code1 = scp_code1
+    test.scp_code2 = scp_code2
+    test.eq = eq
+    test.notes = notes
+    test.put()
     
 def add_program_for_user(author_key, name=None, summary=None, code=None, notes=None, scp_code=None, svg_tree=None):
     db.run_in_transaction(_add_program_for_author, author_key, name, summary, code, notes, scp_code, svg_tree)
