@@ -29,6 +29,8 @@ class Boot {
     val entries = Menu(Loc("Home", "index" :: Nil, "Home")) :: 
                   Menu(Loc("sc0", "sc0" :: Nil, "SC0")) ::
                   Menu(Loc("sc0_result", "sc0_result" :: Nil, "sc0_result", Hidden)) ::
+                  Menu(Loc("eq", "eq" :: Nil, "Equivalence Tester")) ::
+                  Menu(Loc("eq_result", "eq_result" :: Nil, "eq_result", Hidden)) ::
                   Nil 
     LiftRules.setSiteMap(SiteMap(entries:_*))
     
