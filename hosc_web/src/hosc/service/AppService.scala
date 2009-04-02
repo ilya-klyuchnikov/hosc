@@ -9,7 +9,6 @@ import hosc.sc0.ProcessTree0SVG
 import hosc.sc0.CodeConstructor0
 import hosc.LangUtils._
 import hosc.HLanguage._
-import hosc.HLanguage1._
 import scala.util.parsing.input.CharArrayReader
 
 object AppService {
