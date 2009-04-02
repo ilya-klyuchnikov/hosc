@@ -1,9 +1,9 @@
-package hosc.sc0
+package hosc
 
 import HLanguage._
-import TermAlgebra0._
+import sc0.TermAlgebra0._
 
-object HE0 {
+object HE {
   def he(term1: Expression, term2: Expression): Boolean = he(term1, term2, Nil)
   
   def heByCoupling(term1: Expression, term2: Expression): Boolean = heByCoupling(term1, term2, Nil)

@@ -46,7 +46,7 @@ object EnrichedLambdaCalculus {
    }   
    case class Branch(pattern: Pattern, term: Expression) {
      override def toString = pattern + " -> " + term + ";"
-     def toDoc: Document = group(pattern.toDoc :: " ->" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
+     def toDoc = group(pattern.toDoc :: " ->" :: nest(2 , ED :/: term.toDoc :: ";" :: ED)); 
    }
    case class Pattern(name: String, args: List[Variable]) {
      override def toString = name + " " + args.mkString(" ")

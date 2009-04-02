@@ -52,11 +52,16 @@ object LambdaLifting {
   }
   
   def injectArgument(e: Expression, f: Variable, v0: Variable): Expression = e match {
-    case v@Variable(_) => if (v==f) Application(f, v0) else v
-    case Constructor(name, args) => Constructor(name, args map {injectArgument(_, f, v0)})
-    case LambdaAbstraction(v, body) => LambdaAbstraction(v, injectArgument(body, f, v0))
-    case Application(head, arg) => Application(injectArgument(head, f, v0), injectArgument(arg, f, v0))
-    case CaseExpression(sel, branches) => CaseExpression(injectArgument(sel, f, v0), branches map {b => Branch(b.pattern, injectArgument(b.term, f, v0))})
+    case v@Variable(_) => 
+      if (v==f) Application(f, v0) else v
+    case Constructor(name, args) => 
+      Constructor(name, args map {injectArgument(_, f, v0)})
+    case LambdaAbstraction(v, body) => 
+      LambdaAbstraction(v, injectArgument(body, f, v0))
+    case Application(head, arg) => 
+      Application(injectArgument(head, f, v0), injectArgument(arg, f, v0))
+    case CaseExpression(sel, branches) => 
+      CaseExpression(injectArgument(sel, f, v0), branches map {b => Branch(b.pattern, injectArgument(b.term, f, v0))})
     case LetRecExpression((f1, e1), e2) => 
       if (f1==f) {
         val nv = newVar()
