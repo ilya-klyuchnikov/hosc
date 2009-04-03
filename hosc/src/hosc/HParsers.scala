@@ -13,7 +13,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
   lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
   
-  def program = (typeConstrDefinition*) ~ term ~ ("where" ~> strong(function*)) ^^ Program
+  def program = (typeConstrDefinition*) ~ term ~ (("where" ~> strong(function*)) | success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
   
   def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")

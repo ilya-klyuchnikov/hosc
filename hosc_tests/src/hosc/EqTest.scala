@@ -11,6 +11,7 @@ class EqTest {
     testEq("eq/app1.hs", "eq/app2.hs")
     testEq("eq/iter1.hs", "eq/iter2.hs")
     testEq("eq/comp1.hs", "eq/comp2.hs")
+    testEq("eq/filter1.hs", "eq/filter2.hs")
   }
   
   def testEq(f1: String, f2: String) = {

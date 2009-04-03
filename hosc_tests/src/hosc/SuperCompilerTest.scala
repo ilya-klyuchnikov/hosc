@@ -27,6 +27,15 @@ class SuperCompilerTest {
         "-t", "output/eq.svg",
         "-p", "output/eq.hl"));
     }
+  
+  @Test def zip(): Unit = {
+    SuperCompiler0App.main(Array("-si", "hl/supercompiler/zip1.hl",
+        "-t", "output/zip1.svg",
+        "-p", "output/zip1.hl"));
+    SuperCompiler0App.main(Array("-si", "hl/supercompiler/zip2.hl",
+        "-t", "output/zip2.svg",
+        "-p", "output/zip2.hl"));
+    }
   @Test def eqnum_plus(): Unit = {
     SuperCompiler0App.main(Array("-si", "hl/supercompiler/eqnum_plus.hl",
         "-t", "output/eqnum_plus.svg",
@@ -131,7 +140,7 @@ class SuperCompilerTest {
         "-p", "output/eqnum.hl"));
   }
   
-  
+  @Ignore
   @Test def synapse(): Unit = {
     SuperCompiler0App.main(Array("-si", "hl/supercompiler/synapse.hl",
         "-t", "output/synapse.svg",

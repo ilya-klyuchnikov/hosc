@@ -9,7 +9,7 @@ import LangUtils._
 
 class SuperCompiler0(program: Program){
   val emptyMap = Map[Variable, Expression]()
-  val debug = true
+  val debug = false
   
   def driveExp(expr: Expression): List[Pair[Expression, Map[Variable, Expression]]] = expr match {
     case LetExpression(bs, t) => {
@@ -44,6 +44,16 @@ class SuperCompiler0(program: Program){
   }  
   
   def buildProcessTree(e: Expression): ProcessTree0 = {
+    try {
+      return buildSuperPureProcessTree(e)
+    } catch {
+      case _ =>
+    }
+    try {
+      return buildPureProcessTree(e)
+    } catch {
+      case _ =>
+    }
     val p = ProcessTree0(e)
     if (debug) {
       println(program.toDocString)
@@ -84,6 +94,76 @@ class SuperCompiler0(program: Program){
     renameVars(p)
   }
   
+  def buildPureProcessTree(e: Expression): ProcessTree0 = {
+    val p = ProcessTree0(e)
+    if (debug) {
+      println(program.toDocString)
+    }
+    var i = 0;
+    while (!p.isClosed) {
+      i = i + 1
+      if (i > 100) throw new Exception()
+      println(i)
+      if (debug) { 
+        println(p)
+        println("==========")
+      }
+      val beta = p.leafs.find(!_.isProcessed).get
+      val bExpr = beta.expr
+      beta.expr match {
+        case LetExpression(_, _) => drive(p, beta)
+        case bTerm if canBeEnhanced_?(bTerm) => {
+          beta.ancestors find equivalenceTest(bTerm) match {
+            case Some(alpha) => beta.repeatedOf = alpha; 
+            case None => {
+              beta.ancestors find instanceTest(bTerm) match {
+                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case None => drive(p, beta)
+              }
+            }
+          }
+        }
+        case _ => drive(p, beta)
+      }      
+    }
+    renameVars(p)
+  }
+  
+  def buildSuperPureProcessTree(e: Expression): ProcessTree0 = {
+    val p = ProcessTree0(e)
+    if (debug) {
+      println(program.toDocString)
+    }
+    var i = 0;
+    while (!p.isClosed) {
+      i = i + 1
+      if (i > 100) throw new Exception()
+      println(i)
+      if (debug) { 
+        println(p)
+        println("==========")
+      }
+      val beta = p.leafs.find(!_.isProcessed).get
+      val bExpr = beta.expr
+      beta.expr match {
+        case LetExpression(_, _) => drive(p, beta)
+        case bTerm if canBeEnhanced1_?(bTerm) => {
+          beta.ancestors find equivalenceTest(bTerm) match {
+            case Some(alpha) => beta.repeatedOf = alpha; 
+            case None => {
+              beta.ancestors find instanceTest(bTerm) match {
+                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case None => drive(p, beta)
+              }
+            }
+          }
+        }
+        case _ => drive(p, beta)
+      }      
+    }
+    renameVars(p)
+  }
+  
   private def instanceTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => sameRedex(aTerm, bTerm) && instanceOf(aTerm, bTerm);
@@ -112,6 +192,16 @@ class SuperCompiler0(program: Program){
       case r: RedexCaseVarApp => true
       case _ => false
     }
+    case c@ContextCase(_, _) => c.redex match { 
+      case r: RedexCall => true
+      case r: RedexCaseVar => true
+      case r: RedexCaseVarApp => true
+      case _ => false
+    }
+    case _ => false
+  }
+  
+  def canBeEnhanced1_?(t: Expression) = decompose(t) match {
     case c@ContextCase(_, _) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true

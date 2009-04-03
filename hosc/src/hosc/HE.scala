@@ -23,7 +23,7 @@ object HE {
   
   private def heByDiving(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = { 
     val term1Vars = getFreeVars(term1)
-    for (p <- binders) if (term1Vars contains p._1) return false
+    for (p <- binders) if ((p._1 != null) && (term1Vars contains p._1)) return false
     term2 match {
       case Constructor(_, args) => args exists (he(term1, _, binders))
       case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders)
