@@ -277,6 +277,7 @@ class Eq(webapp.RequestHandler):
         self.response.out.write(template.render('templates/eq.html', template_values))
     def display_errors(self, network_error=False, code_error=None):
         template_values = {
+                        'network_error': network_error,   
                         'user': users.get_current_user(),
                         'sign_in': users.create_login_url(self.request.uri),
                         'sign_out': users.create_logout_url(self.request.uri),
@@ -540,6 +541,7 @@ class Test(webapp.RequestHandler):
             if program:
                 template_values = {
                                    'program': program,
+                                   'eq': program.eq, 'noteq': not program.eq,
                                    'user': users.get_current_user(),
                                    'sign_in': users.create_login_url(self.request.uri),
                                    'sign_out': users.create_logout_url(self.request.uri)

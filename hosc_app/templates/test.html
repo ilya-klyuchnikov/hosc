@@ -8,6 +8,7 @@
 			<a href ="/author?key={{program.author.key}}"/> {{ program.author.user.nickname }}</a> 
 			<span class="program-date">{{ program.date|date:"jS F Y H:i" }}</span> 
 		</div>
+		<div class="program_summary">{{program.summary}}</div>
 	    <table>
     	<tbody>
     	<tr><td colspan="2">Types:</td></tr>
@@ -25,11 +26,11 @@
     	<tr><td colspan="2">Definitions:</td></tr>
     	<tr><td colspan="2"><pre class="code">{{ program.defs }}</pre></td></tr>
     	{% if eq %}
-    	<tr><td colspan="2"><div>EQUIVALENT!!</div></td></tr>
+    	<tr><td colspan="2"><div class="eq">EQUIVALENT</div></td></tr>
     	{% endif %}
     	
     	{% if noteq %}
-    	<tr><td colspan="2"><div>CANNOT INFER EQUIVALENCE</div></td></tr>
+    	<tr><td colspan="2"><div class="noteq">CANNOT INFER EQUIVALENCE</div></td></tr>
     	{% endif %}
     	
     	<tr><td colspan="2">Residual code 1:</td></tr>
@@ -38,7 +39,8 @@
     	<tr><td colspan="2"><pre class="code">{{ program.scp_code2 }}</pre></td></tr>
 		</tbody>
 		</table>
-			
+			<h3>Notes</h3>
+			<div class="description">{{ program.notes }}</div>
 			<div class="hidden-form">
 				<table>
 				<tr>

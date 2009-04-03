@@ -115,3 +115,13 @@ table.programs tr.even td {
 	margin-top: 8px;
 	margin-bottom: 8px;
 }
+
+.eq {
+	font-weight: bold;
+	color: green;
+}
+
+.noteq {
+	font-weight: bold;
+	color: gray;
+}
