@@ -1,11 +1,11 @@
 package hosc.snippet;
 
 import net.liftweb.http.S
-import hosc.sc0.ProcessTree0SVG
-import hosc.sc0.CodeConstructor0
+import hosc.ProcessTree0SVG
+import hosc.CodeConstructor0
 import hosc.HLanguage._
 import hosc.Eq
-import hosc.sc0.SuperCompiler0
+import hosc.SuperCompiler0
 import scala.util.parsing.input.CharArrayReader
 import hosc.LangUtils._
 

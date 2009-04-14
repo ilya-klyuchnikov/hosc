@@ -2,7 +2,6 @@ package hosc
 
 import org.junit.Test
 import org.junit.Ignore
-import sc0.SuperCompiler0App
 
 class TasksTest {
   @Test def task01_app(): Unit = {    

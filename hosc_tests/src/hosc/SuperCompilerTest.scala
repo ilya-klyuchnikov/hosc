@@ -5,8 +5,6 @@ import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage._
 import Util._
-import sc0.SuperCompiler0
-import sc0.SuperCompiler0App
 
 class SuperCompilerTest {
   

@@ -4,7 +4,6 @@ import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
 
-import sc0.Interpreter0
 import HLanguage._
 import TestUtils._
 

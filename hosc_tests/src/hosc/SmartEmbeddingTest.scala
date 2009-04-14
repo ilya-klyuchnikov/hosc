@@ -2,7 +2,6 @@ package hosc
 
 import org.junit.Test
 import org.junit.Ignore
-import sc0.SuperCompiler0App
 
 class SmartEmbeddingTest {
   @Test def example01_rev(): Unit = {    

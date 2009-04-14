@@ -2,11 +2,11 @@ package hosc.service
 
 import net.liftweb.http.{LiftRules, Req, PostRequest, S, XmlResponse}
 import net.liftweb.util.Full
-import hosc.sc0.ProcessTree0
+import hosc.ProcessTree0
 import HParsers._
-import hosc.sc0.SuperCompiler0
-import hosc.sc0.ProcessTree0SVG
-import hosc.sc0.CodeConstructor0
+import hosc.SuperCompiler0
+import hosc.ProcessTree0SVG
+import hosc.CodeConstructor0
 import hosc.LangUtils._
 import hosc.HLanguage._
 import scala.util.parsing.input.CharArrayReader

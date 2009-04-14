@@ -3,7 +3,7 @@ package hosc
 import scala.collection.mutable.ListBuffer
 
 import HLanguage._
-import sc0.TermAlgebra0
+import TermAlgebra0._
 
 object LambdaLifting {
   
