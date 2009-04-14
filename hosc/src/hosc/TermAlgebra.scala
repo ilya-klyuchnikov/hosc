@@ -205,15 +205,15 @@ object TermAlgebra {
   
   def getAllVars(expr: Expression): Set[Variable] = expr match {
     case v: Variable => Set(v)
-    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getAllVars(term)}
+    case Constructor(_, args) => (Set[Variable]() /: args) {_ ++ getAllVars(_)}
     case LambdaAbstraction(x, term) => getAllVars(term) + x
     case Application(head, arg) => getAllVars(head) ++ getAllVars(arg)
     case CaseExpression(sel, bs) => 
-      getAllVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b.term) ++ b.pattern.args}
+       (getAllVars(sel) /: bs) {(vs, b) => vs ++ getAllVars(b.term) ++ b.pattern.args}
     case LetExpression(bs, expr) =>
-      getAllVars(expr) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
+       (getAllVars(expr) /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
     case LetRecExpression(bs, expr) =>
-      getAllVars(expr) ++ (Set[Variable]() /: (bs :: Nil)) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
+       (getAllVars(expr) /: (bs :: Nil)) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
   }
   
 }
