@@ -54,3 +54,8 @@ indexes:
   properties:
   - name: modified
     direction: desc
+
+- kind: Test
+  ancestor: yes
+  properties:
+  - name: name

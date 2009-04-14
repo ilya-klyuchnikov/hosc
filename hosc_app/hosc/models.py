@@ -3,6 +3,7 @@ from google.appengine.ext import db
 class Author(db.Model):
     user = db.UserProperty()
     n_programs = db.IntegerProperty()
+    n_tests = db.IntegerProperty()
 
 class Program(db.Model):
     name = db.StringProperty()
@@ -43,7 +44,7 @@ def get_author_for_user(user):
     if author is not None:
         return author
     else:
-        return Author.get_or_insert(user.email(), user=user, n_programs=0)
+        return Author.get_or_insert(user.email(), user=user, n_programs=0, n_tests=0)
         
     
 def _add_program_for_author(author_key, name=None, summary=None, code=None, notes=None, scp_code=None, svg_tree=None):
@@ -64,6 +65,7 @@ def add_test_for_user(author_key, name=None, summary=None,
                         types=None, goal1=None, goal2=None, defs=None, 
                         scp_code1=None, scp_code2=None, eq=None, notes=None):
     author = db.get(author_key)
+    author.n_tests = author.n_test + 1
     test = Test(parent=author)
     test.name = name
     test.summary = summary
@@ -77,6 +79,7 @@ def add_test_for_user(author_key, name=None, summary=None,
     test.eq = eq
     test.notes = notes
     test.put()
+    author.put()
     
 def add_program_for_user(author_key, name=None, summary=None, code=None, notes=None, scp_code=None, svg_tree=None):
     db.run_in_transaction(_add_program_for_author, author_key, name, summary, code, notes, scp_code, svg_tree)
@@ -89,3 +92,12 @@ def _delete_program(program):
     
 def delete_program(program):
     db.run_in_transaction(_delete_program, program)
+
+def _delete_test(test):
+    author = test.author
+    author.n_tests = author.n_tests - 1
+    test.delete()
+    author.put()
+    
+def delete_test(test):
+    db.run_in_transaction(_delete_test, test)

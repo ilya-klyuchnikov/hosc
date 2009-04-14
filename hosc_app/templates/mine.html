@@ -4,13 +4,33 @@
      <table class="programs">
         <thead>
         <tr>
-        	<th><a href="/mine?order={% ifequal order 'name' %}-{% endifequal %}name">Name</a></th>
-        	<th><a href="/mine?order={% ifequal order 'summary' %}-{% endifequal %}summary">Summary</a></th>
-        	<th><a href="/mine?order={% ifequal order 'date' %}-{% endifequal %}date">Created</a></th>
-        	<th><a href="/mine?order={% ifequal order 'modified' %}-{% endifequal %}modified">Modified</a></th>
+        	<th>Name</th>
+        	<th>Summary</th>
+        	<th>Created</th>
+        	<th>Modified</th>
         </tr>
         </thead>
         {% for program in programs %}
+ 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+            <td><a href ="/view?key={{program.key}}"/>{{program.name}}</a></td>
+            <td>{{program.summary}}</td>
+            <td>{{ program.date|date:"jS F Y H:i" }}</td>
+            <td>{{ program.modified|date:"jS F Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </table>
+      
+       <h2>My Tests</h2>
+     <table class="programs">
+        <thead>
+        <tr>
+        	<th>Name</th>
+        	<th>Summary</th>
+        	<th>Created</th>
+        	<th>Modified</th>
+        </tr>
+        </thead>
+        {% for program in tests %}
  		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
             <td><a href ="/view?key={{program.key}}"/>{{program.name}}</a></td>
             <td>{{program.summary}}</td>

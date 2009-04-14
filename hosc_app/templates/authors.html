@@ -3,7 +3,7 @@
 {%block content%}
     {% for author in authors %}
     <div class="author">
-		<a href="/author?key={{author.key}}">{{author.user.nickname}}</a>({{author.n_programs}})
+		<a href="/author?key={{author.key}}">{{author.user.nickname}}</a>({{author.n_programs}} tasks, {{author.n_tests}} tests)
 	</div>
     {% endfor %}
 {%endblock%}

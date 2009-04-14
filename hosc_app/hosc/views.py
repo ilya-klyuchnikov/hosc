@@ -565,9 +565,9 @@ class TDelete(webapp.RequestHandler):
     def get(self):
         key_name = self.request.get('key')
         try:
-            program = db.get(db.Key(key_name))
-            if program and users.get_current_user() == program.author.user:
-                program.delete()
+            test = db.get(db.Key(key_name))
+            if test and users.get_current_user() == test.author.user:
+                models.delete_test(test)
             self.redirect('/tests')
         except db.BadKeyError:
             self.redirect('/test')
@@ -587,13 +587,14 @@ class Author(webapp.RequestHandler):
     def get(self):
         order = self.request.get('order')
         if order not in ['name', '-name', 'date', '-date', 'summary', '-summary', 'modified', '-modified']:
-            order = '-modified'
+            order = 'name'
         author_key = self.request.get('key')
         author = db.get(db.Key(author_key))
         programs = models.Program.all().ancestor(author).order(order)
+        tests = models.Test.all().ancestor(author).order(order)
         template_values = {
                         'order': order,
-                        'programs': programs,
+                        'programs': programs, 'tests': tests,
                         'user': users.get_current_user(),
                         'sign_in': users.create_login_url(self.request.uri),
                         'sign_out': users.create_logout_url(self.request.uri),
@@ -609,12 +610,13 @@ class Mine(webapp.RequestHandler):
             return
         order = self.request.get('order')
         if order not in ['name', '-name', 'date', '-date', 'summary', '-summary', 'modified', '-modified']:
-            order = '-modified'
+            order = 'name'
         author = models.get_author_for_user(user)
         programs = models.Program.all().ancestor(author).order(order)
+        tests = models.Test.all().ancestor(author).order(order)
         template_values = {
                         'order': order,   
-                        'programs': programs,
+                        'programs': programs, 'tests': tests,
                         'user': users.get_current_user(),
                         'sign_in': users.create_login_url(self.request.uri),
                         'sign_out': users.create_logout_url(self.request.host_url),

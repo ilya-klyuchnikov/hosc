@@ -4,10 +4,10 @@
      <table class="programs">
         <thead>
         <tr>
-        	<th><a href="/author?key={{author.key}}&amp;order={% ifequal order 'name' %}-{% endifequal %}name">Name</a></th>
-        	<th><a href="/author?key={{author.key}}&amp;order={% ifequal order 'summary' %}-{% endifequal %}summary">Summary</a></th>
-        	<th><a href="/author?key={{author.key}}&amp;order={% ifequal order 'date' %}-{% endifequal %}date">Created</a></th>
-        	<th><a href="/author?key={{author.key}}&amp;order={% ifequal order 'modified' %}-{% endifequal %}modified">Modified</a></th>
+        	<th>Name</th>
+        	<th>Summary</th>
+        	<th>Created</th>
+        	<th>Modified</th>
         </tr>
         </thead>
         {% for program in programs %}
@@ -19,4 +19,24 @@
         </tr>
         {% endfor %}
       </table>
+ 
+ <h2>Tests by {{ author.user.nickname }}</h2>
+     <table class="programs">
+        <thead>
+        <tr>
+        	<th>Name</th>
+        	<th>Summary</th>
+        	<th>Created</th>
+        	<th>Modified</th>
+        </tr>
+        </thead>
+        {% for program in tests %}
+ 		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+            <td><a href ="/view?key={{program.key}}"/>{{program.name}}</a></td>
+            <td>{{program.summary}}</td>
+            <td>{{ program.date|date:"jS F Y H:i" }}</td>
+            <td>{{ program.modified|date:"jS F Y H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </table>   
 {%endblock%}
