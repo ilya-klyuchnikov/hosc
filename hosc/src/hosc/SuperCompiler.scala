@@ -2,12 +2,12 @@ package hosc
 
 import HLanguage._
 import HE._
-import MSG0._
-import TermAlgebra0._
-import ProcessTree0._
+import MSG._
+import TermAlgebra._
+import ProcessTree._
 import LangUtils._
 
-class SuperCompiler0(program: Program){
+class SuperCompiler(program: Program){
   val emptyMap = Map[Variable, Expression]()
   val debug = false
   
@@ -43,7 +43,7 @@ class SuperCompiler0(program: Program){
     }
   }  
   
-  def buildProcessTree(e: Expression): ProcessTree0 = {
+  def buildProcessTree(e: Expression): ProcessTree = {
     try {
       return buildSuperPureProcessTree(e)
     } catch {
@@ -54,7 +54,7 @@ class SuperCompiler0(program: Program){
     } catch {
       case _ =>
     }
-    val p = ProcessTree0(e)
+    val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
     }
@@ -94,8 +94,8 @@ class SuperCompiler0(program: Program){
     renameVars(p)
   }
   
-  def buildPureProcessTree(e: Expression): ProcessTree0 = {
-    val p = ProcessTree0(e)
+  def buildPureProcessTree(e: Expression): ProcessTree = {
+    val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
     }
@@ -129,8 +129,8 @@ class SuperCompiler0(program: Program){
     renameVars(p)
   }
   
-  def buildSuperPureProcessTree(e: Expression): ProcessTree0 = {
-    val p = ProcessTree0(e)
+  def buildSuperPureProcessTree(e: Expression): ProcessTree = {
+    val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
     }
@@ -216,11 +216,11 @@ class SuperCompiler0(program: Program){
     case _ => false
   }
   
-  def drive(t: ProcessTree0, n: Node): Unit = {
+  def drive(t: ProcessTree, n: Node): Unit = {
     t.addChildren(n, driveExp(n.expr))
   }
   
-  def makeAbstraction(t: ProcessTree0, alpha: Node, beta: Node): Unit = {
+  def makeAbstraction(t: ProcessTree, alpha: Node, beta: Node): Unit = {
     val aTerm = alpha.expr
     val bTerm = beta.expr
     val g = msg(aTerm, bTerm)
@@ -240,7 +240,7 @@ class SuperCompiler0(program: Program){
     }    
   }
   
-  def renameVars(p: ProcessTree0): ProcessTree0 = {
+  def renameVars(p: ProcessTree): ProcessTree = {
     val vars = p.rootNode.getAllVars()
     var i = 0
     def createVar(): Variable = {      

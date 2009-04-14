@@ -3,7 +3,7 @@ package hosc
 import scala.collection.mutable.ListBuffer
 
 import HLanguage._
-import TermAlgebra0._
+import TermAlgebra._
 
 object LambdaLifting {
   
@@ -29,7 +29,7 @@ object LambdaLifting {
     var result = e
     while (letrecOpt.isDefined) {
       val LetRecExpression((f, e0), _) = letrecOpt.get
-      val freeVars = TermAlgebra0.getFreeVars(e0)
+      val freeVars = TermAlgebra.getFreeVars(e0)
       for (v <- freeVars.toList) {
         result = injectArgument(result, f, v)
       }
@@ -46,7 +46,7 @@ object LambdaLifting {
     case Application(head, arg) => findLetRec(head).orElse(findLetRec(arg))
     case CaseExpression(sel, branches) => branches.foldLeft(findLetRec(sel)){(r, branch) => r.orElse(findLetRec(branch.term))}
     case letrec@LetRecExpression((f, e1), e2) => {
-      val e1FreeVars = TermAlgebra0.getFreeVars(e1) - f
+      val e1FreeVars = TermAlgebra.getFreeVars(e1) - f
       if (e1FreeVars.isEmpty) findLetRec(e1).orElse(findLetRec(e2)) else Some(letrec)
     }  
   }

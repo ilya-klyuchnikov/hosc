@@ -1,11 +1,11 @@
 package hosc.snippet;
 
 import net.liftweb.http.S
-import hosc.ProcessTree0SVG
-import hosc.CodeConstructor0
+import hosc.ProcessTreeSVG
+import hosc.CodeConstructor
 import hosc.HLanguage._
 import hosc.Eq
-import hosc.SuperCompiler0
+import hosc.SuperCompiler
 import scala.util.parsing.input.CharArrayReader
 import hosc.LangUtils._
 
@@ -33,14 +33,14 @@ class Eqt {
     val ti = new TypeInferrer(program1.ts)
     ti.inferType(hl0ToELC(program1))
     
-    val sc1 = new SuperCompiler0(program1)
+    val sc1 = new SuperCompiler(program1)
     val pt1 = sc1.buildProcessTree(program1.goal)
-    val g1 = new CodeConstructor0(program1, pt1, true)
+    val g1 = new CodeConstructor(program1, pt1, true)
     val p1 = g1.generateProgram()
     
-    val sc2 = new SuperCompiler0(program2)
+    val sc2 = new SuperCompiler(program2)
     val pt2 = sc1.buildProcessTree(program2.goal)
-    val g2 = new CodeConstructor0(program2, pt2, true)
+    val g2 = new CodeConstructor(program2, pt2, true)
     val p2 = g2.generateProgram()
     
     val doc1 = p1.toDoc    

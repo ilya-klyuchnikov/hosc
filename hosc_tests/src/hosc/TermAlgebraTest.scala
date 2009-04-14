@@ -4,9 +4,9 @@ import org.junit.Test
 import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage.{Application => A, _}
-import TermAlgebra0._
+import TermAlgebra._
 import HE._
-import MSG0._
+import MSG._
 import TestUtils._
 import Util._
 

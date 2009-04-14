@@ -13,7 +13,7 @@ import java.io.BufferedReader
 import HLanguage._
 import Util._
 
-object SuperCompiler0App {
+object SuperCompilerApp {
   val help = """usage: hosc.SuperCompilerApp [-si sinput_file] -t tree_output_file -p program_output_file
   |Where:
   |sinput_file           path to input file (code in hl0 language)
@@ -44,9 +44,9 @@ object SuperCompiler0App {
     }
     
     val program = programFromFile(fileName)
-    val sc = new SuperCompiler0(program)
+    val sc = new SuperCompiler(program)
     val pt = sc.buildProcessTree(program.goal)    
-    val svg = new ProcessTree0SVG(pt).treeToSVG
+    val svg = new ProcessTreeSVG(pt).treeToSVG
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){
@@ -54,7 +54,7 @@ object SuperCompiler0App {
     } 
     scala.xml.XML.save(outFileName, svg)
     
-    val g = new CodeConstructor0(program, pt, true)
+    val g = new CodeConstructor(program, pt, true)
     val p = g.generateProgram()
     val doc = p.toDoc
     val slFile = new java.io.File(outProgramFileName)

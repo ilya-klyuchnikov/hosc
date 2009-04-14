@@ -2,9 +2,9 @@ package hosc
 
 import HLanguage._
 
-object ProcessTree0 {
+object ProcessTree {
   def apply(expr: Expression) = 
-    new ProcessTree0(new Node(expr, null, Nil))
+    new ProcessTree(new Node(expr, null, Nil))
   
   class Node(var expr: Expression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
@@ -36,7 +36,7 @@ object ProcessTree0 {
     def getRepParent(): Node = repeatedOf
     
     def getAllVars(): Set[Variable] = {
-      var vars = TermAlgebra0.getAllVars(expr)
+      var vars = TermAlgebra.getAllVars(expr)
       for (e <- outs) {
         vars = vars ++ e.child.getAllVars()
       }
@@ -58,8 +58,8 @@ object ProcessTree0 {
   
 }
 
-import ProcessTree0._
-class ProcessTree0 {
+import ProcessTree._
+class ProcessTree {
   var rootNode: Node = null
   private var leafs_ = List[Node]()
   

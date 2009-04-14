@@ -1,9 +1,9 @@
 package hosc
 
 import HLanguage._
-import MSG0._
+import MSG._
 
-object TermAlgebra0 {
+object TermAlgebra {
   var i = 0
   def newVar() = {
     i += 1

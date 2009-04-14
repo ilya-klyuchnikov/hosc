@@ -2,11 +2,11 @@ package hosc.service
 
 import net.liftweb.http.{LiftRules, Req, PostRequest, S, XmlResponse}
 import net.liftweb.util.Full
-import hosc.ProcessTree0
+import hosc.ProcessTree
 import HParsers._
-import hosc.SuperCompiler0
-import hosc.ProcessTree0SVG
-import hosc.CodeConstructor0
+import hosc.SuperCompiler
+import hosc.ProcessTreeSVG
+import hosc.CodeConstructor
 import hosc.LangUtils._
 import hosc.HLanguage._
 import scala.util.parsing.input.CharArrayReader
@@ -55,14 +55,14 @@ object AppService {
 		    val ti = new TypeInferrer(program1.ts)
 		    ti.inferType(hl0ToELC(program1))
 		    
-		    val sc1 = new SuperCompiler0(program1)
+		    val sc1 = new SuperCompiler(program1)
 		    val pt1 = sc1.buildProcessTree(program1.goal)
-		    val g1 = new CodeConstructor0(program1, pt1, true)
+		    val g1 = new CodeConstructor(program1, pt1, true)
 		    val p1 = g1.generateProgram()
 		    
-		    val sc2 = new SuperCompiler0(program2)
+		    val sc2 = new SuperCompiler(program2)
 		    val pt2 = sc1.buildProcessTree(program2.goal)
-		    val g2 = new CodeConstructor0(program2, pt2, true)
+		    val g2 = new CodeConstructor(program2, pt2, true)
 		    val p2 = g2.generateProgram()
 		    
 		    val doc1 = p1.toDoc    
@@ -103,10 +103,10 @@ object AppService {
   }
   
   def superCompile(program: HLanguage.Program): (String, scala.xml.Elem) = {
-    val supercompiler = new SuperCompiler0(program)
+    val supercompiler = new SuperCompiler(program)
     val processTree = supercompiler.buildProcessTree(program.goal)
-    val svg = new ProcessTree0SVG(processTree).treeToSVG
-    val generator = new CodeConstructor0(program, processTree, true)
+    val svg = new ProcessTreeSVG(processTree).treeToSVG
+    val generator = new CodeConstructor(program, processTree, true)
     val residualProgram = generator.generateProgram()
     val residualProgramDocument = residualProgram.toDoc    
     val stringWriter = new java.io.StringWriter()

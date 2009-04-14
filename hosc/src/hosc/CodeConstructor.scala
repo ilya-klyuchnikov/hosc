@@ -2,11 +2,11 @@ package hosc
 
 import HLanguage._
 import LangUtils._
-import ProcessTree0._
-import MSG0._
-import TermAlgebra0._
+import ProcessTree._
+import MSG._
+import TermAlgebra._
 
-class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, freeVarsInLetrecs: Boolean) {
+class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
   def generateProgram() = Program(originalProgram.ts, construct(tree.rootNode), Nil)
   
   private def construct(node: Node): Expression = node.expr match {
@@ -57,7 +57,7 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                   }
                 }
                 else {
-                  vars = TermAlgebra0.getFreeVars(t)
+                  vars = TermAlgebra.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0
@@ -114,7 +114,7 @@ class CodeConstructor0(val originalProgram: Program, val tree: ProcessTree0, fre
                   }
                 }
                 else {
-                  vars = TermAlgebra0.getFreeVars(t)
+                  vars = TermAlgebra.getFreeVars(t)
                 }
                 val args0 = vars.toList 
                 val args = args0

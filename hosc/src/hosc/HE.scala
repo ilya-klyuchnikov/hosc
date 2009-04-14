@@ -1,7 +1,7 @@
 package hosc
 
 import HLanguage._
-import TermAlgebra0._
+import TermAlgebra._
 
 object HE {
   def he(term1: Expression, term2: Expression): Boolean = he(term1, term2, Nil)

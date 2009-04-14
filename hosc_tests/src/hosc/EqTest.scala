@@ -22,9 +22,9 @@ class EqTest {
   
   def supercompile(file: String) = {
     val program = programFromFile(file)
-    val sc = new SuperCompiler0(program)
+    val sc = new SuperCompiler(program)
     val pt = sc.buildProcessTree(program.goal)
-    val g = new CodeConstructor0(program, pt, true)
+    val g = new CodeConstructor(program, pt, true)
     val p = g.generateProgram()
     p
   }

@@ -3,10 +3,10 @@ package hosc
 import scala.util.parsing.input.{CharArrayReader, Reader}
 
 import HLanguage._
-import TermAlgebra0._
+import TermAlgebra._
 import Util._
 
-class Interpreter0(program: Program) {
+class Interpreter(program: Program) {
   
   def this(fileName: String) = this(Util.programFromFile(fileName))
   

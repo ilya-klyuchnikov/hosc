@@ -2,8 +2,8 @@ package hosc
 
 import HLanguage._
 
-class ProcessTree0SVG(tree: ProcessTree0) {
-  var map = Map[ProcessTree0.Node, Tuple4[Int, Int, Int, Int]]()
+class ProcessTreeSVG(tree: ProcessTree) {
+  var map = Map[ProcessTree.Node, Tuple4[Int, Int, Int, Int]]()
   
   def treeToSVG() = 
     <svg:svg xmlns:svg="http://www.w3.org/2000/svg" width={"" + width(tree.rootNode)} height={"" + height(tree.rootNode)} >
@@ -46,7 +46,7 @@ class ProcessTree0SVG(tree: ProcessTree0) {
     edges
   }
     
-  def nodeToSVG(node: ProcessTree0.Node, trX: Int, trY: Int): scala.xml.NodeBuffer = {
+  def nodeToSVG(node: ProcessTree.Node, trX: Int, trY: Int): scala.xml.NodeBuffer = {
     def childrenToSVG() = {
       val children = new scala.xml.NodeBuffer
       var trChX = (width(node) - childrenWidth(node))/2
@@ -78,18 +78,18 @@ class ProcessTree0SVG(tree: ProcessTree0) {
     &+ childrenToSVG
   }   
       
-  def width(node: ProcessTree0.Node): Int = {
+  def width(node: ProcessTree.Node): Int = {
     val myWidth = rectWidth(node) + 40
     Math.max(myWidth, childrenWidth(node))
   }
     
-  def height(node: ProcessTree0.Node): Int = {
+  def height(node: ProcessTree.Node): Int = {
     var childrenHeight = 0
     for (out <- node.outs) childrenHeight = Math.max(height(out.child), childrenHeight)
     if (childrenHeight > 0) childrenHeight + 100 else 30
   }
     
-  def childrenWidth(node: ProcessTree0.Node): Int = {
+  def childrenWidth(node: ProcessTree.Node): Int = {
     var childrenWidth = 0
     for (out <- node.outs){
       childrenWidth += width(out.child)
@@ -98,6 +98,6 @@ class ProcessTree0SVG(tree: ProcessTree0) {
   }
     
     
-  def rectWidth(node: ProcessTree0.Node): Int = node.expr.toString.length*6 + 10
+  def rectWidth(node: ProcessTree.Node): Int = node.expr.toString.length*6 + 10
 
 }

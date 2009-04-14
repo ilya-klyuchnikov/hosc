@@ -37,7 +37,7 @@ object LocalTreeBuilder0App {
     val program = programFromFile(fileName)
     val sc = new LocalTreeBuilder0(program)
     val pt = sc.buildProcessTree(program.goal)    
-    val svg = new ProcessTree0SVG(pt).treeToSVG
+    val svg = new ProcessTreeSVG(pt).treeToSVG
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){

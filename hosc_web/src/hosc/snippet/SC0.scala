@@ -1,10 +1,10 @@
 package hosc.snippet;
 
 import net.liftweb.http.S
-import hosc.ProcessTree0SVG
-import hosc.CodeConstructor0
+import hosc.ProcessTreeSVG
+import hosc.CodeConstructor
 import hosc.HLanguage._
-import hosc.SuperCompiler0
+import hosc.SuperCompiler
 import scala.util.parsing.input.CharArrayReader
 import hosc.LangUtils._
 
@@ -17,10 +17,10 @@ class SC0 {
     val program1 = LambdaLifting.lift(program)
     val ti = new TypeInferrer(program1.ts)
     ti.inferType(hl0ToELC(program1))
-    val sc = new SuperCompiler0(program1)
+    val sc = new SuperCompiler(program1)
     val pt = sc.buildProcessTree(program1.goal)
-    val svg = new ProcessTree0SVG(pt).treeToSVG
-    val g = new CodeConstructor0(program1, pt, true)
+    val svg = new ProcessTreeSVG(pt).treeToSVG
+    val g = new CodeConstructor(program1, pt, true)
     val p1 = g.generateProgram()
     val doc1 = p1.toDoc    
     val writer1 = new java.io.StringWriter()

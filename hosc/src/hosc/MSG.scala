@@ -1,9 +1,9 @@
 package hosc
 
 import HLanguage._
-import TermAlgebra0._
+import TermAlgebra._
 
-object MSG0 {
+object MSG {
   
   type Substitution = Tuple2[Variable, Expression]
   type DoubleSubstitution = Tuple3[Variable, Expression, Expression]

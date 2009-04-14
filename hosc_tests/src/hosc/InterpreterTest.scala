@@ -19,7 +19,7 @@ class InterpreterTest {
   }  
   
   def testInt(fileName: String, expectedOutput: String): Unit = {
-    val in = new Interpreter0(fileName)
+    val in = new Interpreter(fileName)
     val expected = termFromString(expectedOutput)
     val actual = in.eval()
     assertEquals(expected, actual)

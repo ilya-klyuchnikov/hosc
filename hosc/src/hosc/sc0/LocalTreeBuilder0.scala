@@ -2,9 +2,9 @@ package hosc.sc0
 
 import HLanguage._
 import HE._
-import MSG0._
-import TermAlgebra0._
-import ProcessTree0._
+import MSG._
+import TermAlgebra._
+import ProcessTree._
 import LangUtils._
 
 class LocalTreeBuilder0(program: Program){
@@ -51,8 +51,8 @@ class LocalTreeBuilder0(program: Program){
     }
   }  
   
-  def buildProcessTree(e: Expression): ProcessTree0 = {
-    val p = ProcessTree0(e)
+  def buildProcessTree(e: Expression): ProcessTree = {
+    val p = ProcessTree(e)
     while (!p.isClosed) {
       val beta = p.leafs.find(!_.isProcessed).get
       val bExpr = beta.expr
@@ -112,11 +112,11 @@ class LocalTreeBuilder0(program: Program){
     case _ => false
   }
   
-  def drive(t: ProcessTree0, n: Node): Unit = {
+  def drive(t: ProcessTree, n: Node): Unit = {
     t.addChildren(n, driveExp(n.expr))
   }
   
-  def renameVars(p: ProcessTree0): ProcessTree0 = {
+  def renameVars(p: ProcessTree): ProcessTree = {
     val vars = p.rootNode.getAllVars()
     var i = 0
     def createVar(): Variable = {      
