@@ -32,7 +32,7 @@
         </thead>
         {% for program in tests %}
  		<tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-            <td><a href ="/view?key={{program.key}}"/>{{program.name}}</a></td>
+            <td><a href ="/test?key={{program.key}}"/>{{program.name}}</a></td>
             <td>{{program.summary}}</td>
             <td>{{ program.date|date:"jS F Y H:i" }}</td>
             <td>{{ program.modified|date:"jS F Y H:i" }}</td>
