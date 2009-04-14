@@ -1,0 +1,56 @@
+indexes:
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: name
+  
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: name
+    direction: desc
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: summary
+    
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: summary
+    direction: desc
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: author
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: author
+    direction: desc
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: date
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: modified
+
+- kind: Program
+  ancestor: yes
+  properties:
+  - name: modified
+    direction: desc
