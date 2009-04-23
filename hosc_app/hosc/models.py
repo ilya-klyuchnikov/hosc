@@ -65,7 +65,7 @@ def add_test_for_user(author_key, name=None, summary=None,
                         types=None, goal1=None, goal2=None, defs=None, 
                         scp_code1=None, scp_code2=None, eq=None, notes=None):
     author = db.get(author_key)
-    author.n_tests = author.n_test + 1
+    author.n_tests = author.n_tests + 1
     test = Test(parent=author)
     test.name = name
     test.summary = summary
