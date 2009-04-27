@@ -5,12 +5,6 @@ app (Cons True Nil) (Cons False Nil)
 
 where
 
-rev = \xs ->
-  case xs of {
-    Nil -> Nil;
-    Cons z  zs -> app (rev zs) (Cons z Nil);
-  };
-
 app = \xs ys -> 
     case xs of {
       Nil -> ys;

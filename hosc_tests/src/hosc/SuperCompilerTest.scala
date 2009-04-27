@@ -230,4 +230,10 @@ class SuperCompilerTest {
         "-t", "output/filter.svg",
         "-p", "output/filter.hs"));
     }
+  
+  @Test def church(): Unit = {
+    SuperCompilerApp.main(Array("-si", "hl/supercompiler/church.hs",
+        "-t", "output/church.svg",
+        "-p", "output/church.hs"));
+    }
 }

@@ -9,14 +9,21 @@ import TestUtils._
 
 class InterpreterTest {
   
-  @Test def simple(): Unit = {
-    testInt("hl/interpreter/rev1.hl", "Cons True (Cons False Nil)")
-    testInt("hl/interpreter/rev2.hl", "Cons False (Cons True Nil)")
+  @Test def app(): Unit = {
+    testInt("hl/interpreter/app.hs", "Cons True (Cons False Nil)")
+  }
+  
+  @Test def rev(): Unit = {
+    testInt("hl/interpreter/rev.hs", "Cons False (Cons True Nil)")
   }
   
   @Test def laziness(): Unit = {
-    testInt("hl/interpreter/lazy.hl", "Cons Z (Cons (S Z) Nil)")
-  }  
+    testInt("hl/interpreter/lazy.hs", "Cons Z (Cons (S Z) Nil)")
+  }
+  
+  @Test def church(): Unit = {
+    testInt("hl/interpreter/church.hs", "(S (Z ))")
+  }
   
   def testInt(fileName: String, expectedOutput: String): Unit = {
     val in = new Interpreter(fileName)
