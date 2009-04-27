@@ -72,11 +72,11 @@ object TermAlgebra {
     case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
     case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
     case LambdaAbstraction(v, t) => 
-      LambdaAbstraction(v, applySubstitution(t, s))
+      LambdaAbstraction(v, applySubstitution(t, s - v))
     case Application(h, a) => Application(applySubstitution(h, s), applySubstitution(a, s))
     case CaseExpression(sel, bs) => 
       CaseExpression(applySubstitution(sel, s), 
-          bs map {b => Branch(b.pattern, applySubstitution(b.term, s))})
+          bs map {b => Branch(b.pattern, applySubstitution(b.term, s -- b.pattern.args))})
   }
   
   private def getBoundedVars(t: Expression): Set[Variable] = t match {
