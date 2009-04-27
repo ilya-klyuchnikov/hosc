@@ -24,10 +24,7 @@ class Interpreter(program: Program) {
   
   private def lazyEval(term: Expression): Expression = {
     var t = term
-    do {
-      t = baseLazyEval(t);
-      println(t)
-    } while (decompose(t) match {case _: Context => true; case _: Observable => false})
+    while (decompose(t) match {case _: Context => true; case _ => false}) {t = baseLazyEval(t)}
     t
   }
   
