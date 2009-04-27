@@ -11,22 +11,23 @@ class Interpreter(program: Program) {
   def this(fileName: String) = this(Util.programFromFile(fileName))
   
   def eval(t: Expression): Expression = lazyEval(t) match {
-    case c: Constructor => Constructor(c.name, c.args.map(eval))
-    case l: LambdaAbstraction => l
+    case Constructor(name, args) => Constructor(name, args.map(eval))
+    case LambdaAbstraction(v, t) => LambdaAbstraction(v, t)
     case x => throw new Exception("Internal Error: lazy eval returns " + x)
   }
   
   def eval(): Expression = {
     // validate that term is ground
-    Validator.valTerm(Set.empty[String] ++ (program.fs map {f => f.name}), program.goal, program)
+    Validator.valTerm(Set.empty[String] ++ (program.fs map {_.name}), program.goal, program)
     eval(program.goal)
   }
   
   private def lazyEval(term: Expression): Expression = {
     var t = term
     do {
-      t = baseLazyEval(t);      
-    } while (decompose(t).isInstanceOf[Context])
+      t = baseLazyEval(t);
+      println(t)
+    } while (decompose(t) match {case _: Context => true; case _: Observable => false})
     t
   }
   
