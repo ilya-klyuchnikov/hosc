@@ -135,7 +135,10 @@ case class TypeConstructor(name: String, typeParameters: List[Type]) extends Typ
     case _   => "(" + name + " " + typeParameters.mkString(" ") + ")";
   }
 }
-case class Arrow(t1: Type, t2: Type) extends Type {pos = t1.pos}
+case class Arrow(t1: Type, t2: Type) extends Type {
+  pos = t1.pos
+  override def toString = "(" + t1 + "->" + t2 + ")"
+}
  
 abstract sealed class TypeDefinition extends Positional {
   def name: String
