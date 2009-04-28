@@ -43,6 +43,30 @@ object Util {
     }
   }
   
+  def inferGoalType(fileName: String): Type = {
+    val file = new File(fileName)
+    val sb = new StringBuilder
+    val in = new BufferedReader(new FileReader(fileName));
+    var str: String = null
+    do {
+      str = in.readLine
+      if (str != null){
+        sb.append(str)
+        sb.append("\n")
+      }
+    } while (str != null)
+    in.close();
+    val pr = HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
+    if (pr.successful) {
+      val program = pr.get
+      val program1 = LambdaLifting.lift(program)
+      val ti = new TypeInferrer(program1.ts)
+      ti.inferType(hl0ToELC(program1))
+    } else { 
+      throw new IllegalArgumentException(pr.toString)
+    }
+  }
+  
   def rawProgramFromFile(fileName: String): Program = {
     val file = new File(fileName)
     val sb = new StringBuilder
