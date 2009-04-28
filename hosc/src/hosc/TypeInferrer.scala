@@ -317,7 +317,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     // unifying left and right sides
     val phi2 = mgu(lSideTypes zip rSideTypes, phi1)    
     // apply sub2 to env and also extend result with the derived type schemes for xs
-    val extEnv = addDecls(env.sub(phi2), xs, lSideTypes)
+    val extEnv = addDecls(env.sub(phi2), xs, lSideTypes map phi2)
     // type check the letrec body wrt updated env
     val r = tc(extEnv, letrec.expr)
     // construct result
@@ -450,29 +450,23 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     Result(res.s, Arrow(res.s(tcon), res.t))
   }
   
-  //type-checking of list of branches
-  private def tclb(tes: TypeEnv, tss: List[Branch]):ResultL = {
-    def tcl0(te: TypeEnv, ts: List[Branch]): ResultL = ts match {
-      case Nil => ResultL(emptySubst, Nil) 
-      case e :: es => tcl1(te, es, tcBranch(te, e))
-    }
-
-    def tcl1(te: TypeEnv, es: List[Branch], r: Result) = {
-      val gamma = te.sub(r.s)
-      tcl2(r.s, r.t, tcl0(gamma, es))
-    }
-
-    def tcl2(phi: Subst, t: Type, r: ResultL) = ResultL(r.s compose phi, r.s(t) :: r.ts)
-
-    tcl0(tes,tss)
-  }
-  
-  def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
-    val r = tclb(te, caseExp.branches)    
+  private def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): Result = {
+    val r = tcBranches(te, caseExp.branches)    
     val tv = newTyvar
     val pairs = r.ts map {(tv, _)}    
     val s = mgu(pairs, r.s)
     Result(s, s(tv))
+  }
+  
+  // type-checking of list of branches
+  private def tcBranches(environment: TypeEnv, expressions: List[Branch]): ResultL = expressions match {
+    case Nil => ResultL(emptySubst, Nil) 
+    case e :: es => {
+      val r1 = tcBranch(environment, e)
+      println(r1)
+      val rs = tcBranches(environment.sub(r1.s), es)
+      ResultL(rs.s compose r1.s, rs.s(r1.t) :: rs.ts)
+    }
   }
   
   // type-checking of list of expressions
