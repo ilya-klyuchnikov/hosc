@@ -441,6 +441,7 @@ class TEdit(webapp.RequestHandler):
                     test.types = types
                     test.goal1 = goal1
                     test.goal2 = goal2
+                    test.defs = defs
                     test.scp_code1 = result.code1
                     test.scp_code2 = result.code2
                     test.eq = result.eq
