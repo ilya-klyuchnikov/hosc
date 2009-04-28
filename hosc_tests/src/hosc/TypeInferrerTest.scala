@@ -219,17 +219,17 @@ class TypeInferrerTest {
     println
   
   }
+  */
+  @Test def churchNumbers(): Unit = {
+    val goalType = Util.inferGoalType("hl/type_inferrer/church.hs")
+    println("GT")
+    println(goalType)
   
-  @Test def simpleProgram04(): Unit = {
-    val programResult = TestUtils.programResultFromFile("hl/type_inferrer/04.hl")
-    println(programResult)
-    assertTrue(programResult.successful)
-    val program = programResult.get
-    val ti = new TypeInferrer(program);
-    
-    ti.tcProgram()
+  }
   
-    println
+  @Test def churchNumbers2(): Unit = {
+    val goalType = Util.inferGoalType("hl/type_inferrer/church2.hs")
+    println(goalType)
   
-  }*/
+  }
 }
