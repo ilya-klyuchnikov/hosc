@@ -146,7 +146,6 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       te = te.install(lv, ts)
     }
     val r =tc(te, expr).t
-    //println(r)
     r
   }
   
@@ -463,7 +462,6 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     case Nil => ResultL(emptySubst, Nil) 
     case e :: es => {
       val r1 = tcBranch(environment, e)
-      println(r1)
       val rs = tcBranches(environment.sub(r1.s), es)
       ResultL(rs.s compose r1.s, rs.s(r1.t) :: rs.ts)
     }
