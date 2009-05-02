@@ -111,23 +111,23 @@ object TypeInferrer {
   }
   case class ResultL(s: Subst, ts: List[Type])
   
-  private def equal(type1: Type, type2: Type): Boolean = {
-    def equal1(tp1: Type, tp2: Type): Boolean = {
-      var map1to2 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
-      def test(t1: Type, t2: Type): Boolean = (t1, t2) match {
-        case (v1: TypeVariable, v2: TypeVariable) => map1to2.get(v1) match {
-          case None => map1to2(v1) = v2; true
-          case Some(v) if v2 == v => true
-          case _ => false
-        }
-        case (TypeConstructor(n1, a1), TypeConstructor(n2, a2)) =>
-          n1 == n2 && a1.length == a2.length && ((a1 zip a2) forall {pair => test(pair._1, pair._2)})
-        case (Arrow(a1, v1), Arrow(a2, v2)) => test(a1, a1) && test(v1, v2)
+  def equivalent(type1: Type, type2: Type): Boolean = {
+    val map1to2 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
+    val map2to1 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
+    def eq1(t1: Type, t2: Type): Boolean = (t1, t2) match {
+      case (v1: TypeVariable, v2: TypeVariable) => (map1to2.get(v1), map2to1.get(v2)) match {
+        case (Some(v3), Some(v4)) => v2 == v3 && v1 == v4
+        case (None, None) => map1to2(v1) = v2; map2to1(v2) = v1; true
         case _ => false
       }
-      test(tp1, tp2)
-    }
-    equal1(type1, type2) && equal(type2, type1)
+      case (TypeConstructor(name1, args1), TypeConstructor(name2, args2)) if name1 == name2 =>
+        ((args1 zip args2) forall (args => eq1(args._1, args._2)))
+      case (Arrow(b1, v1), Arrow(b2, v2)) =>
+        eq1(b1, b2) && eq1(v1, v2)
+      case _ => 
+        false
+    }    
+    eq1(type1, type2)
   }
 }
 
