@@ -1,0 +1,82 @@
+package hosc
+
+import HLanguage._
+import TermAlgebra._
+import scala.collection.mutable.ListBuffer
+object HE1 {
+  def he(term1: Expression, term2: Expression): Boolean = he(term1, term2, Nil, Map())
+  def heByCoupling(term1: Expression, term2: Expression): Boolean = heByCoupling(term1, term2, Nil, Map())
+  
+  private def he(term1: Expression, term2: Expression, binders: List[Tuple2[Variable, Variable]], 
+      letrecs: Map[Variable, Variable]): Boolean = 
+    heByVar(term1, term2, binders, letrecs) || 
+      heByDiving(term1, term2, binders, letrecs) || 
+        heByCoupling(term1, term2, binders, letrecs)
+  
+  private def heByVar(term1: Expression, term2: Expression, 
+      binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = 
+    (term1, term2) match {
+    case (v1: Variable, v2: Variable) => 
+      (letrecs.contains(v1) && letrecs(v1) == v2) ||
+      (!letrecs.keys.contains(v1) && !letrecs.values.contains(v2)) && 
+        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))
+    case _ => false
+  }
+  
+  private def heByDiving(term1: Expression, term2: Expression, 
+      binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = {
+    val term1Vars = Set(getVarsOrdered(term1):_*) // ??? maybe free vars?
+    for ((b1, b2) <- binders) if ((b1 != null) && (term1Vars contains b1)) return false
+    term2 match {
+      case Constructor(_, args) => args exists (he(term1, _, binders, letrecs))
+      case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders, letrecs)
+      case a: Application => lineApp(a) exists (he(term1, _, binders, letrecs))
+      case CaseExpression(sel, bs) => he(term1, sel, binders, letrecs) || 
+        (bs exists {b => he(term1, b.term, (b.pattern.args map {(null, _)}) ::: binders, letrecs)})
+      case LetRecExpression((v, t), e) => he(term1, e, binders, letrecs) || he(term1, t, binders, letrecs) // seems to be correct (?? binders??)
+      case _ => false
+    }
+  }  
+  
+  private def heByCoupling(term1: Expression, term2: Expression, 
+      binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = 
+    (term1, term2) match {
+    case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
+      (args1 zip args2) forall (args => he(args._1, args._2, binders, letrecs))
+    case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders, letrecs)
+    case (a1: Application, a2: Application) => {
+      val (line1, line2) = (lineApp(a1), lineApp(a2)) 
+      line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders, letrecs)))
+    }
+    case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
+      val bs1_ = bs1 sort compareB
+      val bs2_ = bs2 sort compareB
+      he(sel1, sel2, binders, letrecs) && 
+        ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
+          he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders, letrecs)))
+    }
+    case (LetRecExpression((f1, a1), e1), LetRecExpression((f2, a2), e2)) =>
+      he(e1, e2, binders, letrecs + (f1 -> f2)) && heByCoupling(a1, a2, binders, letrecs + (f1 -> f2)) // maybe || ?
+    case _ => false
+  }
+  
+  private def lineApp(term: Expression): List[Expression] = term match {
+    case Application(h, a) => lineApp(h) ::: (a:: Nil)
+    case t => t :: Nil
+  }
+  
+  def getVarsOrdered(exprr: Expression): List[Variable] = {
+    val buffer = new ListBuffer[Variable]
+    def dump(expr: Expression): Unit = expr match {
+      case v: Variable => if (!buffer.contains(v)) buffer + v 
+      case Constructor(_, args) => args map dump
+      case LambdaAbstraction(x, term) => dump(x); dump(term)
+      case Application(head, arg) => dump(head); dump(arg);
+      case CaseExpression(sel, bs) => dump(sel); bs map {b => b.pattern.args map dump; dump(b.term)};
+      case LetRecExpression(b, term) => dump(b._1); dump(b._2); dump(term);
+    }
+    dump(exprr)
+    buffer.toList
+  }
+
+}
