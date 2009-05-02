@@ -14,4 +14,9 @@ class SmartEmbeddingTest {
     SuperCompilerApp.main(Array("-si", "se/in/03a_comp_map_join.hl0", "-t", "se/out/03a_comp_map_join.svg", "-p", "se/out/03a_comp_map_join.hl1"));
     SuperCompilerApp.main(Array("-si", "se/in/03b_comp_map_join.hl0", "-t", "se/out/03b_comp_map_join.svg", "-p", "se/out/03b_comp_map_join.hl1"));
   }
+  
+  @Test def iter(): Unit = {    
+    SuperCompilerApp.main(Array("-si", "se/in/iter1.hs", "-t", "se/out/iter1.svg", "-p", "se/out/iter1.hs"));
+    SuperCompilerApp.main(Array("-si", "se/in/iter2.hs", "-t", "se/out/iter2.svg", "-p", "se/out/iter2.hs"));
+  }
 }
