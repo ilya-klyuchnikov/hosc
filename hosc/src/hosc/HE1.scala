@@ -26,11 +26,11 @@ object HE1 {
   private def heByDiving(term1: Expression, term2: Expression, 
       binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = {
     val term1Vars = Set(getVarsOrdered(term1):_*) // ??? maybe free vars?
-    for ((b1, b2) <- binders) if ((b1 != null) && (term1Vars contains b1)) return false
+    //for ((b1, b2) <- binders) if ((b1 != null) && (term1Vars contains b1)) return false
     term2 match {
       case Constructor(_, args) => args exists (he(term1, _, binders, letrecs))
       case LambdaAbstraction(v, t) => he(term1, t, (null, v)::binders, letrecs)
-      case a: Application => lineApp(a) exists (he(term1, _, binders, letrecs))
+      case Application(h, a) => he(term1, h, binders, letrecs) || he(term1, a, binders, letrecs) 
       case CaseExpression(sel, bs) => he(term1, sel, binders, letrecs) || 
         (bs exists {b => he(term1, b.term, (b.pattern.args map {(null, _)}) ::: binders, letrecs)})
       case LetRecExpression((v, t), e) => he(term1, e, binders, letrecs) || he(term1, t, binders, letrecs) // seems to be correct (?? binders??)
@@ -44,9 +44,8 @@ object HE1 {
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2, binders, letrecs))
     case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders, letrecs)
-    case (a1: Application, a2: Application) => {
-      val (line1, line2) = (lineApp(a1), lineApp(a2)) 
-      line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders, letrecs)))
+    case (Application(h1, a1), Application(h2, a2)) => {
+      he(h1, h2, binders, letrecs) && he(a1, a2, binders, letrecs) 
     }
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB
@@ -56,7 +55,7 @@ object HE1 {
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders, letrecs)))
     }
     case (LetRecExpression((f1, a1), e1), LetRecExpression((f2, a2), e2)) =>
-      he(e1, e2, binders, letrecs + (f1 -> f2)) && heByCoupling(a1, a2, binders, letrecs + (f1 -> f2)) // maybe || ?
+      he(e1, e2, binders, letrecs + (f1 -> f2)) && he(a1, a2, binders, letrecs + (f1 -> f2)) // maybe || ?
     case _ => false
   }
   
