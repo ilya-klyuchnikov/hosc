@@ -157,7 +157,7 @@ class HParsersTest {
             )
         )))
     val expected = Program(listT :: Nil, goal, revF :: appF :: Nil )
-    val programResult = TestUtils.programResultFromFile("hl/parser/rev.hl")    
+    val programResult = TestUtils.programResultFromFile("parser/rev.hs")    
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -165,48 +165,48 @@ class HParsersTest {
   }
   
   @Test def validator(): Unit = {
-    assertValidationError("hl/validator/err01.hl",
+    assertValidationError("parser/err01.hs",
         "duplicate type definition should be reported")
-    assertValidationError("hl/validator/err02.hl",
+    assertValidationError("parser/err02.hs",
         "undefined var should be reported")
-    assertValidationError("hl/validator/err03.hl",
+    assertValidationError("parser/err03.hs",
         "wrong numbers of type parameters should be reported")
-    assertValidationError("hl/validator/err04.hl",
+    assertValidationError("parser/err04.hs",
         "wrong numbers of type parameters should be reported")
-    assertValidationError("hl/validator/err05.hl",
+    assertValidationError("parser/err05.hs",
         "undefined constructors should be reported")
-    assertValidationError("hl/validator/err06.hl",
+    assertValidationError("parser/err06.hs",
         "unknown type List2 should be reported")
-    assertValidationError("hl/validator/err07.hl",
+    assertValidationError("parser/err07.hs",
         "duplicate data constructor Cons should be reported")
-    assertValidationError("hl/validator/err08.hl",
+    assertValidationError("parser/err08.hs",
         "duplicate type var a should be reported")
-    assertValidationError("hl/validator/err09.hl",
+    assertValidationError("parser/err09.hs",
         "useless type type var b should be reported");
-    assertValidationError("hl/validator/err10.hl",
+    assertValidationError("parser/err10.hs",
         "unbound var x should be reported");
-    assertValidationError("hl/validator/err11.hl",
+    assertValidationError("parser/err11.hs",
         "wrong number of parameters for constructor Cons should be reported");
-    assertValidationError("hl/validator/err12.hl",
+    assertValidationError("parser/err12.hs",
         "undefined constructor Cons2 should be reported");
-    assertValidationError("hl/validator/err13.hl",
+    assertValidationError("parser/err13.hs",
         "undefined constructor Nil2 should be reported");
-    assertValidationError("hl/validator/err14.hl",
+    assertValidationError("parser/err14.hs",
         "undefined (for type list) constructor Cons2 should be reported");
-    assertValidationError("hl/validator/err15.hl",
+    assertValidationError("parser/err15.hs",
         "wrong number of parameters for constructor Cons should be reported");
-    assertValidationError("hl/validator/err16.hl",
+    assertValidationError("parser/err16.hs",
         "duplicate var z should be reported");
-    assertValidationError("hl/validator/err17.hl",
+    assertValidationError("parser/err17.hs",
         "non exhaustive should be reported");
   }
   
   @Test def caseError(): Unit = {
-    assertSyntaxError("hl/parser/case.hl", "missing ; should be reported")
+    assertSyntaxError("parser/case.hs", "missing ; should be reported")
   }
   
   @Test def parserErrors(): Unit = {
-    assertSyntaxError("parser_input/err01.hl", "")
+    assertSyntaxError("parser/syntax_err.hs", "")
   }
   
   def assertValidationError(fileName: String, msg: String)  = {
