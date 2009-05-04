@@ -9,7 +9,7 @@ import TestUtils._
 
 class LambdaLiftingTest {
   @Test def letrec1(): Unit = {
-    val p = Util.rawProgramFromFile("hl/supercompiler/letrec.hs")
+    val p = Util.rawProgramFromFile("lifting/letrec.hs")
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
@@ -20,7 +20,7 @@ class LambdaLiftingTest {
   }
   
   @Test def letrec_rev(): Unit = {
-    val p = Util.rawProgramFromFile("hl/supercompiler/letrec_rev.hs")
+    val p = Util.rawProgramFromFile("lifting/letrec_rev.hs")
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
