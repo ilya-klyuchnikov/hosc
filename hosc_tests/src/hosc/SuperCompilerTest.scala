@@ -8,12 +8,11 @@ import Util._
 
 class SuperCompilerTest {
   
-  @Test{val timeout = 9000} def t01_loop(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/01_loop.hl",
-        "-t", "output/01_loop.svg",
-        "-p", "output/01_loop.hl"));
-    }
-  @Ignore
+  @Test def t01_loop(): Unit = 
+    SuperCompilerApp.main(Array("-si", "sc/01_loop.hs",
+        "-t", "sc/out0/01_loop.svg",
+        "-p", "sc/out0/01_loop.hs"))
+
   @Test def loop(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/loop.hl",
         "-t", "output/loop.svg",
@@ -138,7 +137,7 @@ class SuperCompilerTest {
         "-p", "output/eqnum.hl"));
   }
   
-  @Ignore
+  
   @Test def synapse(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse.hl",
         "-t", "output/synapse.svg",
@@ -194,7 +193,7 @@ class SuperCompilerTest {
   
   // TODO: this input is supercompiled in loop
   // allow def to be not lambda only but any term
-	@Ignore
+    @Ignore
   @Test def rev1(): Unit = {
   SuperCompilerApp.main(Array("-si", "hl/supercompiler/sc_rev1.hl",
       "-t", "output/sc_rev1.svg",
@@ -230,7 +229,7 @@ class SuperCompilerTest {
         "-t", "output/filter.svg",
         "-p", "output/filter.hs"));
     }
-  
+  @Ignore
   @Test def church(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/church.hs",
         "-t", "output/church.svg",
