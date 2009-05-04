@@ -11,6 +11,7 @@ class EqTest {
   @Test def add() = testEq("eq/add1.hs", "eq/add2.hs")
   @Test def app() = testEq("eq/app1.hs", "eq/app2.hs")
   @Test def churchAdd() = testEq("eq/churchAdd1.hs", "eq/churchAdd2.hs")
+  @Test def churchMult() = testEq("eq/churchMult1.hs", "eq/churchMult2.hs")
   @Test def churchUnchurch() = testEq("eq/churchUnchurch1.hs", "eq/churchUnchurch2.hs")
   @Test def churchPred() = testEq("eq/churchPred1.hs", "eq/churchPred2.hs")
   @Test def comp() = testEq("eq/comp1.hs", "eq/comp2.hs")
