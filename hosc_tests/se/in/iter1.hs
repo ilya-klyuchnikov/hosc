@@ -1,7 +1,6 @@
 data List a = Nil | Cons a (List a);
 
-//(compose (map f) join) xs where
-case  (join xs)  of { Cons v10 v11 -> (Cons (f v10) ((map f) v11)); Nil  -> Nil; } where
+(map f) (join xs) where
 
 compose = \f g x ->  f (g x);
 

@@ -1,0 +1,8 @@
+EqTest					eq/
+GraphAnalysisTest		------
+HParsersTest			parser/
+InterpreterTest			interpreter/
+LambdaLiftingTest		lifting/
+SuperCompilerTest		sc/
+
+TermAlgebraTest			term_algebra/

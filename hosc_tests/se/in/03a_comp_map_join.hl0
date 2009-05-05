@@ -1,6 +1,6 @@
 data List a = Nil | Cons a (List a);
 
-(compose (map f) join) xs
+case  (join xs)  of { Cons v3 v4 -> (Cons (f v3) ((map f) v4)); Nil  -> Nil; } 
 
 where
 

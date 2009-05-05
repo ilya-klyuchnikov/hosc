@@ -6,24 +6,22 @@ import org.junit.Assert._
 import HLanguage._
 import Util._
 
+import hosc.{SuperCompilerApp => SCP}
+
 class SuperCompilerTest {
   
-  @Test def t01_loop(): Unit = 
-    SuperCompilerApp.main(Array("-si", "sc/01_loop.hs",
-        "-t", "sc/out0/01_loop.svg",
-        "-p", "sc/out0/01_loop.hs"))
-
-  @Test def loop(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/loop.hl",
-        "-t", "output/loop.svg",
-        "-p", "output/loop.hl"));
-    }
+  @Test def t01_loop = 
+    SCP.main(Array("-si", "sc/01_loop.hs", "-t", "sc/out0/01_loop.svg","-p", "sc/out0/01_loop.hs"))
   
-  @Test def eq(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/eq.hl",
-        "-t", "output/eq.svg",
-        "-p", "output/eq.hl"));
-    }
+  // producing bottom: TODO -> make special case for program generator 
+  @Test def loop = 
+    SCP.main(Array("-si", "sc/loop.hs", "-t", "sc/out0/loop.svg", "-p", "sc/out0/loop.hs"))
+  
+  @Test def eqnum_plus = 
+    SCP.main(Array("-si", "sc/eqnum_plus.hs", "-t", "sc/out0/eqnum_plus.svg", "-p", "sc/out0/eqnum_plus.hs"))
+  
+  @Test def eq = 
+    SCP.main(Array("-si", "sc/eq.hs", "-t", "sc/out0/eq.svg", "-p", "sc/out0/eq.hs"));
   
   @Test def zip(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/zip1.hl",
@@ -32,11 +30,6 @@ class SuperCompilerTest {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/zip2.hl",
         "-t", "output/zip2.svg",
         "-p", "output/zip2.hl"));
-    }
-  @Test def eqnum_plus(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/eqnum_plus.hl",
-        "-t", "output/eqnum_plus.svg",
-        "-p", "output/eqnum_plus.hl"));
     }
   @Test def t02_ham(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/02_ham.hl",
