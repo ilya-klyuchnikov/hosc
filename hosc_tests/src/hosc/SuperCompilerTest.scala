@@ -29,6 +29,13 @@ class SuperCompilerTest {
   @Test def zip2 = 
     SCP.main(Array("-si", "sc/zip2.hs", "-t", "sc/out0/zip2.svg", "-p", "sc/out0/zip2.hs"))
   
+  @Test def regexp(): Unit = 
+    SCP.main(Array("-si", "sc/regexp.hs", "-t", "sc/out0/regexp.svg", "-p", "sc/out0/regexp.hs"))
+  
+  
+  // --------------------------------------------------------------------------------------------------
+  
+  
   @Test def t02_ham(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/02_ham.hl",
         "-t", "output/02_ham.svg",
@@ -139,12 +146,6 @@ class SuperCompilerTest {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse2.hl",
         "-t", "output/synapse2.svg",
         "-p", "output/synapse2.hl"));
-  }
-  
-  @Test def regexp(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/regexp.hl",
-        "-t", "output/regexp.svg",
-        "-p", "output/regexp.hl"));
   }
   
   @Test def even(): Unit = {

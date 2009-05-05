@@ -21,4 +21,7 @@ class SuperCompiler1Test {
     
   @Test def zip2 = 
     SCP1.main(Array("-si", "sc/zip2.hs", "-t", "sc/out1/zip2.svg", "-p", "sc/out1/zip2.hs"))
+  
+  @Test def regexp(): Unit = 
+    SCP1.main(Array("-si", "sc/regexp.hs", "-t", "sc/out1/regexp.svg", "-p", "sc/out1/regexp.hs"))
 }
