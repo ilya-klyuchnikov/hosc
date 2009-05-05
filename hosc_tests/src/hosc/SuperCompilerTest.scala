@@ -52,164 +52,44 @@ class SuperCompilerTest {
   
   @Test def evenSS() = 
     SCP.main(Array("-si", "sc/evenSS.hs", "-t", "sc/out0/evenSS.svg", "-p", "sc/out0/evenSS.hs"))
-  // --------------------------------------------------------------------------------------------------
   
+  // -----
+  @Test def case_() = 
+    SCP.main(Array("-si", "sc/case.hs", "-t", "sc/out0/case.svg", "-p", "sc/out0/case.hs"))
   
-  @Test def t02_ham(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/02_ham.hl",
-        "-t", "output/02_ham.svg",
-        "-p", "output/02_ham.hl"));
-    }
+  @Test def eqnum() = 
+    SCP.main(Array("-si", "sc/eqnum.hs", "-t", "sc/out0/eqnum.svg", "-p", "sc/out0/eqnum.hs"))
   
-  @Test def t03_revs1(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/revs1.hl",
-        "-t", "output/revs1.svg",
-        "-p", "output/revs1.hl"));
-    }
-  @Test def rev_2(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_2.hl",
-        "-t", "output/rev_2.svg",
-        "-p", "output/rev_2.hl"));
-    }
+  @Test def eqnumxx() = 
+    SCP.main(Array("-si", "sc/eqnumxx.hs", "-t", "sc/out0/eqnumxx.svg", "-p", "sc/out0/eqnumxx.hs"))
   
-  @Test def rev_3(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_3.hl",
-        "-t", "output/rev_3.svg",
-        "-p", "output/rev_3.hl"));
-    }
+  @Test def exp() = 
+    SCP.main(Array("-si", "sc/exp.hs", "-t", "sc/out0/exp.svg", "-p", "sc/out0/exp.hs"))
   
-  @Test def simple(): Unit = {
-    testSC("hl/supercompiler/rev1.hl")
-    testSC("hl/supercompiler/rev2.hl")
-    testSC("hl/supercompiler/rev3.hl")
-  }  
+  @Test def fib() = 
+    SCP.main(Array("-si", "sc/fib.hs", "-t", "sc/out0/fib.svg", "-p", "sc/out0/fib.hs"))
+ 
+  @Test def filter() = 
+    SCP.main(Array("-si", "sc/filter.hs", "-t", "sc/out0/filter.svg", "-p", "sc/out0/filter.hs"))
   
-  def testSC(fileName: String): Unit = {
-    val p = programFromFile(fileName)
-    val sc = new SuperCompiler(p)
-    val tree = sc.buildProcessTree(p.goal)
-    println(tree)
-  }
+  @Test def isort() = 
+    SCP.main(Array("-si", "sc/isort.hs", "-t", "sc/out0/isort.svg", "-p", "sc/out0/isort.hs"))
   
-  @Test def processSamples(): Unit =
-  {
-    
-    
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev1.hl",
-        "-t", "output/app1_1.svg",
-        "-p", "output/app1.hl"));
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev2.hl",
-        "-t", "output/app2_1.svg",
-        "-p", "output/app2.hl"));    
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev3.hl",
-        "-t", "output/app3_1.svg",
-        "-p", "output/app3.hl"));
-    
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/app.hl",
-        "-t", "output/z02.svg",
-        "-p", "output/z02.hl"));
-        
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/f.hl",
-            "-t", "output/z03.svg",
-            "-p", "output/z03.hl"));   
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/mapNotNot1.hl", 
-       "-t", "output/mapNotNot.svg",
-       "-p", "output/mapNotNot.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/mapNotNot2.hl",
-       "-t", "output/notNot.svg",
-       "-p", "output/notNot.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/mapNotNot3.hl",
-       "-t", "output/mapNot.svg",
-       "-p", "output/mapNot.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/mapNotNot4.hl",
-       "-t", "output/mapx.svg",
-       "-p", "output/mapx.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/mapNotNot5.hl",
-       "-t", "output/id.svg",
-       "-p", "output/id.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/eqnumxx.hl",
-       "-t", "output/eqnumxx.svg",
-       "-p", "output/eqnumxx.hl"));
-   
-   SuperCompilerApp.main(Array("-si", "hl/supercompiler/app1.hl",
-       "-t", "output/app1.svg",
-       "-p", "output/app.hl"));
-  }
+  @Test def leq_add() = 
+    SCP.main(Array("-si", "sc/leq_add.hs", "-t", "sc/out0/leq_add.svg", "-p", "sc/out0/leq_add.hs"))
   
-  @Test def takenm(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/takenm.hl",
-        "-t", "output/takenm.svg",
-        "-p", "output/takenm.hl"));
-  }
+  @Test def letrec_rev() = 
+    SCP.main(Array("-si", "sc/letrec_rev.hs", "-t", "sc/out0/letrec_rev.svg", "-p", "sc/out0/letrec_rev.hs"))
   
-  @Test def eqnum(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/eqnum.hl",
-        "-t", "output/eqnum.svg",
-        "-p", "output/eqnum.hl"));
-  }
+  @Test def letrec() = 
+    SCP.main(Array("-si", "sc/letrec.hs", "-t", "sc/out0/letrec.svg", "-p", "sc/out0/letrec.hs"))  
   
-
+  @Test def min() = 
+    SCP.main(Array("-si", "sc/min.hs", "-t", "sc/out0/min.svg", "-p", "sc/out0/min.hs"))
   
-  @Test def caze(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/case.hl",
-        "-t", "output/case.svg",
-        "-p", "output/case.hl"));
-  }
+  @Test def takenm() = 
+    SCP.main(Array("-si", "sc/takenm.hs", "-t", "sc/out0/takenm.svg", "-p", "sc/out0/takenm.hs"))
   
-  @Test def `var`(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/var.hl",
-        "-t", "output/var.svg",
-        "-p", "output/var.hl"));
-  }
-  
-  @Test def rev(): Unit = {
-  SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev.hl",
-      "-t", "output/rev.svg",
-      "-p", "output/rev.hl"));
-  }
-  
-  // TODO: this input is supercompiled in loop
-  // allow def to be not lambda only but any term
-    @Ignore
-  @Test def rev1(): Unit = {
-  SuperCompilerApp.main(Array("-si", "hl/supercompiler/sc_rev1.hl",
-      "-t", "output/sc_rev1.svg",
-      "-p", "output/sc_rev1.hl"));
-  }
-  
-  @Test def rev_1(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_1.hl",
-        "-t", "output/rev_11.svg",
-        "-p", "output/rev_11.hl"));
-    }
-  
-  @Test def exp(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/exp.hl",
-        "-t", "output/exp.svg",
-        "-p", "output/exp.hl"));
-    }
-  
-  @Test def letrec(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/letrec.hs",
-        "-t", "output/letrec.svg",
-        "-p", "output/letrec.hs"));
-    }
-  
-  @Test def filter(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/filter.hs",
-        "-t", "output/filter.svg",
-        "-p", "output/filter.hs"));
-    }
-  @Ignore
-  @Test def church(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/church.hs",
-        "-t", "output/church.svg",
-        "-p", "output/church.hs"));
-    }
+  @Test def war() = 
+    SCP.main(Array("-si", "sc/var.hs", "-t", "sc/out0/var.svg", "-p", "sc/out0/var.hs"))
 }

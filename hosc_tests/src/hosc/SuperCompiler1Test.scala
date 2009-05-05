@@ -45,4 +45,43 @@ class SuperCompiler1Test {
   
   @Test def evenSS() = 
     SCP1.main(Array("-si", "sc/evenSS.hs", "-t", "sc/out1/evenSS.svg", "-p", "sc/out1/evenSS.hs"))
+  // -----
+  @Test def case_() = 
+    SCP1.main(Array("-si", "sc/case.hs", "-t", "sc/out1/case.svg", "-p", "sc/out1/case.hs"))
+  
+  @Test def eqnum() = 
+    SCP1.main(Array("-si", "sc/eqnum.hs", "-t", "sc/out1/eqnum.svg", "-p", "sc/out1/eqnum.hs"))
+  
+  @Test def eqnumxx() = 
+    SCP1.main(Array("-si", "sc/eqnumxx.hs", "-t", "sc/out1/eqnumxx.svg", "-p", "sc/out1/eqnumxx.hs"))
+  
+  @Test def exp() = 
+    SCP1.main(Array("-si", "sc/exp.hs", "-t", "sc/out1/exp.svg", "-p", "sc/out1/exp.hs"))
+  
+  @Test def fib() = 
+    SCP1.main(Array("-si", "sc/fib.hs", "-t", "sc/out1/fib.svg", "-p", "sc/out1/fib.hs"))
+ 
+  @Test def filter() = 
+    SCP1.main(Array("-si", "sc/filter.hs", "-t", "sc/out1/filter.svg", "-p", "sc/out1/filter.hs"))
+  
+  @Test def isort() = 
+    SCP1.main(Array("-si", "sc/isort.hs", "-t", "sc/out1/isort.svg", "-p", "sc/out1/isort.hs"))
+  
+  @Test def leq_add() = 
+    SCP1.main(Array("-si", "sc/leq_add.hs", "-t", "sc/out1/leq_add.svg", "-p", "sc/out1/leq_add.hs"))
+  
+  @Test def letrec_rev() = 
+    SCP1.main(Array("-si", "sc/letrec_rev.hs", "-t", "sc/out1/letrec_rev.svg", "-p", "sc/out1/letrec_rev.hs"))
+  
+  @Test def letrec() = 
+    SCP1.main(Array("-si", "sc/letrec.hs", "-t", "sc/out1/letrec.svg", "-p", "sc/out1/letrec.hs"))  
+  
+  @Test def min() = 
+    SCP1.main(Array("-si", "sc/min.hs", "-t", "sc/out1/min.svg", "-p", "sc/out1/min.hs"))
+  
+  @Test def takenm() = 
+    SCP1.main(Array("-si", "sc/takenm.hs", "-t", "sc/out1/takenm.svg", "-p", "sc/out1/takenm.hs"))
+  
+  @Test def war() = 
+    SCP1.main(Array("-si", "sc/var.hs", "-t", "sc/out1/var.svg", "-p", "sc/out1/var.hs"))
 }
