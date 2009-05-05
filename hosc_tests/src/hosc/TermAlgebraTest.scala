@@ -12,7 +12,7 @@ import Util._
 
 class TermAlgebraTest {
   
-  val inputFile = "hl/term_algebra/01.hl"
+  val inputFile = "term_algebra/test.hs"
   
   @Test def equivalency01(): Unit = {
     val appCall = Variable("app")
