@@ -32,7 +32,26 @@ class SuperCompilerTest {
   @Test def regexp(): Unit = 
     SCP.main(Array("-si", "sc/regexp.hs", "-t", "sc/out0/regexp.svg", "-p", "sc/out0/regexp.hs"))
   
+  @Test def synapse() = 
+    SCP.main(Array("-si", "sc/synapse.hs", "-t", "sc/out0/synapse.svg", "-p", "sc/out0/synapse.hs"))
   
+  @Test def synapse1() = 
+    SCP.main(Array("-si", "sc/synapse1.hs",  "-t", "sc/out0/synapse1.svg", "-p", "sc/out0/synapse1.hs"))
+  
+  @Test def synapse2() = 
+    SCP.main(Array("-si", "sc/synapse2.hs", "-t", "sc/out0/synapse2.svg", "-p", "sc/out0/synapse2.hs"))
+  
+  @Test def even() = 
+    SCP.main(Array("-si", "sc/even.hs", "-t", "sc/out0/even.svg", "-p", "sc/out0/even.hs"))
+    
+  @Test def even1() = 
+    SCP.main(Array("-si", "sc/even1.hs", "-t", "sc/out0/even1.svg", "-p", "sc/out0/even1.hs"))
+  
+  @Test def even2() = 
+    SCP.main(Array("-si", "sc/even2.hs", "-t", "sc/out0/even2.svg", "-p", "sc/out0/even2.hs"))
+  
+  @Test def evenSS() = 
+    SCP.main(Array("-si", "sc/evenSS.hs", "-t", "sc/out0/evenSS.svg", "-p", "sc/out0/evenSS.hs"))
   // --------------------------------------------------------------------------------------------------
   
   
@@ -135,35 +154,7 @@ class SuperCompilerTest {
         "-p", "output/eqnum.hl"));
   }
   
-  
-  @Test def synapse(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse.hl",
-        "-t", "output/synapse.svg",
-        "-p", "output/synapse.hl"));
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse1.hl",
-        "-t", "output/synapse1.svg",
-        "-p", "output/synapse1.hl"));
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/synapse2.hl",
-        "-t", "output/synapse2.svg",
-        "-p", "output/synapse2.hl"));
-  }
-  
-  @Test def even(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even.hl",
-        "-t", "output/even.svg",
-        "-p", "output/even.hl"));
-    
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even2.hl",
-        "-t", "output/even2.svg",
-        "-p", "output/even2.hl"));
-  }
-  
-  @Test def evenSS(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/evenSS.hl",
-        "-t", "output/evenSS.svg",
-        "-p", "output/evenSS.hl"));
-    
-  }
+
   
   @Test def caze(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/case.hl",
@@ -196,12 +187,6 @@ class SuperCompilerTest {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/rev_1.hl",
         "-t", "output/rev_11.svg",
         "-p", "output/rev_11.hl"));
-    }
-  
-  @Test def even1(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/even1.hl",
-        "-t", "output/even1.svg",
-        "-p", "output/even1.hl"));
     }
   
   @Test def exp(): Unit = {

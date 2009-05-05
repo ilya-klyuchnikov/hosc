@@ -24,4 +24,25 @@ class SuperCompiler1Test {
   
   @Test def regexp(): Unit = 
     SCP1.main(Array("-si", "sc/regexp.hs", "-t", "sc/out1/regexp.svg", "-p", "sc/out1/regexp.hs"))
+
+  @Test def synapse() = 
+    SCP1.main(Array("-si", "sc/synapse.hs", "-t", "sc/out1/synapse.svg", "-p", "sc/out1/synapse.hs"))
+  
+  @Test def synapse1() = 
+    SCP1.main(Array("-si", "sc/synapse1.hs",  "-t", "sc/out1/synapse1.svg", "-p", "sc/out1/synapse1.hs"))
+  
+  @Test def synapse2() = 
+    SCP1.main(Array("-si", "sc/synapse2.hs", "-t", "sc/out1/synapse2.svg", "-p", "sc/out1/synapse2.hs"))
+  
+  @Test def even() = 
+    SCP1.main(Array("-si", "sc/even.hs", "-t", "sc/out1/even.svg", "-p", "sc/out1/even.hs"))
+    
+  @Test def even1() = 
+    SCP1.main(Array("-si", "sc/even1.hs", "-t", "sc/out1/even1.svg", "-p", "sc/out1/even1.hs"))
+  
+  @Test def even2() = 
+    SCP1.main(Array("-si", "sc/even2.hs", "-t", "sc/out1/even2.svg", "-p", "sc/out1/even2.hs"))
+  
+  @Test def evenSS() = 
+    SCP1.main(Array("-si", "sc/evenSS.hs", "-t", "sc/out1/evenSS.svg", "-p", "sc/out1/evenSS.hs"))
 }
