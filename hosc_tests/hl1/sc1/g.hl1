@@ -1,5 +1,0 @@
-number  :: Z  | S number;
-case  n  of {
-  S zz : ( letrec f = %z { %u { case  z  of { S x1 : ((f (S x1)) (S u)); Z : (S u); } } } in  ((f zz) b));
-  Z : a;
-}
