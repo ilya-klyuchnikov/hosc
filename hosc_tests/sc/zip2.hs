@@ -1,7 +1,6 @@
 data List a = Nil | Cons a (List a);
 data Pair a b = P a b;
 
-
 zip (fp (P (map f1) (map f2)) (P l1 l2))
 
 

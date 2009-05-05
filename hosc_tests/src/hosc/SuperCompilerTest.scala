@@ -21,16 +21,14 @@ class SuperCompilerTest {
     SCP.main(Array("-si", "sc/eqnum_plus.hs", "-t", "sc/out0/eqnum_plus.svg", "-p", "sc/out0/eqnum_plus.hs"))
   
   @Test def eq = 
-    SCP.main(Array("-si", "sc/eq.hs", "-t", "sc/out0/eq.svg", "-p", "sc/out0/eq.hs"));
+    SCP.main(Array("-si", "sc/eq.hs", "-t", "sc/out0/eq.svg", "-p", "sc/out0/eq.hs"))
   
-  @Test def zip(): Unit = {
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/zip1.hl",
-        "-t", "output/zip1.svg",
-        "-p", "output/zip1.hl"));
-    SuperCompilerApp.main(Array("-si", "hl/supercompiler/zip2.hl",
-        "-t", "output/zip2.svg",
-        "-p", "output/zip2.hl"));
-    }
+  @Test def zip1 = 
+    SCP.main(Array("-si", "sc/zip1.hs", "-t", "sc/out0/zip1.svg", "-p", "sc/out0/zip1.hs"))
+    
+  @Test def zip2 = 
+    SCP.main(Array("-si", "sc/zip2.hs", "-t", "sc/out0/zip2.svg", "-p", "sc/out0/zip2.hs"))
+  
   @Test def t02_ham(): Unit = {
     SuperCompilerApp.main(Array("-si", "hl/supercompiler/02_ham.hl",
         "-t", "output/02_ham.svg",
