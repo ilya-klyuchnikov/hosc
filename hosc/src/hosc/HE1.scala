@@ -16,16 +16,16 @@ object HE1 {
   private def heByVar(term1: Expression, term2: Expression, 
       binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = 
     (term1, term2) match {
-    case (v1: Variable, v2: Variable) => 
-      (letrecs.contains(v1) && letrecs(v1) == v2) ||
-      (!letrecs.keys.contains(v1) && !letrecs.values.contains(v2)) && 
-        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))
+    case (v1: Variable, v2: Variable) => true 
+      //(letrecs.contains(v1) && letrecs(v1) == v2) ||
+      /*(!letrecs.keys.contains(v1) && !letrecs.values.contains(v2)) && 
+        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))*/
     case _ => false
   }
   
   private def heByDiving(term1: Expression, term2: Expression, 
       binders: List[Tuple2[Variable, Variable]], letrecs: Map[Variable, Variable]): Boolean = {
-    val term1Vars = Set(getVarsOrdered(term1):_*) // ??? maybe free vars?
+    //val term1Vars = Set(getVarsOrdered(term1):_*) // ??? maybe free vars?
     //for ((b1, b2) <- binders) if ((b1 != null) && (term1Vars contains b1)) return false
     term2 match {
       case Constructor(_, args) => args exists (he(term1, _, binders, letrecs))
@@ -57,25 +57,6 @@ object HE1 {
     case (LetRecExpression((f1, a1), e1), LetRecExpression((f2, a2), e2)) =>
       he(e1, e2, binders, letrecs + (f1 -> f2)) && he(a1, a2, binders, letrecs + (f1 -> f2)) // maybe || ?
     case _ => false
-  }
-  
-  private def lineApp(term: Expression): List[Expression] = term match {
-    case Application(h, a) => lineApp(h) ::: (a:: Nil)
-    case t => t :: Nil
-  }
-  
-  def getVarsOrdered(exprr: Expression): List[Variable] = {
-    val buffer = new ListBuffer[Variable]
-    def dump(expr: Expression): Unit = expr match {
-      case v: Variable => if (!buffer.contains(v)) buffer + v 
-      case Constructor(_, args) => args map dump
-      case LambdaAbstraction(x, term) => dump(x); dump(term)
-      case Application(head, arg) => dump(head); dump(arg);
-      case CaseExpression(sel, bs) => dump(sel); bs map {b => b.pattern.args map dump; dump(b.term)};
-      case LetRecExpression(b, term) => dump(b._1); dump(b._2); dump(term);
-    }
-    dump(exprr)
-    buffer.toList
   }
 
 }
