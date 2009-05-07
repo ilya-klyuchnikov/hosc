@@ -92,4 +92,7 @@ class SuperCompilerTest {
   
   @Test def war() = 
     SCP.main(Array("-si", "sc/var.hs", "-t", "sc/out0/var.svg", "-p", "sc/out0/var.hs"))
+  
+  @Test def banana() = 
+    SCP.main(Array("-si", "sc/banana.hs", "-t", "sc/out0/banana.svg", "-p", "sc/out0/banana.hs"))
 }
