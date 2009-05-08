@@ -29,18 +29,11 @@ loop = \state acts ->
       Nil -> test state;
       Cons a as -> loop (act a state) as;
     };
-/*
-add = \ x y ->
-    case y of {
-      Z   -> x;
-      S n -> S (add x n);
-    };
-}*/
 
-add = \y x ->
-    case y of {
-      Z   -> x;
-      S n -> S (add x n);
+add = \x y ->
+    case x of {
+      Z   -> y;
+      S n -> S (add n y);
     };
 
 act = \a state ->
