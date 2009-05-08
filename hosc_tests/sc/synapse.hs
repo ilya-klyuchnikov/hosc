@@ -20,8 +20,6 @@ data List a = Nil | Cons a (List a);
 
 loop (State (S x) Z Z) y
 
-//((loop ((act v3) (State (S x) (Z ) (Z )))) v4)
-
 where
 
 loop = \state acts ->
