@@ -28,11 +28,7 @@ loop = \state acts ->
       Cons a as -> loop (act a state) as;
     };
 
-add = \x y ->
-    case x of {
-      Z   -> y;
-      S n -> S (add n y);
-    };
+add = \x y -> case x of {Z -> y; S n -> S (add n y);};
 
 act = \a state ->
     case a of {
