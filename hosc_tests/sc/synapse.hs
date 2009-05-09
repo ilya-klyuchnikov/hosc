@@ -20,9 +20,9 @@ act = \a state add ->
 		State i d v -> case a of {
 			RM -> case i of {Z -> Stop; S x-> State (add x d) Z (S v);};
 			WH2 -> case i of {
-			Z -> case v of {Z-> Stop; S x-> State (add (add i d) x) (S Z) Z;};
-			S x -> case v of {Z-> State (add (add i d) v) (S Z) Z; S y-> State (add (add i d) y) (S Z) Z;};
-        };
+				Z -> case v of {Z-> Stop; S x-> State (add (add i d) x) (S Z) Z;};
+				S x -> case v of {Z-> State (add (add i d) v) (S Z) Z; S y-> State (add (add i d) y) (S Z) Z;};
+        	};
 		};
 	};
 
