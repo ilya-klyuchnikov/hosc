@@ -4,19 +4,17 @@ data State = State Number Number Number | Stop;
 data Boolean = True | False;
 data List a = Nil | Cons a (List a);
 
-loop (State (S x) Z Z) y
+test (loop (State (S x) Z Z) y add)
 
 where
 
-loop = \state acts ->
+loop = \state acts add ->
     case acts of {
-      Nil -> test state;
-      Cons a as -> loop (act a state) as;
+      Nil -> state;
+      Cons a as -> loop (act a state add) as add;
     };
 
-add = \x y -> case x of {Z -> y; S n -> S (add n y);};
-
-act = \a state ->
+act = \a state add ->
 	case state of {
 		Stop -> Stop;
 		State i d v -> case a of {
