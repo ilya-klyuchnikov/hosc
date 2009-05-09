@@ -1,17 +1,3 @@
-/*
-The parameterized  initial  configuration  is  expressed  as:   
-invalid >= 1, dirty = 0, valid = 0
-
-loop (State (S x) Z Z) t
-
-act a (State (S x) Z Z)
-act b (act a (State (S x) Z Z))
-
-The potentially unsafe states:
-(1) invalid >= 0, dirty >= 1, valid >= 1
-(2) invalid >= 0, dirty >= 2, valid >= 0
-*/
-
 data Action = RM | WH2;
 data Number = Z | S Number;
 data State = State Number Number Number | Stop;
@@ -31,19 +17,16 @@ loop = \state acts ->
 add = \x y -> case x of {Z -> y; S n -> S (add n y);};
 
 act = \a state ->
-    case a of {
-      RM -> case state of {
-        State i d v -> case i of {Z -> Stop; S x-> State (add x d) Z (S v);};
-        Stop -> Stop;
-      };
-      WH2 -> case state of {
-        State i d v -> case i of {
-                        Z -> case v of {Z-> Stop; S x-> State (add (add i d) x) (S Z) Z;};
-                        S x -> case v of {Z-> State (add (add i d) v) (S Z) Z; S y-> State (add (add i d) y) (S Z) Z;};
-                      };
-        Stop -> Stop;
-      };
-    };
+	case state of {
+		Stop -> Stop;
+		State i d v -> case a of {
+			RM -> case i of {Z -> Stop; S x-> State (add x d) Z (S v);};
+			WH2 -> case i of {
+			Z -> case v of {Z-> Stop; S x-> State (add (add i d) x) (S Z) Z;};
+			S x -> case v of {Z-> State (add (add i d) v) (S Z) Z; S y-> State (add (add i d) y) (S Z) Z;};
+        };
+		};
+	};
 
 test = \state ->
   case state of {
