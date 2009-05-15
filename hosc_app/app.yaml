@@ -13,3 +13,6 @@ handlers:
 
 - url: (/|/all|/view|/edit|/delete|/mine|/authors|/author|/svg|/supercompiler|/svgpreview|/eq|/tests|/tedit|/tdelete|/test)
   script: main.py
+  
+- url: /wakeup
+  script: wakeup.py
