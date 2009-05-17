@@ -44,7 +44,7 @@ class SuperCompiler(program: Program){
   }  
   
   def buildProcessTree(e: Expression): ProcessTree = {
-    try {
+    /*try {
       return buildSuperPureProcessTree(e)
     } catch {
       case _ =>
@@ -53,7 +53,7 @@ class SuperCompiler(program: Program){
       return buildPureProcessTree(e)
     } catch {
       case _ =>
-    }
+    }*/
     val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
