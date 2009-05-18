@@ -78,9 +78,57 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
           }}
         }
         case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
-          val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
-          val newSel = construct(node.children.head)
-          CaseExpression(newSel, newBs)
+          if (node.getRepParent != null) {
+            val alphaNode: Node = node.getRepParent()
+            val alphaT = alphaNode.expr
+            
+            val (appHead, args) = alphaNode.signature
+            val z = constructApplication(Variable(appHead), args)
+            
+            val msg = strongMsg(alphaT, t)
+            // after substitution:
+            val sub = Map[Variable, Expression]() ++ msg.sub2
+            val z1 = applySubstitution(z, sub)
+            z1
+          } else {{
+            tree.leafs.filter(n => n.repeatedOf == node) match {
+              case Nil => {
+                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
+                val newSel = construct(node.children.head)
+                CaseExpression(newSel, newBs)
+              }
+              case repeatNodes => {
+                var vars: Set[Variable] = null
+                if (freeVarsInLetrecs){
+                  vars = Set[Variable]()
+                  for (n <- repeatNodes) {
+                    val betaT = n.expr
+                    val msg = strongMsg(t, betaT)
+                    val args0 = msg.sub2 map {p => p._1}
+                    vars = vars ++ args0
+                  }
+                }
+                else {
+                  vars = TermAlgebra.getFreeVars(t)
+                }
+                val args0 = vars.toList 
+                val args = args0
+                val newVars = args map {p => createVar()}
+                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars) map {p => (Variable(p._1.name), p._2)})
+                node.signature = (createFName(), args0)
+                
+                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
+                val newSel = construct(node.children.head)
+                val ce = CaseExpression(newSel, newBs)/sub
+                
+                val lam = constructLambda(newVars, ce)
+                val appHead = Variable(node.signature._1)
+                appHead.global = true
+                LetRecExpression((appHead, lam), constructApplication(appHead, args))
+              }
+            }          
+          }}
+
         }
         case RedexCall(f) => {
           if (node.getRepParent != null) {
