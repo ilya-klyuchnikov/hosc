@@ -1,10 +1,7 @@
 package hosc
 
-import scala.util.parsing.input.{CharArrayReader, Reader}
-
 import HLanguage._
 import TermAlgebra._
-import Util._
 
 class Interpreter(program: Program) {
   
