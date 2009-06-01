@@ -25,10 +25,6 @@ class ProcessTreeSVG(tree: ProcessTree) {
       val (pn, style) = 
         if (n.repeatedOf != null) {
           (n.repeatedOf, "stroke:black;")
-        } else  if (n.instanceOf != null) {
-          (n.instanceOf, "stroke:green;")
-        } else if (n.embedderOf != null) {
-          (n.embedderOf, "stroke:red;")
         }else {
           (null, null)
         }
