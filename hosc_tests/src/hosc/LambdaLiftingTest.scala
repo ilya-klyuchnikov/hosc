@@ -16,7 +16,7 @@ class LambdaLiftingTest {
     println("\n")
     
     val e = LambdaLifting.lift(p)
-    println(e)
+    println(e.toDocString)
   }
   
   @Test def letrec_rev(): Unit = {
@@ -28,6 +28,18 @@ class LambdaLiftingTest {
     println("\n")
     
     val e = LambdaLifting.lift(p)
-    println(e)
+    println(e.toDocString)
+  }
+  
+  @Test def letrec_2app(): Unit = {
+    val p = Util.rawProgramFromFile("lifting/letrec_2app.hs")
+    println(p.goal)
+    val l = LambdaLifting.findLetRec(p.goal)
+    println(l)
+    
+    println("\n")
+    
+    val e = LambdaLifting.lift(p)
+    println(e.toDocString)
   }
 }
