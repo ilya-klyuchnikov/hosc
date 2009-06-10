@@ -4,10 +4,10 @@
 <pydev_project>
 <pydev_property name="org.python.pydev.PYTHON_PROJECT_VERSION">python 2.5</pydev_property>
 <pydev_pathproperty name="org.python.pydev.PROJECT_EXTERNAL_SOURCE_PATH">
-<path>/home/ilya/apps/google_appengine</path>
-<path>/home/ilya/apps/google_appengine/lib/django</path>
-<path>/home/ilya/apps/google_appengine/lib/webob</path>
-<path>/home/ilya/apps/google_appengine/lib/yaml/lib</path>
+<path>/usr/local/google_appengine</path>
+<path>/usr/local/google_appengine/lib/django</path>
+<path>/usr/local/google_appengine/lib/webob</path>
+<path>/usr/local/google_appengine/lib/yaml/lib</path>
 </pydev_pathproperty>
 <pydev_pathproperty name="org.python.pydev.PROJECT_SOURCE_PATH">
 <path>/hosc_app</path>
