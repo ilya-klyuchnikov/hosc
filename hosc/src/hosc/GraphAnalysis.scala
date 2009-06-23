@@ -9,7 +9,7 @@ package hosc
   *  program.
   *
   *  For algorithm details see:
-  *  Aho, A.V., Hopcroft, J.E.,  and Ullman, D. 1983, Data structures and algorithms, pp. 221-226
+  *  Aho, A.V., Hopcroft, J.E. and Ullman, D. 1983, Data structures and algorithms, pp. 221-226
   */
 object GraphAnalysis {
   
