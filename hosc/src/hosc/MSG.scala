@@ -56,14 +56,15 @@ object MSG {
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
         l2 ++= List((rs, t1r, t2r))
       }
-      case (v, app1: Application, app2: Application) 
-      if getAppLevel(app1) == getAppLevel(app2) && getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
-        val head = getCoreLocalHead(app1)
-        val args1 = extractAppArgs(app1)
-        val args2 = extractAppArgs(app2)
-        val newVars = args1.map(arg => newVar())
-        val addDSubs = ((newVars zip args1) zip (newVars zip args2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
-        t = applySubstitution(t, Map(v -> constructApplication(head, newVars)))
+      // TODO - maybe we need a special case for core local head
+      case (v, app1: Application, app2: Application) if getAppLevel(app1) == getAppLevel(app2) => {
+        //&& getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
+        //val head = getCoreLocalHead(app1)
+        val exps1 = lineApp(app1)
+        val exps2 = lineApp(app2)
+        val newVars = exps1.map(arg => newVar())
+        val addDSubs = ((newVars zip exps1) zip (newVars zip exps2)) map (pair => (pair._1._1, pair._1._2, pair._2._2))
+        t = applySubstitution(t, Map(v -> constructApplication(newVars.head, newVars.tail)))
         l2 ++= addDSubs
       }
       case (v, CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
