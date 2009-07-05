@@ -20,16 +20,14 @@ object TypeInferrer {
     def extend(x: TypeVariable, t: Type): Subst =
       if (x == t) {
         this 
-      } else {
-        tyvars(t) contains x match {
-          case false =>  new Subst {
-            val cs = delta(x, t) compose Subst.this
-            override def apply(t: Type) = cs.apply(t)
-            override def toString = cs.toString
-          }
-          case true => 
-            throw new TypeError("recursive binding: " + x + " = " + t)
+      } else if (tyvars(t) contains x) {
+        new Subst {
+          val cs = delta(x, t) compose Subst.this
+          override def apply(t: Type) = cs.apply(t)
+          override def toString = cs.toString
         }
+      } else { 
+        throw new TypeError("recursive binding: " + x + " = " + t)
       }
       
     
