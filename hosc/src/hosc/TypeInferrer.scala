@@ -17,17 +17,17 @@ object TypeInferrer {
       case TypeConstructor(k, ts) => TypeConstructor(k, ts map apply)
     }
     
-    def extend(x: TypeVariable, t: Type): Subst =
+    def extend(x: TypeVariable, t: Type) =
       if (x == t) {
         this 
       } else if (tyvars(t) contains x) {
+        throw new TypeError("recursive binding: " + x + " = " + t)
+      } else { 
         new Subst {
           val cs = delta(x, t) compose Subst.this
           override def apply(t: Type) = cs.apply(t)
           override def toString = cs.toString
         }
-      } else { 
-        throw new TypeError("recursive binding: " + x + " = " + t)
       }
       
     
