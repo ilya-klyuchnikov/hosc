@@ -8,7 +8,7 @@ object TypeInferrer {
   case class TypeError(s: String) extends Exception(s) {}
 
   // substitutions
-  class Subst extends Function1[Type, Type] {
+  class Subst extends (Type => Type) {
     def baseApply(x: TypeVariable): Type = x
     
     def apply(t: Type): Type = t match {
@@ -56,11 +56,8 @@ object TypeInferrer {
   case class TypeScheme(schematicVars: List[TypeVariable], t: Type) {
     // returns the type contained in the scheme 
     // after all schematic type variables have been renamed to fresh variables    
-    def newInstance(): Type =
-      (emptySubst /: schematicVars) ((sub, tv) => sub.extend(tv, newTyvar())) (t)
-    
+    def newInstance() = (emptySubst /: schematicVars) (_.extend(_, newTyvar())) (t)
     def unknownVars = tyvars(t) -- schematicVars
-    
     def sub(sub: Subst) = TypeScheme(schematicVars, (sub exclude schematicVars) (t))
   }
   
