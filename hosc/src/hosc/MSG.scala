@@ -11,7 +11,7 @@ object MSG {
   case class Generalization2(term: Expression, dSub: List[DoubleSubstitution])
   
   def msg(term1: Expression, term2: Expression): Generalization = {
-    null
+
     def msg_(term1: Expression, term2: Expression): Generalization2 = {
       val initialVar = newVar()
       var g = Generalization2(initialVar, List((initialVar, term1, term2)))
@@ -23,25 +23,20 @@ object MSG {
       } while (exp != g.term)    
       g
     }
-    val g = msg_(term1, term2)
-    def f(t1: Expression, t2: Expression): Boolean = (t1, t2) match {
-      case (v1: Variable, v2: Variable) => v1.name == v2.name
-      case _ => false
-    }
     
-    val evidentSub = g.dSub filter (tr => f(tr._2, tr._3))
-    val residualSub = g.dSub remove (tr => f(tr._2, tr._3))
-    val evidentMap = Map[Variable, Expression]() ++ (evidentSub map (tr => (tr._1, tr._2)))
-    val term = applySubstitution(g.term, evidentMap)
-    val s1 = residualSub.map(triple => (triple._1, triple._2))
-    val s2 = residualSub.map(triple => (triple._1, triple._3))
-    Generalization(term, s1, s2)
+    val g = msg_(term1, term2)
+    val s1 = g.dSub.map(triple => (triple._1, triple._2))
+    val s2 = g.dSub.map(triple => (triple._1, triple._3))
+    Generalization(g.term, s1, s2)
   }
   
   private def applyCommonFunctorRule(g: Generalization2): Generalization2 = {
     val l2 = new scala.collection.mutable.ListBuffer[DoubleSubstitution]()
     var t = g.term;
     for (dSub <- g.dSub) dSub match {
+      case (v, v1: Variable, v2: Variable) if v1.name == v2.name => {
+        t = applySubstitution(t, Map(v -> v1))
+      }
       case (v, Constructor(n1, a1), Constructor(n2, a2)) if n1 == n2 => {
         val newVars = a1.map(arg => newVar())
         val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2)) 
@@ -56,10 +51,7 @@ object MSG {
         t = applySubstitution(t, Map(v -> LambdaAbstraction(arg, rs)))
         l2 ++= List((rs, t1r, t2r))
       }
-      // TODO - maybe we need a special case for core local head
       case (v, app1: Application, app2: Application) if getAppLevel(app1) == getAppLevel(app2) => {
-        //&& getCoreLocalHead(app1) == getCoreLocalHead(app2) => {        
-        //val head = getCoreLocalHead(app1)
         val exps1 = lineApp(app1)
         val exps2 = lineApp(app2)
         val newVars = exps1.map(arg => newVar())
@@ -111,7 +103,8 @@ object MSG {
         Generalization2(o1.foldRight(g.term)((ds, t) => applySubstitution(t, Map[Variable, Expression](ds._1 -> v))), s :: o2)
     }
   }
-  // term1 is equivalent with msg
+  
+  // term1 a renaming of e_g
   def strongMsg(term1: Expression, term2: Expression): Generalization = {
     val g = msg(term1, term2)
     var term = g.term
