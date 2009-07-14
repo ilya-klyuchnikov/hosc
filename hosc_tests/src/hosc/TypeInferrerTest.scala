@@ -7,6 +7,14 @@ import scala.util.parsing.input.{CharArrayReader, Reader}
 
 class TypeInferrerTest {
 
+  @Test def case1() = 
+    testTyping("types/case1.hs",
+               "Pair a b -> a")
+  
+  @Test def case2() = 
+    testTyping("types/case2.hs",
+               "Pair a b -> b")
+  
   @Test def church() = 
     testTyping("types/church.hs",
                "Nat -> (t -> t) -> (t -> t)")
@@ -21,6 +29,9 @@ class TypeInferrerTest {
   
   @Test def churchSubErr() = 
     testTypeError("types/churchSubErr.hs")
+  
+  @Test def fixErr() =
+    testTypeError("types/fixErr.hs")
   
   def testTyping(fileName: String, typeString: String) = {
     val actualType = Util.inferGoalType(fileName)

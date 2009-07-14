@@ -1,18 +1,21 @@
-// Program Optimizations and Transformations in Calculation Form
+-- Program Optimizations and Transformations in Calculation Form
 
 data List a = Nil | Cons a (List a);
 data B = True | False;
 data N = Z | S N;
 
-// note that hd < isort (homeomorphic embedding!)
+-- note that hd < isort (homeomorphic embedding!)
 
-//hd z (isort lessOrEq xs)
+--hd z (isort lessOrEq xs)
 
-//hd z (isort lessOrEq (Cons x xs)) // this will be the minimal element
+{-
+hd z (isort lessOrEq (Cons x xs)) // this will be the minimal element
 
-//hd z (insert lessOrEq x xs)
+hd z (insert lessOrEq x xs)
 
-//hd z (insert lessOrEq x (isort lessOrEq xs))
+hd z (insert lessOrEq x (isort lessOrEq xs))
+
+-}
 
 case (case ((((insert lessOrEq) w42) ((isort lessOrEq) w43))) of {Nil  -> (Cons x (Nil )); Cons w11 w12 -> case (((lessOrEq x) w11)) of {True  -> (Cons x (Cons w11 w12)); False  -> (Cons w11 (((insert lessOrEq) x) w12));};}) of {Nil  -> z; Cons w3 w4 -> w3;}
 

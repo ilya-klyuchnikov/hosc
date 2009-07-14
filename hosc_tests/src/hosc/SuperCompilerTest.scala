@@ -95,4 +95,7 @@ class SuperCompilerTest {
   
    @Test def church() = 
     SCP.main(Array("-si", "sc/church.hs", "-t", "sc/out0/church.svg", "-p", "sc/out0/church.hs"))
+   
+   @Test def fix() = 
+    SCP.main(Array("-si", "sc/fix.hs", "-t", "sc/out0/fix.svg", "-p", "sc/out0/fix.hs"))
 }

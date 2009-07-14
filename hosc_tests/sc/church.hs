@@ -1,8 +1,8 @@
 data Nat = Z | S Nat;
 
-church (add x y) where
+-- church (add x y) where
 
-//churchAdd (church x) (church y) where
+churchAdd (church x) (church y) where
 
 church = \n -> case n of {
   Z    -> \f x -> x;
