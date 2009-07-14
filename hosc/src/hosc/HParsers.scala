@@ -91,6 +91,7 @@ trait HTokens extends StdTokens {
   case class UIdentifier(chars: String) extends Token
 }
 
+import scala.util.parsing.input.CharArrayReader.EofCh
 class HLexical extends StdLexical with HTokens {
   override def token: Parser[Token] = 
     (upperCaseLetter ~ rep(letter | digit) ^^ { case first ~ rest => processUIdent(first :: rest mkString "") }
@@ -101,6 +102,28 @@ class HLexical extends StdLexical with HTokens {
   protected def processUIdent(name: String) = if (reserved contains name) Keyword(name) else UIdentifier(name)
   def upperCaseLetter = elem("upper-case-letter", _.isUpperCase)
   def lowerCaseLetter = elem("lower-case-letter", _.isLowerCase)
+  
+    // see `whitespace in `Scanners'
+  override def whitespace: Parser[Any] = rep(
+      whitespaceChar
+    | '/' ~ '*' ~ comment
+    | '/' ~ '/' ~ rep( chrExcept(EofCh, '\n') )
+    | '/' ~ '*' ~ failure("unclosed comment")
+    
+    | '{' ~ '-' ~ hComment
+    | '-' ~ '-' ~ rep( chrExcept(EofCh, '\n') )
+    | '{' ~ '-' ~ failure("unclosed comment")
+    )
+
+  override protected def comment: Parser[Any] = (
+      '*' ~ '/'  ^^ { case _ => ' '  }
+    | chrExcept(EofCh) ~ comment
+    )
+  
+  protected def hComment: Parser[Any] = (
+      '-' ~ '}'  ^^ { case _ => ' '  }
+    | chrExcept(EofCh) ~ hComment
+    )
 }
 
 class HTokenParsers extends StdTokenParsers {
