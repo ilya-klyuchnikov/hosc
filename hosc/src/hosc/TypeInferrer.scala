@@ -417,10 +417,10 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     */  
   private def tcCase(te: TypeEnv, caseExp: CaseExpression): Result = {
     val r1 = tcCaseRaw(te, caseExp)
-    val r2 = tc(te.sub(r1.s), caseExp.selector)    
-    val appSchematicType = newTyvar()
-    val sub = mgu(r1.t, Arrow(r2.t, appSchematicType), r2.s compose r1.s)
-    Result(sub, sub(appSchematicType))
+    val r2 = tc(te.sub(r1.s), caseExp.selector)
+    val Arrow(selType, branchBodyType) = r1.t.asInstanceOf[Arrow]
+    val sub = mgu(selType, r2.t, r2.s compose r1.s)
+    Result(sub, sub(branchBodyType))
   }
   
   // deals with branch as with pattern-matching lambda abstraction
