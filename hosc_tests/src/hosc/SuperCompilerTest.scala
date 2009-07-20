@@ -98,4 +98,7 @@ class SuperCompilerTest {
    
    @Test def fix() = 
     SCP.main(Array("-si", "sc/fix.hs", "-t", "sc/out0/fix.svg", "-p", "sc/out0/fix.hs"))
+   
+   @Test def drec() = 
+    SCP.main(Array("-si", "sc/drec.hs", "-t", "sc/out0/drec.svg", "-p", "sc/out0/drec.hs"))
 }
