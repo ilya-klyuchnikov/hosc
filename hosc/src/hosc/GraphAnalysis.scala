@@ -111,19 +111,22 @@ object GraphAnalysis {
   private def findComponents(graph: Graph): List[GraphComponent] = {    
     var components = List[GraphComponent]()
     
+    // 1.
     depthFirstTraverse(graph)
+    // 2.
     val reversedGraph = reverseTraversedGraph(graph)
+    // 3.
     depthFirstTraverse(reversedGraph)   
     
-    // construct strongly connected components
+    // 4.a construct strongly connected components
     for (a <- reversedGraph.arcs.filter {_.visited}) {
-      components find {comp => (comp.vs contains a.from) || (comp.vs contains a.to)} match {
-        case Some(comp) => comp.vs = comp.vs + a.from + a.to
-        case None => components = GraphComponent(Set(a.from, a.to), true) :: components
+      components partition {comp => (comp.vs contains a.from) || (comp.vs contains a.to)} match {
+        case (Nil, l2) => components = GraphComponent(Set(a.from, a.to), true) :: l2
+        case (l1, l2)  => components = GraphComponent(l1.foldLeft(Set(a.from, a.to)){_ ++ _.vs}, true) :: l2
       }
     }
     
-    // construct singleton components
+    // 4.b construct singleton components
     for (v <- reversedGraph.vertices) components find (_.vs contains v) match {
       case None => components = GraphComponent(Set(v), false) :: components
       case _ => 
