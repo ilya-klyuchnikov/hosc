@@ -101,4 +101,13 @@ class SuperCompilerTest {
    
    @Test def drec() = 
     SCP.main(Array("-si", "sc/drec.hs", "-t", "sc/out0/drec.svg", "-p", "sc/out0/drec.hs"))
+   
+   @Test def enc() = 
+    SCP.main(Array("-si", "sc/encoding.hs", "-t", "sc/out0/enc.svg", "-p", "sc/out0/enc.hs"))
+   
+   @Test def sf() = 
+    SCP.main(Array("-si", "sc/sf.hs", "-t", "sc/out0/sf.svg", "-p", "sc/out0/sf.hs"))
+   
+   @Test def rev() = 
+    SCP.main(Array("-si", "sc/rev.hs", "-t", "sc/out0/rev.svg", "-p", "sc/out0/rev.hs"))
 }

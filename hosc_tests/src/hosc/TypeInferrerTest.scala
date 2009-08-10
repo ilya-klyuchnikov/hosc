@@ -33,6 +33,9 @@ class TypeInferrerTest {
   @Test def fixErr() =
     testTypeError("types/fixErr.hs")
   
+  @Test def drec() =
+    println(Util.inferGoalType("sc/encoding.hs"))
+  
   def testTyping(fileName: String, typeString: String) = {
     val actualType = Util.inferGoalType(fileName)
     val expectedType = HParsers.parseType(new CharArrayReader(typeString.toCharArray)).get

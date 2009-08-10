@@ -90,4 +90,7 @@ class SuperCompiler1Test {
   
   @Test def join2() = 
     SCP1.main(Array("-si", "sc/join2.hs", "-t", "sc/out1/join2.svg", "-p", "sc/out1/join2.hs"))
+  
+  @Test def rev() = 
+    SCP1.main(Array("-si", "sc/rev.hs", "-t", "sc/out1/rev.svg", "-p", "sc/out1/rev.hs"))
 }

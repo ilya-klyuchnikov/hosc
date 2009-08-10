@@ -1,5 +1,7 @@
 {-# LANGUAGE NoImplicitPrelude#-}
 
+dRec1 x y where
+
 n0 = \x y -> y;
 n1 = \x y -> x y;
 n2 = \x y -> x (x y);
