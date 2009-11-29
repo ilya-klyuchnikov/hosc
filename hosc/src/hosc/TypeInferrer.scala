@@ -4,7 +4,6 @@ import EnrichedLambdaCalculus._
 import TypeAlgebra._
 
 case class TypeError(s: String) extends Exception(s)
-case class ResultL(s: Subst, ts: List[Type])
 
 class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
   
@@ -79,10 +78,10 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     case v: Variable => 
       (new Subst(), te.value(TypeVariable(v.name)).newInstance)
     case a: Application => {
-      val r = check(te, a.head :: a.arg :: Nil)
+      val (sub1, type1s) = check(te, a.head :: a.arg :: Nil)
       val genericVar = newTyvar()
-      val sub = mgu(r.ts.head, Arrow(r.ts.last, genericVar), r.s)
-      (sub, sub(genericVar))
+      val sub2 = mgu(type1s.head, Arrow(type1s.last, genericVar), sub1)
+      (sub2, sub2(genericVar))
     }
     case l: LambdaAbstraction => checkLambda(te, l)
     case l: LetExpression => tcLet(te, l)
@@ -138,15 +137,15 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   private def tcLet(env: TypeEnv, let: LetExpression): (Subst, Type) = {      
     // check the rights sides of bindings
     val letExps = let.bs map {_._2}    
-    val r = check(env, letExps)
+    val (sub1, type1s) = check(env, letExps)
     
     val tvs = let.bs map {p => TypeVariable(p._1.name)}
-    val gamma1 = env.sub(r.s)
-    val gamma2 = addDecls(gamma1, tvs, r.ts)
+    val gamma1 = env.sub(sub1)
+    val gamma2 = addDecls(gamma1, tvs, type1s)
     
     // check the let body wrt updated env
     val (sub2, type2) = tc(gamma2, let.expr)
-    (r.s compose sub2, type2)
+    (sub1 compose sub2, type2)
   }
   
   /** 
@@ -181,14 +180,11 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val schemes = letRecVars map {x => TypeScheme(Nil, newTyvar)}
     
     // check right hand sides in extended env
-    val rl = check(TypeEnv(env.map ++ (xs zip schemes)), letRecRSides)
+    val (sub1, type1s) = check(TypeEnv(env.map ++ (xs zip schemes)), letRecRSides)
     
-    val phi1 = rl.s
-    val rSideTypes = rl.ts
-    
-    val lSideTypes = (schemes map {s => s.sub(phi1)}) map {_.t}   
+    val lSideTypes = (schemes map {s => s.sub(sub1)}) map {_.t}   
     // unifying left and right sides
-    val phi2 = mgu(lSideTypes zip rSideTypes, phi1)    
+    val phi2 = mgu(lSideTypes zip type1s, sub1)    
     // apply sub2 to env and also extend result with the derived type schemes for xs
     val extEnv = addDecls(env.sub(phi2), xs, lSideTypes map phi2)
     // type check the letrec body wrt updated env
@@ -212,7 +208,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     */  
   private def tcCon(te: TypeEnv, c: Constructor): (Subst, Type) = {
     // infer constructor arguments
-    val rl = check(te, c.args)
+    val (sub1, type1s) = check(te, c.args)
     
     // construct equqations saying that declared types equal to inferred ones
     val conDef = typeConstructorDefs(c.name)
@@ -220,10 +216,10 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     // just substitution refreshing parametric variables
     val fSub = (new Subst() /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
     val freshedDcArgs: List[Type] = dataConstructors(c.name).args map fSub    
-    val typeEqns = freshedDcArgs zip rl.ts
+    val typeEqns = freshedDcArgs zip type1s
     
     // solve equations and construct answer
-    val sub2 = mgu(typeEqns, rl.s)
+    val sub2 = mgu(typeEqns, sub1)
     val cvars = typeParams map (sub2 compose fSub)
     (sub2, TypeConstructor(conDef.name, cvars))
   }
@@ -324,28 +320,28 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   }
   
   private def tcCaseRaw(te: TypeEnv, caseExp: CaseExpression): (Subst, Type) = {
-    val r = tcBranches(te, caseExp.branches)    
+    val (sub1, type1s) = tcBranches(te, caseExp.branches)    
     val tv = newTyvar
-    val pairs = r.ts map {(tv, _)}    
-    val s = mgu(pairs, r.s)
-    (s, s(tv))
+    val pairs = type1s map {(tv, _)}    
+    val sub2 = mgu(pairs, sub1)
+    (sub2, sub2(tv))
   }
   
-  private def tcBranches(environment: TypeEnv, expressions: List[Branch]): ResultL = expressions match {
-    case Nil => ResultL(new Subst(), Nil) 
+  private def tcBranches(environment: TypeEnv, expressions: List[Branch]): (Subst, List[Type]) = expressions match {
+    case Nil => (new Subst(), Nil) 
     case e :: es => {
       val (sub1, type1) = tcBranch(environment, e)
-      val rs = tcBranches(environment.sub(sub1), es)
-      ResultL(rs.s compose sub1, rs.s(type1) :: rs.ts)
+      val (sub2, types2) = tcBranches(environment.sub(sub1), es)
+      (sub2 compose sub1, sub2(type1) :: types2)
     }
   }
   
-  private def check(environment: TypeEnv, expressions: List[Expression]): ResultL = expressions match {
-    case Nil => ResultL(new Subst(), Nil) 
+  private def check(environment: TypeEnv, expressions: List[Expression]): (Subst, List[Type]) = expressions match {
+    case Nil => (new Subst(), Nil) 
     case e :: es => {
       val (sub1, type1) = tc(environment, e)
-      val rs = check(environment sub sub1, es)
-      ResultL(rs.s compose sub1, rs.s(type1) :: rs.ts)
+      val (sub2, types2) = check(environment sub sub1, es)
+      (sub2 compose sub1, sub2(type1) :: types2)
     }
   }
   
