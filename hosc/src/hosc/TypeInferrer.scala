@@ -2,79 +2,60 @@ package hosc
 
 import EnrichedLambdaCalculus._
 
+object Subst {
+  val empty = new Subst(Map())
+}
+
+class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
+    
+  def apply(t: Type): Type = t match {
+    case tv : TypeVariable => map.getOrElse(tv, tv)
+    case Arrow(t1, t2) => Arrow(this(t1), this(t2))
+    case TypeConstructor(k, ts) => TypeConstructor(k, ts map this)
+  }
+    
+  def extend(x: TypeVariable, t: Type) =
+    if (TypeInferrer.tyvars(t) contains x)
+      throw new TypeInferrer.TypeError("recursive binding: " + x + " = " + t)
+    else if (x == t) this
+    else new Subst(Map(x -> t)) compose this
+         
+  def compose(z: Subst): Subst = new Subst(Map()) {
+    override def apply(t: Type) = Subst.this.apply(z.apply(t))
+  }
+    
+  def exclude(vs: List[TypeVariable]) = new Subst(map -- vs)
+}
+
+case class TypeScheme(schematicVars: List[TypeVariable], t: Type) {
+  // returns the type contained in the scheme 
+  // after all schematic type variables have been renamed to fresh variables    
+  def newInstance() = (Subst.empty /: schematicVars) (_.extend(_, TypeInferrer.newTyvar())) (t)
+  def unknownVars = TypeInferrer.tyvars(t) -- schematicVars
+  // applies a substitution to a type scheme
+  // substitution affects non-schematic variables only
+  def sub(sub: Subst) = TypeScheme(schematicVars, (sub exclude schematicVars) (t))
+}
+
+case class TypeEnv(al: List[Pair[TypeVariable, TypeScheme]]){
+    def value(tv: TypeVariable) = al find(_._1 == tv) match {
+      case Some(x) => x._2
+      case None => throw new TypeInferrer.TypeError("undefined: " + tv)
+    }
+    private def dom = al map (_._1)
+    private def range = for (a <- dom) yield value(a)
+    def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv((tv, ts) :: al)
+    def unknownsVars = (range :\ List[TypeVariable]()){(ts, l) => (l ::: ts.unknownVars )}
+    // sub_te
+    def sub(s: Subst) = TypeEnv(al map {p => (p._1, p._2.sub(s))})
+}
+
 object TypeInferrer {
   private var n: Int = 0
   def newTyvar(): TypeVariable = { n += 1; TypeVariable("$$" + n) }
-  case class TypeError(s: String) extends Exception(s) {}
-
-  // substitutions
-  class Subst extends (Type => Type) {
-    def baseApply(x: TypeVariable): Type = x
-    
-    def apply(t: Type): Type = t match {
-      case tv : TypeVariable => baseApply(tv)
-      case Arrow(t1, t2) => Arrow(apply(t1), apply(t2))
-      case TypeConstructor(k, ts) => TypeConstructor(k, ts map apply)
-    }
-    
-    def extend(x: TypeVariable, t: Type) =
-      if (x == t) {
-        this 
-      } else if (tyvars(t) contains x) {
-        throw new TypeError("recursive binding: " + x + " = " + t)
-      } else { 
-        new Subst {
-          val cs = delta(x, t) compose Subst.this
-          override def apply(t: Type) = cs.apply(t)
-          override def toString = cs.toString
-        }
-      }
-      
-    
-    def compose(z: Subst): Subst = new Subst {
-      override def apply(t: Type) = Subst.this.apply(z.apply(t))
-      override def toString = "{" + Subst.this + " * " + z + "}"
-    }
-    
-    def exclude(vs: List[TypeVariable]) = new Subst {
-      override def apply(y: Type): Type = if (vs contains y) y else Subst.this.apply(y)
-      override def toString = "{" + Subst.this + " / (" + vs.mkString(", ") + ")}"
-    }
-  } 
-
-  val emptySubst = new Subst {
-    override def baseApply(t: TypeVariable): Type = t
-    override def toString = ""
-  }
+  case class TypeError(s: String) extends Exception(s) {} 
   
-  private def delta(x: TypeVariable, t: Type) = new Subst {
-    override def baseApply(tv: TypeVariable): Type = if (x == tv) t else tv
-    override def toString = x + "=" + t + ";"
-  }
-  
-  // type schemes
-  case class TypeScheme(schematicVars: List[TypeVariable], t: Type) {
-    // returns the type contained in the scheme 
-    // after all schematic type variables have been renamed to fresh variables    
-    def newInstance() = (emptySubst /: schematicVars) (_.extend(_, newTyvar())) (t)
-    def unknownVars = tyvars(t) -- schematicVars
-    def sub(sub: Subst) = TypeScheme(schematicVars, (sub exclude schematicVars) (t))
-  }
-  
-  case class TypeEnv(al: List[Pair[TypeVariable, TypeScheme]]){
-    def value(tv: TypeVariable) = al find(_._1 == tv) match {
-      case Some(x) => x._2
-      case None => throw new TypeError("undefined: " + tv)
-    }
-    def dom = al map (_._1)
-    def mg = for (a <- dom) yield value(a)
-    def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv((tv, ts) :: al)
-    def unknownsVars = (mg :\ List[TypeVariable]()){(ts, l) => (l ::: ts.unknownVars )}
-    // sub_te
-    def sub(s: Subst) = TypeEnv(al map {p => (p._1, p._2.sub(s))})
-  }
-  
-  private def tyvars(t: Type): List[TypeVariable] = t match {
+  def tyvars(t: Type): List[TypeVariable] = t match {
     case tv @ TypeVariable(a) => List(tv)
     case Arrow(t1, t2) => tyvars(t1) union tyvars(t2)
     case TypeConstructor(k, ts) => (List[TypeVariable]() /: ts) ((tvs, t) => tvs union tyvars(t))
@@ -132,6 +113,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   private val cnameDC = Map(typeDefs flatMap {_.cons map {c => c.name -> c}}:_*)
   private val cnameTD = Map(typeDefs flatMap {td => td.cons map {_.name -> td} }:_*)
   
+  // the 'main' interface method
   def inferType(expr: Expression) = {
     var te = TypeEnv(Nil)
     for (v <- getFreeVars(expr)){
@@ -181,7 +163,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     *          by fresh type variables
     */
   private def checkVar(te: TypeEnv, v: Variable): Result =
-    Result(emptySubst, te.value(TypeVariable(v.name)).newInstance())
+    Result(Subst.empty, te.value(TypeVariable(v.name)).newInstance())
   
   /** 
     *  When type-checking an application (e1 e2) wrt a given type environment
@@ -339,7 +321,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val conDef = cnameTD(c.name)
     val typeParams = conDef.args
     // just substitution refreshing parametric variables
-    val fSub = (emptySubst /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
+    val fSub = (Subst.empty /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
     val freshedDcArgs: List[Type] = cnameDC(c.name).args map fSub    
     val typeEqns = freshedDcArgs zip rl.ts
     
@@ -382,7 +364,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     // map from schematic vars to new vars
     val al = scvs map (tv => (tv, newTyvar))
     // substitution of new vars instead of schematic vars
-    val sub = (emptySubst /: al)((sub, tv) => sub.extend(tv._1, tv._2))
+    val sub = (Subst.empty /: al)((sub, tv) => sub.extend(tv._1, tv._2))
     // schematic variables are freshed in t1
     val t1 = sub(t)
     // type scheme where schematic vars are freshed
@@ -430,7 +412,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val dc = cnameDC(b.pattern.name)
     
     val originalTvars = cd.args
-    val s = (emptySubst /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
+    val s = (Subst.empty /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
     val freshDcArgs: List[Type] = dc.args map s
     
     val tcon = s(TypeConstructor(cd.name, cd.args))
@@ -454,7 +436,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   
   // type-checking of list of branches
   private def tcBranches(environment: TypeEnv, expressions: List[Branch]): ResultL = expressions match {
-    case Nil => ResultL(emptySubst, Nil) 
+    case Nil => ResultL(Subst.empty, Nil) 
     case e :: es => {
       val r1 = tcBranch(environment, e)
       val rs = tcBranches(environment.sub(r1.s), es)
@@ -464,7 +446,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   
   // type-checking of list of expressions
   private def check(environment: TypeEnv, expressions: List[Expression]): ResultL = expressions match {
-    case Nil => ResultL(emptySubst, Nil) 
+    case Nil => ResultL(Subst.empty, Nil) 
     case e :: es => {
       val r1 = tc(environment, e)
       val rs = check(environment sub r1.s, es)
