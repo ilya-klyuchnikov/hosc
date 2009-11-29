@@ -1,5 +1,7 @@
 package hosc
 
+import EnrichedLambdaCalculus._
+
 object TypeAlgebra {
   private var n: Int = 0
   def newTyvar(): TypeVariable = { n += 1; TypeVariable("$$" + n) }
@@ -27,5 +29,19 @@ object TypeAlgebra {
         false
     }    
     eq1(type1, type2)
+  }
+  
+  def freeVars(expr: Expression): Set[Variable] = expr match {
+    case v: Variable => Set(v)
+    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ freeVars(term)}
+    case LambdaAbstraction(x, term) => freeVars(term) - x
+    case Application(head, arg) => 
+      freeVars(head) ++ freeVars(arg)
+    case CaseExpression(sel, bs) => 
+      freeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (freeVars(b.term) -- b.pattern.args)}
+    case LetRecExpression(bs, expr) => 
+      ((freeVars(expr) /: bs) {(vs, b) => vs ++ freeVars(b._2)}) -- (bs map {_._1})
+    case LetExpression(bs, expr) => 
+      ((freeVars(expr) /: bs) {(vs, b) => vs ++ freeVars(b._2)}) -- (bs map {_._1})
   }
 }
