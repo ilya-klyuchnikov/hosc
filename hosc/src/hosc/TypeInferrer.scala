@@ -1,65 +1,45 @@
 package hosc
 
 import EnrichedLambdaCalculus._
+import TypeAlgebra._
 
-object Subst {
-  val empty = new Subst(Map())
-}
+case class TypeError(s: String) extends Exception(s)
+case class Result(s: Subst, t: Type)
+case class ResultL(s: Subst, ts: List[Type])
 
 class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
+  
+  def this() = this(Map())
+  def compose(s: Subst) = new Subst(s.map.transform((k, v) => this(v)) ++ this.map)
+  def excl(vs: List[TypeVariable]) = new Subst(map -- vs)
     
   def apply(t: Type): Type = t match {
     case tv : TypeVariable => map.getOrElse(tv, tv)
     case Arrow(t1, t2) => Arrow(this(t1), this(t2))
     case TypeConstructor(k, ts) => TypeConstructor(k, ts map this)
   }
-    
+
   def extend(x: TypeVariable, t: Type) =
-    if (TypeInferrer.tyvars(t) contains x)
-      throw new TypeInferrer.TypeError("recursive binding: " + x + " = " + t)
+    if (tyvars(t) contains x)
+      throw TypeError("recursive binding: " + x + " = " + t)
     else if (x == t) this
     else new Subst(Map(x -> t)) compose this
-         
-  def compose(z: Subst): Subst = new Subst(Map()) {
-    override def apply(t: Type) = Subst.this.apply(z.apply(t))
-  }
-    
-  def exclude(vs: List[TypeVariable]) = new Subst(map -- vs)
 }
 
-case class TypeScheme(schematicVars: List[TypeVariable], t: Type) {
-  // returns the type contained in the scheme 
-  // after all schematic type variables have been renamed to fresh variables    
-  def newInstance() = (Subst.empty /: schematicVars) (_.extend(_, TypeInferrer.newTyvar())) (t)
-  def unknownVars = TypeInferrer.tyvars(t) -- schematicVars
-  // applies a substitution to a type scheme
-  // substitution affects non-schematic variables only
-  def sub(sub: Subst) = TypeScheme(schematicVars, (sub exclude schematicVars) (t))
+case class TypeScheme(genericVars: List[TypeVariable], t: Type) {
+  def newInstance() = (new Subst(Map(genericVars map {(_, newTyvar)}:_*))) (t)
+  def nonGenericVars = tyvars(t) -- genericVars
+  def sub(sub: Subst) = TypeScheme(genericVars, (sub excl genericVars) (t))
 }
 
-case class TypeEnv(al: List[Pair[TypeVariable, TypeScheme]]){
-    def value(tv: TypeVariable) = al find(_._1 == tv) match {
-      case Some(x) => x._2
-      case None => throw new TypeInferrer.TypeError("undefined: " + tv)
-    }
-    private def dom = al map (_._1)
-    private def range = for (a <- dom) yield value(a)
-    def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv((tv, ts) :: al)
-    def unknownsVars = (range :\ List[TypeVariable]()){(ts, l) => (l ::: ts.unknownVars )}
-    // sub_te
-    def sub(s: Subst) = TypeEnv(al map {p => (p._1, p._2.sub(s))})
+case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
+  def value(tv: TypeVariable) = map(tv)
+  def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv(map + {(tv, ts)})
+  def nonGenericVars = map.values.toList flatMap {_.nonGenericVars}
+  def sub(s: Subst) = TypeEnv(map transform {(k, v) => v.sub(s)})
 }
 
 object TypeInferrer {
-  private var n: Int = 0
-  def newTyvar(): TypeVariable = { n += 1; TypeVariable("$$" + n) }
-  case class TypeError(s: String) extends Exception(s) {} 
-  
-  def tyvars(t: Type): List[TypeVariable] = t match {
-    case tv @ TypeVariable(a) => List(tv)
-    case Arrow(t1, t2) => tyvars(t1) union tyvars(t2)
-    case TypeConstructor(k, ts) => (List[TypeVariable]() /: ts) ((tvs, t) => tvs union tyvars(t))
-  }  
 
   private def mgu(t: Type, u: Type, s: Subst): Subst = (t, u) match {
     case (a:TypeVariable, b: TypeVariable) if a == b =>
@@ -82,29 +62,6 @@ object TypeInferrer {
     (s /: ts) {(s, p) => mgu(p._1, p._2, s)}
   }
   
-  case class Result(s: Subst, t: Type) {
-    override def toString = t + "\n" + s
-  }
-  case class ResultL(s: Subst, ts: List[Type])
-  
-  def equivalent(type1: Type, type2: Type): Boolean = {
-    val map1to2 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
-    val map2to1 = scala.collection.mutable.Map[TypeVariable, TypeVariable]()
-    def eq1(t1: Type, t2: Type): Boolean = (t1, t2) match {
-      case (v1: TypeVariable, v2: TypeVariable) => (map1to2.get(v1), map2to1.get(v2)) match {
-        case (Some(v3), Some(v4)) => v2 == v3 && v1 == v4
-        case (None, None) => map1to2(v1) = v2; map2to1(v2) = v1; true
-        case _ => false
-      }
-      case (TypeConstructor(name1, args1), TypeConstructor(name2, args2)) if name1 == name2 =>
-        ((args1 zip args2) forall (args => eq1(args._1, args._2)))
-      case (Arrow(b1, v1), Arrow(b2, v2)) =>
-        eq1(b1, b2) && eq1(v1, v2)
-      case _ => 
-        false
-    }    
-    eq1(type1, type2)
-  }
 }
 
 import TypeInferrer._
@@ -115,7 +72,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   
   // the 'main' interface method
   def inferType(expr: Expression) = {
-    var te = TypeEnv(Nil)
+    var te = TypeEnv(Map())
     for (v <- getFreeVars(expr)){
       val nv = newTyvar()
       val ts = TypeScheme(Nil, nv)
@@ -163,7 +120,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     *          by fresh type variables
     */
   private def checkVar(te: TypeEnv, v: Variable): Result =
-    Result(Subst.empty, te.value(TypeVariable(v.name)).newInstance())
+    Result(new Subst(), te.value(TypeVariable(v.name)).newInstance())
   
   /** 
     *  When type-checking an application (e1 e2) wrt a given type environment
@@ -284,7 +241,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val schemes = letRecVars map {x => TypeScheme(Nil, newTyvar)}
     
     // check right hand sides in extended env
-    val rl = check(TypeEnv((xs zip schemes) :::  env.al), letRecRSides)
+    val rl = check(TypeEnv(env.map ++ (xs zip schemes)), letRecRSides)
     
     val phi1 = rl.s
     val rSideTypes = rl.ts
@@ -321,7 +278,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val conDef = cnameTD(c.name)
     val typeParams = conDef.args
     // just substitution refreshing parametric variables
-    val fSub = (Subst.empty /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
+    val fSub = (new Subst() /: typeParams) ((sub, tv) => sub.extend(tv, newTyvar()))    
     val freshedDcArgs: List[Type] = cnameDC(c.name).args map fSub    
     val typeEqns = freshedDcArgs zip rl.ts
     
@@ -344,9 +301,9 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     *  @return te extended with schemes for xs
     */   
   private def addDecls(te: TypeEnv, xs: List[TypeVariable], ts: List[Type]): TypeEnv = {
-    val unknowns = te.unknownsVars
-    val schemes = ts map {createTypeScheme(unknowns, _)}
-    TypeEnv((xs zip schemes) ::: te.al)
+    val nonGenericVars = te.nonGenericVars
+    val schemes = ts map {createTypeScheme(nonGenericVars, _)}
+    TypeEnv(te.map ++ (xs zip schemes))
   } 
   
   /** 
@@ -364,7 +321,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     // map from schematic vars to new vars
     val al = scvs map (tv => (tv, newTyvar))
     // substitution of new vars instead of schematic vars
-    val sub = (Subst.empty /: al)((sub, tv) => sub.extend(tv._1, tv._2))
+    val sub = (new Subst() /: al)((sub, tv) => sub.extend(tv._1, tv._2))
     // schematic variables are freshed in t1
     val t1 = sub(t)
     // type scheme where schematic vars are freshed
@@ -412,7 +369,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     val dc = cnameDC(b.pattern.name)
     
     val originalTvars = cd.args
-    val s = (Subst.empty /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
+    val s = (new Subst() /: originalTvars) ((sub, tv) => sub.extend(tv, newTyvar()))    
     val freshDcArgs: List[Type] = dc.args map s
     
     val tcon = s(TypeConstructor(cd.name, cd.args))
@@ -436,7 +393,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   
   // type-checking of list of branches
   private def tcBranches(environment: TypeEnv, expressions: List[Branch]): ResultL = expressions match {
-    case Nil => ResultL(Subst.empty, Nil) 
+    case Nil => ResultL(new Subst(), Nil) 
     case e :: es => {
       val r1 = tcBranch(environment, e)
       val rs = tcBranches(environment.sub(r1.s), es)
@@ -446,7 +403,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   
   // type-checking of list of expressions
   private def check(environment: TypeEnv, expressions: List[Expression]): ResultL = expressions match {
-    case Nil => ResultL(Subst.empty, Nil) 
+    case Nil => ResultL(new Subst(), Nil) 
     case e :: es => {
       val r1 = tc(environment, e)
       val rs = check(environment sub r1.s, es)
