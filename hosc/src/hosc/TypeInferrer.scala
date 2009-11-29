@@ -150,7 +150,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     TypeScheme(map.values.toList, new Subst(map)(t))
   }
   
-  def tcBranch(te: TypeEnv, b: Branch): (Subst, Type) = {
+  private def tcBranch(te: TypeEnv, b: Branch): (Subst, Type) = {
     
     val cd = typeConstructorDefs(b.pattern.name)
     val dc = dataConstructors(b.pattern.name)
