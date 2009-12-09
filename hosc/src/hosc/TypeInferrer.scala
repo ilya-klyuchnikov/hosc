@@ -20,6 +20,7 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
 
   def extend(x: TypeVariable, t: Type) =
     if (tyvars(t) contains x)
+      // substitution should be idempotent!
       throw TypeError("recursive binding: " + x + " = " + t)
     else if (x == t) this
     else new Subst(Map(x -> t)) compose this
