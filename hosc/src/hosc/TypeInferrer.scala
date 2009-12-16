@@ -87,7 +87,9 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     }
     case LambdaAbstraction(v, body) => {
       val genVar = newTyvar
-      val extendedEnv = te.install(TypeVariable(v.name), TypeScheme(Nil, genVar)) 
+      // Hindley-Milner: argument is monomorphic!
+      val vScheme = TypeScheme(Nil, genVar)
+      val extendedEnv = te.install(TypeVariable(v.name), vScheme) 
       val (sub, type_body) = check(extendedEnv, body)
       (sub, Arrow(sub(genVar), type_body))
     }
@@ -109,24 +111,31 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       (sub1 compose sub2, type2)
     }
     case LetRecExpression(bs, expr) => {
-      val (fs, bodies) = List.unzip(bs) 
-      val f_types = fs map {x => TypeVariable(x.name)}
+      val (fs, bodies) = List.unzip(bs)
+      val funTypes = fs map {x => TypeVariable(x.name)}
+      
+      // Hindley-Milner: letrecs are monomorphic in their own bodies
       val schemes = fs map {x => TypeScheme(Nil, newTyvar)}
-      val te1 = TypeEnv(te.map ++ (f_types zip schemes))
+      
+      // step 1a: check bodies in extended environment
+      val te1 = TypeEnv(te.map ++ (funTypes zip schemes))
       val (sub1, type1s) = check(te1, bodies)
+      // step 1b:
       val l_types = schemes map {_.sub(sub1).t}
       val sub2 = mgu(l_types zip type1s, sub1)
-      val te2 = extend(te.sub(sub2), f_types, l_types map sub2)
+      
+      // step 2: check 'in' expression
+      val te2 = extend(te.sub(sub2), funTypes, l_types map sub2)
       val (sub3, type3) = check(te2, expr)
+      
       (sub2 compose sub3, type3)
     }
     case CaseExpression(selector, branches) => {
-      // TODO: remove asInstanceOf
       val (sub1, type1s) = checkB(te, branches)    
       val tv = newTyvar 
       val sub2 = mgu(type1s map {(tv, _)}, sub1)
       val (sub3, type3) = check(te.sub(sub2), selector)
-      val Arrow(selType, branchBodyType) = sub2(tv).asInstanceOf[Arrow]
+      val Arrow(selType, branchBodyType) = sub2(tv)
       val sub = mgu(selType, type3, sub3 compose sub2)
       (sub, sub(branchBodyType))
     }
