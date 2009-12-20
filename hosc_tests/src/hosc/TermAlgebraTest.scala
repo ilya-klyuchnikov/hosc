@@ -153,6 +153,13 @@ class TermAlgebraTest {
     assertFalse(heByCoupling(t01, t02))
   }
   
+  @Test def he15(): Unit = {
+    val program = programFromFile(inputFile)
+    val t01 = termFromString("""\x -> S x""", program)
+    val t02 = termFromString("""\x -> S (S x)""", program)
+    assertFalse(heByCoupling(t01, t02))
+  }
+  
   @Test def msg1(): Unit = {
     val program = programFromFile(inputFile)
     val term = termFromString("app x", program)
@@ -252,5 +259,29 @@ class TermAlgebraTest {
     val actualMsg = msg(term1, term2)
     println(actualMsg)
     assertTrue(equivalent(actualMsg.term, term))
+  }
+  
+  @Test def msg6(): Unit = {
+    val program = programFromFile(inputFile)
+    val input1 = 
+      """
+|case (case (a) of {Z  -> b; S v11 -> (S ((plus v11) b));}) of {
+|	Z  -> case (((plus b) a)) of {Z  -> (True ); S v3 -> (False );}; 
+|	S v4 -> case (((plus b) a)) of {Z  -> (False ); S v5 -> ((eqnum v4) v5);};
+|}
+      """.stripMargin;
+      
+    val input2 = 
+      """
+|case (case (x) of {Z  -> (S y); S v11 -> (S ((plus v11) (S y)));}) of {
+|	Z  -> case (((plus y) (S x))) of {Z  -> (True ); S v3 -> (False );}; 
+|	S v4 -> case (((plus y) (S x))) of {Z  -> (False ); S v5 -> ((eqnum v4) v5);};
+|}
+      """.stripMargin;     
+    
+    val term1 = termFromString(input1, program)
+    val term2 = termFromString(input2, program)
+    val actualMsg = msg(term1, term2)
+    println(actualMsg)
   }
 }
