@@ -1,6 +1,7 @@
 // all binders are different here
 data List a = Nil | Cons a (List a);
 data Boolean = True | False;
+data Number = Z | S Number;
 
 zzzz where
 
@@ -66,4 +67,19 @@ f8 = \x8 y8 ->
       Nil -> y8;
       Cons z8 zs8 -> Cons z8 (app zs8 x8);
     };
+    
+plus = \x2 y2 ->
+  		case x2 of {
+  			Z -> y2; 
+  			S x1 -> S (plus x1 y2);
+  		};
+
+eqnum = \x3 y3 ->
+	case x3 of {
+		Z -> case y3 of {Z -> True; S y4 -> False;};
+		S x5 -> case y3 of {Z -> False; S y5 -> eqnum x5 y5;};
+	};
+	
+g1 = \x -> x;
+g2 = \x -> S x;
 

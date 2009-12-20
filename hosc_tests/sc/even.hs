@@ -1,10 +1,9 @@
+{-# LANGUAGE NoImplicitPrelude#-}
+
 data Number = Z | S Number;
 data Boolean = True | False;
 
-even (double n Z)
-
-
-where
+ even (double n Z) where
 
 even = \x ->
   case x of {

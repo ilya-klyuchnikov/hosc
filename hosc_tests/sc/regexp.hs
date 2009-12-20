@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude#-}
+
 data List a = Nil | Cons a (List a);
 data Boolean = True | False;
 
@@ -8,9 +10,7 @@ data RegExp s =
   Alt (RegExp s) (RegExp s) |
   Rep (RegExp s);
   
-regRepTrue i
-
-where
+regRepTrue i where
 
 eqBoolean = \x y ->
   case x of {
@@ -46,7 +46,7 @@ match = \eq r c input ->
         False -> match eq e2 c input;
       };
     Rep e ->
-      //match eq (Alt Empty (Seq e (Rep e))) c input;
+      --match eq (Alt Empty (Seq e (Rep e))) c input;
       case c input of {
         True-> True;
         False ->
