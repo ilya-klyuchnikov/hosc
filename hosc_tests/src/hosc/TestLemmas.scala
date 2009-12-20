@@ -32,7 +32,7 @@ object TestLemmas {
     var typedLemmas: List[(Expression, Expression)] = Nil;
     var proved: List[(Expression, Expression)] = Nil;
     for (e1 <- typedEs; e2 <- typedEs) {
-      if (e1 != e2 && TypeInferrer.equivalent(e2type(e1), e2type(e2))) {
+      if (e1 != e2 && TypeAlgebra.equivalent(e2type(e1), e2type(e2))) {
         //println((e1, e2))
         val p1 = Program(p.ts, e1, p.fs)
         val p2 = Program(p.ts, e2, p.fs)

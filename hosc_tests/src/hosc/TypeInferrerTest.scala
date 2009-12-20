@@ -39,7 +39,11 @@ class TypeInferrerTest {
   def testTyping(fileName: String, typeString: String) = {
     val actualType = Util.inferGoalType(fileName)
     val expectedType = HParsers.parseType(new CharArrayReader(typeString.toCharArray)).get
-    assertTrue(TypeInferrer.equivalent(actualType, expectedType))
+    println("actual")
+    println(actualType)
+    println("expected")
+    println(expectedType)
+    assertTrue(TypeAlgebra.equivalent(actualType, expectedType))
   }
   
   def testTypeError(fileName: String) = {
@@ -47,7 +51,7 @@ class TypeInferrerTest {
       val actualType = Util.inferGoalType(fileName)
       fail(fileName + " cannot be well-typed")
     } catch {
-      case e: TypeError => 
+      case e => 
     }
   }
 }
