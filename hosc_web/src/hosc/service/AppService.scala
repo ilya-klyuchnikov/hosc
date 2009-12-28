@@ -90,13 +90,13 @@ object AppService {
     }
   }
   
-  def findTypeErro(program: HLanguage.Program): Option[TypeInferrer.TypeError] = {
+  def findTypeErro(program: HLanguage.Program): Option[TypeError] = {
     try {
       val ti = new TypeInferrer(program.ts)
       ti.inferType(hl0ToELC(program))
       None
     } catch {
-      case e: TypeInferrer.TypeError => {
+      case e: TypeError => {
         Some(e)
       }
     }
