@@ -43,7 +43,7 @@ object MSG {
         t = applySubstitution(t, Map(v -> Constructor(n1, newVars)))
         l2 ++= addDSubs
       }
-      case (v, la1@LambdaAbstraction(a1, t1), la2@LambdaAbstraction(a2, t2)) if HE.heByCoupling(la1, la2)=> {
+      case (v, la1@LambdaAbstraction(a1, t1), la2@LambdaAbstraction(a2, t2)) if HE.heByCoupling(la1, la2) || HE.heByCoupling(la2, la1) => {
         val arg = newVar() // binder!!
         val rs = newVar()
         val t1r = applySubstitution(t1, Map(a1 -> arg))
@@ -59,7 +59,7 @@ object MSG {
         t = applySubstitution(t, Map(v -> constructApplication(newVars.head, newVars.tail)))
         l2 ++= addDSubs
       }
-      case (v, ce1@CaseExpression(sel1, bs1), ce2@CaseExpression(sel2, bs2)) /*if HE.heByCoupling(ce1, ce2)*/ => {
+      case (v, ce1@CaseExpression(sel1, bs1), ce2@CaseExpression(sel2, bs2)) if HE.heByCoupling(ce1, ce2) || HE.heByCoupling(ce2, ce1) => {
         val bs1s = bs1 sort compareB
         val bs2s = bs2 sort compareB
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){
