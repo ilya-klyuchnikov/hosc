@@ -178,38 +178,6 @@ class TermAlgebraTest {
     assertTrue(equivalent(msg_.term, term))
   }
   
-  @Test def msg3(): Unit = {
-    val program = programFromFile(inputFile)
-    val input1 = 
-      """
-        |case rev x of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev b1) (Cons aa1 Nil);
-        |}
-      """.stripMargin;
-      
-    val input2 = 
-      """
-        |case x of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev (rev b1)) (Cons a1 Nil);
-        |}
-      """.stripMargin;     
-    
-    val expectedMsgInput = 
-      """
-        |case y of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev z) (Cons aa1 Nil);
-        |}
-      """.stripMargin;
-    val term1 = termFromString(input1, program)
-    val term2 = termFromString(input2, program)
-    val term = termFromString(expectedMsgInput, program)
-    val actualMsg = msg(term1, term2)
-    println(actualMsg)
-    assertTrue(equivalent(actualMsg.term, term))
-  }
   
   @Test def msg4(): Unit = {
     val actualMsg = msg(Variable("a"), Variable("a"))
@@ -226,39 +194,6 @@ class TermAlgebraTest {
     val msg1 = msg(e1, e2);
     println(msg1);
     //assertTrue(equivalent(actualMsg.term, term))
-  }
-  
-  @Test def msg5(): Unit = {
-    val program = programFromFile(inputFile)
-    val input1 = 
-      """
-        |case rev x of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev b1) (Cons aa1 Nil);
-        |}
-      """.stripMargin;
-      
-    val input2 = 
-      """
-        |case x of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev (rev b1)) (Cons a1 Nil);
-        |}
-      """.stripMargin;     
-    
-    val expectedMsgInput = 
-      """
-        |case y of {
-        |  Nil -> Nil;
-        |  Cons a1 b1 -> app (rev z) (Cons aa1 Nil);
-        |}
-      """.stripMargin;
-    val term1 = termFromString(input1, program)
-    val term2 = termFromString(input2, program)
-    val term = termFromString(expectedMsgInput, program)
-    val actualMsg = msg(term1, term2)
-    println(actualMsg)
-    assertTrue(equivalent(actualMsg.term, term))
   }
   
   @Test def msg6(): Unit = {
