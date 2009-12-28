@@ -82,6 +82,10 @@ object LambdaLifting {
     case lr: LetRecExpression => letrecToHl(lr, p)
   }
   
+  // TODO!! - cannot be done directly in a correct way
+  // because of infinite data structures
+  // need to decide how to do it - maybe we need to allow general definitions -
+  // not just functions
   def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = { 
     Function(letrec.binding._1.name, extractGlobals(letrec.binding._2, p).asInstanceOf[LambdaAbstraction]) +: p
     extractGlobals(letrec.expr, p)
