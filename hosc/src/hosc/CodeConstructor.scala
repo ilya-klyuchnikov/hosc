@@ -7,6 +7,13 @@ import MSG._
 import TermAlgebra._
 
 class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
+  // name supply for bound variables
+  private val vNames = "xyzuvwprst".toArray
+  // name supply for function variables
+  private val fNames = "fgh".toArray
+  // set of already used variables
+  private var fUsed = Set[String]() ++ (getAllVars(originalProgram.goal) map {v => v.name})
+  
   def generateProgram() = Program(originalProgram.ts, construct(tree.rootNode), Nil)
   
   private def construct(node: Node): Expression = node.expr match {
@@ -204,24 +211,14 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
     name
   }
   
-  private val vNames = "xyzuvwprst".toArray
-  private val fNames = "fgh".toArray
-  
-  // set of already used variables
-  private var fUsed = Set[String]() ++ (getAllVars(originalProgram.goal) map {v => v.name})
-  
   private def varFor(j: Int) = {
-    if (j < 10) 
-      Variable("" + vNames(j))
-    else 
-      Variable("" + vNames(j % 10) + Integer.toString(j / 10))   
+    if (j < 10) Variable("" + vNames(j))
+    else Variable("" + vNames(j % 10) + Integer.toString(j / 10))   
   }
   
   private def fName(j: Int): String = {
-    if (j < 3) 
-      "" + fNames(j)
-    else 
-      fNames(j % 3) + Integer.toString(j / 3)   
+    if (j < 3) "" + fNames(j)
+    else fNames(j % 3) + Integer.toString(j / 3)   
   }
   
   private def isSynthetic(v: Variable) = v.name startsWith "$";    
