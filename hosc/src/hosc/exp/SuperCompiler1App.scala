@@ -1,4 +1,4 @@
-package hosc
+package hosc.exp
 
 import scala.util.parsing.input.StreamReader
 import scala.util.parsing.input.CharArrayReader
@@ -10,8 +10,9 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.BufferedReader
 
-import HLanguage._
-import Util._
+import hosc.ProcessTreeSVG
+import hosc.HLanguage._
+import hosc.Util._
 
 object SuperCompilerApp1 {
   val help = """usage: hosc.SuperCompilerApp1 -si sinput_file -t tree_output_file -p program_output_file

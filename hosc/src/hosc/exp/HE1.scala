@@ -1,8 +1,8 @@
-package hosc
+package hosc.exp
 
-import HLanguage._
-import TermAlgebra._
-import scala.collection.mutable.ListBuffer
+import hosc.HLanguage._
+import hosc.TermAlgebra._
+
 object HE1 {
   def he(term1: Expression, term2: Expression): Boolean = he(term1, term2, Nil, Map())
   def heByCoupling(term1: Expression, term2: Expression): Boolean = heByCoupling(term1, term2, Nil, Map())

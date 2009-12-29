@@ -5,6 +5,8 @@ import org.junit.Assert._
 
 import Util._
 
+import hosc.exp.SuperCompiler1
+
 class EqTest {
   
   @Test def abs() = testEq("eq/abs1.hs", "eq/abs2.hs")

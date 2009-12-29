@@ -1,11 +1,11 @@
-package hosc
+package hosc.exp
 
-import HLanguage._
-import HE._
-import MSG._
-import TermAlgebra._
-import ProcessTree._
-import LangUtils._
+import hosc.HLanguage._
+import hosc.HE._
+import hosc.MSG._
+import hosc.TermAlgebra._
+import hosc.ProcessTree._
+import hosc.LangUtils._
 
 class SuperCompiler1(program: Program){
   val emptyMap = Map[Variable, Expression]()
@@ -99,7 +99,7 @@ class SuperCompiler1(program: Program){
   private def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm if (sameRedex(aTerm, bNode.expr) && heByCoupling(aTerm, bNode.expr)) && checkControl(aNode, bNode) => { 
-      return true;
+      //return true;
       val sca = sc(aTerm);
       val scb = sc(bNode.expr);
       val r = HE1.heByCoupling(sca, scb)

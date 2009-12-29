@@ -50,7 +50,7 @@ object TestLemmas {
   }
   
   def supercompile(program: Program) = {
-    val sc = new SuperCompiler1(program)
+    val sc = new SuperCompiler(program)
     val pt = sc.buildProcessTree(program.goal)
     val g = new CodeConstructor(program, pt, true)
     val p = g.generateProgram()

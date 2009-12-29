@@ -1,7 +1,7 @@
 package hosc
 
 import org.junit.Test
-import hosc.{SuperCompilerApp1 => SCP1}
+import hosc.exp.{SuperCompilerApp1 => SCP1}
 
 class SuperCompiler1Test {
   @Test def t01_loop = 

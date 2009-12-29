@@ -3,6 +3,8 @@ package hosc
 import org.junit.Test
 import org.junit.Ignore
 
+import hosc.exp.SuperCompilerApp1
+
 class SmartEmbeddingTest {
   @Test def example01_rev(): Unit = {    
     SuperCompilerApp1.main(Array("-si", "se/in/01a_rev.hl0", "-t", "se/out/01a_rev.svg", "-p", "se/out/01a_rev.hl1"));
