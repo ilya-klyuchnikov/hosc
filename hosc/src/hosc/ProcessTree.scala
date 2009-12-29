@@ -8,7 +8,7 @@ object ProcessTree {
   
   class Node(var expr: Expression, val in: Edge, var outs: List[Edge]) {
     override def toString = toString("")
-    var signature: (String, List[Variable]) = null
+    var signature: (Variable, List[Variable]) = null
     var repeatedOf: Node = null
     
     def toString(indent: String): String = {

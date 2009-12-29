@@ -28,159 +28,77 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
       case ObservableCon(c) => Constructor(c.name, node.children map construct)
       case ObservableVarApp(v, app) => constructApplication(Variable(v.name), node.children map construct)
       case ObservableLam(l) => LambdaAbstraction(Variable(l.v.name), construct(node.children.head))
-      case context: Context => context.redex match {        
-        case RedexLamApp(lam, app) => construct(node.children.head)
-        case RedexCaseCon(c, ce) => construct(node.children.head)
-        
-        case RedexCaseVar(v, CaseExpression(sel, bs)) => {
-          if (node.getRepParent != null) {
-            val alphaNode: Node = node.getRepParent()
-            val alphaT = alphaNode.expr
-            
-            val (appHead, args) = alphaNode.signature
-            val z = constructApplication(Variable(appHead), args)
-            
-            val msg = strongMsg(alphaT, t)
-            // after substitution:
-            val sub = Map[Variable, Expression]() ++ msg.sub2
-            val z1 = applySubstitution(z, sub)
-            z1
-          } else {{
-            tree.leafs.filter(n => n.repeatedOf == node) match {
-              case Nil => {
-                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
-                val newSel = construct(node.children.head)
-                CaseExpression(newSel, newBs)
-              }
-              case repeatNodes => {
-                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
-                if (freeVarsInLetrecs){
-                  var changedVars = Set[Variable]()
-                  for (n <- repeatNodes) {
-                    val betaT = n.expr
-                    val msg = strongMsg(t, betaT)
-                    val args0 = msg.sub2 map {p => p._1}
-                    changedVars = changedVars ++ args0
-                  }
-                  vars = vars filter {changedVars.contains}
+      case context: Context => {
+        if (node.getRepParent() != null) {
+          val fNode = node.getRepParent()
+          val (f, args) = fNode.signature
+          val app = constructApplication(f, args)
+          val msg = strongMsg(fNode.expr, t)
+          val sub = Map[Variable, Expression]() ++ msg.sub2
+          applySubstitution(app, sub)
+        } else {
+          context.redex match {        
+        	case RedexLamApp(lam, app) => construct(node.children.head)
+        	case RedexCaseCon(c, ce) => construct(node.children.head)
+        	case RedexCall(f) => {
+        	  tree.leafs.filter(n => n.repeatedOf == node) match {
+              	case Nil => {
+              		construct(node.children.head);
+              	}
+              	case repeatNodes => {
+              	  val (f, vars) = createSignature(node, repeatNodes) 
+              	  node.signature = (f, vars)
+              	  val newVars = vars map {p => createVar()}
+              	  val sub = Map[Variable, Expression]() ++ ((vars zip newVars))
+              	  
+              	  val expr = construct(node.children.head)/sub
+                
+              	  val lam = constructLambda(newVars, expr)
+              	  LetRecExpression((f, lam), constructApplication(f, vars))
+              	}
+        	  }
+        	}
+        	case RedexCaseVar(_, CaseExpression(_, bs)) => {
+        	  tree.leafs.filter(n => n.repeatedOf == node) match {
+              	case Nil => {
+              	  val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
+              	  val newSel = construct(node.children.head)
+              	  CaseExpression(newSel, newBs)
+              	}
+                case repeatNodes => {
+                  val (f, vars) = createSignature(node, repeatNodes) 
+                  node.signature = (f, vars)
+                  val newVars = vars map {p => createVar()}
+                  val sub = Map[Variable, Expression]() ++ (vars zip newVars)
+                
+                  val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
+                  val newSel = construct(node.children.head)
+                  val ce = CaseExpression(newSel, newBs)/sub
+                
+                  val lam = constructLambda(newVars, ce)
+                  LetRecExpression((f, lam), constructApplication(f, vars))
                 }
-                val args0 = vars.toList 
-                val args = args0
-                val newVars = args map {p => createVar()}
-                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars) map {p => (Variable(p._1.name), p._2)})
-                node.signature = (createFName(), args0)
-                
-                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
-                val newSel = construct(node.children.head)
-                val ce = CaseExpression(newSel, newBs)/sub
-                
-                val lam = constructLambda(newVars, ce)
-                val appHead = Variable(node.signature._1)
-                appHead.global = true
-                LetRecExpression((appHead, lam), constructApplication(appHead, args))
-              }
-            }          
-          }}
-        }
-        case RedexCaseVarApp(a, CaseExpression(sel, bs)) => {
-          if (node.getRepParent != null) {
-            val alphaNode: Node = node.getRepParent()
-            val alphaT = alphaNode.expr
-            
-            val (appHead, args) = alphaNode.signature
-            val z = constructApplication(Variable(appHead), args)
-            
-            val msg = strongMsg(alphaT, t)
-            // after substitution:
-            val sub = Map[Variable, Expression]() ++ msg.sub2
-            val z1 = applySubstitution(z, sub)
-            z1
-          } else {{
-            tree.leafs.filter(n => n.repeatedOf == node) match {
-              case Nil => {
-                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
-                val newSel = construct(node.children.head)
-                CaseExpression(newSel, newBs)
-              }
-              case repeatNodes => {
-                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
-                if (freeVarsInLetrecs){
-                  var changedVars = Set[Variable]()
-                  for (n <- repeatNodes) {
-                    val betaT = n.expr
-                    val msg = strongMsg(t, betaT)
-                    val args0 = msg.sub2 map {p => p._1}
-                    changedVars = changedVars ++ args0
-                  }
-                  vars = vars filter {changedVars.contains}
-                }
-                val args0 = vars.toList 
-                val args = args0
-                val newVars = args map {p => createVar()}
-                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars) map {p => (Variable(p._1.name), p._2)})
-                node.signature = (createFName(), args0)
-                
-                val newBs = (bs zip node.children.tail) map {p => Branch(p._1.pattern, construct(p._2))}
-                val newSel = construct(node.children.head)
-                val ce = CaseExpression(newSel, newBs)/sub
-                
-                val lam = constructLambda(newVars, ce)
-                val appHead = Variable(node.signature._1)
-                appHead.global = true
-                LetRecExpression((appHead, lam), constructApplication(appHead, args))
-              }
-            }          
-          }}
-
-        }
-        case RedexCall(f) => {
-          if (node.getRepParent != null) {
-            val alphaNode: Node = node.getRepParent()
-            val alphaT = alphaNode.expr
-            
-            val (appHead, args) = alphaNode.signature
-            val z = constructApplication(Variable(appHead), args)
-            
-            val msg = strongMsg(alphaT, t)
-            // after substitution:
-            val sub = Map[Variable, Expression]() ++ msg.sub2
-            val z1 = applySubstitution(z, sub)
-            z1
-          } else {
-            tree.leafs.filter(n => n.repeatedOf == node) match {
-              // call to this function does't result in recursive definition
-              case Nil => {
-                construct(node.children.head);
-              }
-              // call to this function results in recursive definition
-              case repeatNodes => {
-                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
-                if (freeVarsInLetrecs){
-                  var changedVars = Set[Variable]()
-                  for (n <- repeatNodes) {
-                    val betaT = n.expr
-                    val msg = strongMsg(t, betaT)
-                    val args0 = msg.sub2 map {p => p._1}
-                    changedVars = changedVars ++ args0
-                  }
-                  vars = vars filter {changedVars.contains}
-                }
-                val args0 = vars.toList 
-                val args = args0
-                val newVars = args map {p => createVar()}
-                val sub = Map[Variable, Expression]() ++ ((args0 zip newVars))
-                node.signature = (createFName(), args0)
-                val expr = construct(node.children.head)/sub
-                val lam = constructLambda(newVars, expr)
-                val appHead = Variable(node.signature._1)
-                appHead.global = true
-                LetRecExpression((appHead, lam), constructApplication(appHead, args))
-              }
-            }            
+              }          
+            }
           }
         }
       }
     }
+  }
+  
+  def createSignature(fNode: Node, recNodes: List[Node]) = {
+    var vars: List[Variable] = TermAlgebra.getFreeVars(fNode.expr)
+    if (freeVarsInLetrecs){
+      var changedVars = Set[Variable]()
+      for (n <- recNodes) {
+        val betaT = n.expr
+        val msg = strongMsg(fNode.expr, betaT)
+        val args0 = msg.sub2 map {p => p._1}
+        changedVars = changedVars ++ args0
+      }
+      vars = vars filter {changedVars.contains}
+    }
+    (Variable(createFName()), vars)
   }
   
   var i = 0;

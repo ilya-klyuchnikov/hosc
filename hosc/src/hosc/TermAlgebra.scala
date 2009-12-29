@@ -21,9 +21,9 @@ object TermAlgebra {
   sealed abstract class Redex(val term : Expression)
   case class RedexCall(v: Variable) extends Redex(v)
   case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
-  case class RedexCaseVarApp(a: Application, ce: CaseExpression) extends Redex(ce)
-  case class RedexCaseVar(v: Variable, ce: CaseExpression) extends Redex(ce)  
   case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
+  // The global control
+  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends Redex(ce)  
   
   sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
@@ -54,8 +54,7 @@ object TermAlgebra {
     case v: Variable if (v.global) => ContextHole(RedexCall(v))
     case app @ Application(l: LambdaAbstraction, arg) => ContextHole(RedexLamApp(l, app))
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
-    case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => 
-      ContextHole(RedexCaseVarApp(a, ce))
+    case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => ContextHole(RedexCaseVar(a, ce))
     case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
     case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)

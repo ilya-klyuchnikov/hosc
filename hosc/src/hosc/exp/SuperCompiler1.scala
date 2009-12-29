@@ -36,10 +36,7 @@ class SuperCompiler1(program: Program){
         }
         case RedexCaseVar(v, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
-            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), Map(v-> Constructor(b.pattern.name, b.pattern.args)))})  
-        case RedexCaseVarApp(a, CaseExpression(sel, bs)) =>
-          (sel, emptyMap) :: (bs map 
-            {b => (replaceTerm(context.replaceHole(b.term), a, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})
+            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})  
       }
     }
   }  
@@ -144,7 +141,6 @@ class SuperCompiler1(program: Program){
     case e => decompose(e) match {
       case c: Context => c.redex match {
         case RedexCaseVar(_, _) => true
-        case RedexCaseVarApp(_, _) => true
         case _ => false
       }
       case _ => false
@@ -161,19 +157,16 @@ class SuperCompiler1(program: Program){
     case c@ContextHole(_) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true
-      case r: RedexCaseVarApp => true
       case _ => false
     }
     case c@ContextApp(_, _) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true
-      case r: RedexCaseVarApp => true
       case _ => false
     }
     case c@ContextCase(_, _) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true
-      case r: RedexCaseVarApp => true
       case _ => false
     }
     case _ => false
@@ -183,7 +176,6 @@ class SuperCompiler1(program: Program){
     case c@ContextCase(_, _) => c.redex match { 
       case r: RedexCall => true
       case r: RedexCaseVar => true
-      case r: RedexCaseVarApp => true
       case _ => false
     }
     case _ => false
