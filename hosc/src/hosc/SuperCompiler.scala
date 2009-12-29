@@ -33,9 +33,9 @@ class SuperCompiler(program: Program){
           val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
           (context.replaceHole(applySubstitution(b.term, sub)), emptyMap) :: Nil          
         }
-        case RedexCaseVar(v, CaseExpression(sel, bs)) =>
+        case RedexCaseVar(_, CaseExpression(sel, bs)) =>
           (sel, emptyMap) :: (bs map 
-            {b => (replaceTerm(context.replaceHole(b.term), v, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})
+            {b => (replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})
       }
     }
   }  

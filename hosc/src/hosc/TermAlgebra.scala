@@ -18,12 +18,14 @@ object TermAlgebra {
   case class ObservableCon(c: Constructor) extends Observable(c)
   case class ObservableLam(l: LambdaAbstraction) extends Observable(l)
   
-  sealed abstract class Redex(val term : Expression)
-  case class RedexCall(v: Variable) extends Redex(v)
+  sealed abstract class Redex(term : Expression)
   case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
   case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
+  
+  abstract case class NonTrivialRedex(term: Expression) extends Redex(term) 
+  case class RedexCall(v: Variable) extends NonTrivialRedex(v)
   // The global control
-  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends Redex(ce)  
+  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)  
   
   sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
