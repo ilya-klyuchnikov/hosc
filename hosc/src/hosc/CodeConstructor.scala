@@ -18,10 +18,9 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
   
   private def construct(node: Node): Expression = node.expr match {
     case LetExpression(bs, t) => {
-      val node0 = node.outs.head.child
-      val nodes = node.outs.tail map {edge => edge.child}
-      val ts = nodes map construct
-      val subs = Map[Variable, Expression]() ++ ((bs zip ts) map {pair => (pair._1._1, pair._2)})
+      val node0 :: nodes = node.children
+      val residualBs = nodes map construct
+      val subs = Map[Variable, Expression]() ++ ((bs map (_._1)) zip residualBs)
       construct(node0)/subs
     }
     case t => decompose(t) match {
@@ -32,6 +31,7 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
       case context: Context => context.redex match {        
         case RedexLamApp(lam, app) => construct(node.children.head)
         case RedexCaseCon(c, ce) => construct(node.children.head)
+        
         case RedexCaseVar(v, CaseExpression(sel, bs)) => {
           if (node.getRepParent != null) {
             val alphaNode: Node = node.getRepParent()
@@ -53,18 +53,16 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
                 CaseExpression(newSel, newBs)
               }
               case repeatNodes => {
-                var vars: Set[Variable] = null
+                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
                 if (freeVarsInLetrecs){
-                  vars = Set[Variable]()
+                  var changedVars = Set[Variable]()
                   for (n <- repeatNodes) {
                     val betaT = n.expr
                     val msg = strongMsg(t, betaT)
                     val args0 = msg.sub2 map {p => p._1}
-                    vars = vars ++ args0
+                    changedVars = changedVars ++ args0
                   }
-                }
-                else {
-                  vars = TermAlgebra.getFreeVars(t)
+                  vars = vars filter {changedVars.contains}
                 }
                 val args0 = vars.toList 
                 val args = args0
@@ -105,18 +103,16 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
                 CaseExpression(newSel, newBs)
               }
               case repeatNodes => {
-                var vars: Set[Variable] = null
+                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
                 if (freeVarsInLetrecs){
-                  vars = Set[Variable]()
+                  var changedVars = Set[Variable]()
                   for (n <- repeatNodes) {
                     val betaT = n.expr
                     val msg = strongMsg(t, betaT)
                     val args0 = msg.sub2 map {p => p._1}
-                    vars = vars ++ args0
+                    changedVars = changedVars ++ args0
                   }
-                }
-                else {
-                  vars = TermAlgebra.getFreeVars(t)
+                  vars = vars filter {changedVars.contains}
                 }
                 val args0 = vars.toList 
                 val args = args0
@@ -158,18 +154,16 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
               }
               // call to this function results in recursive definition
               case repeatNodes => {
-                var vars: Set[Variable] = null
+                var vars: List[Variable] = TermAlgebra.getFreeVars(t)
                 if (freeVarsInLetrecs){
-                  vars = Set[Variable]()
+                  var changedVars = Set[Variable]()
                   for (n <- repeatNodes) {
                     val betaT = n.expr
                     val msg = strongMsg(t, betaT)
                     val args0 = msg.sub2 map {p => p._1}
-                    vars = vars ++ args0
+                    changedVars = changedVars ++ args0
                   }
-                }
-                else {
-                  vars = TermAlgebra.getFreeVars(t)
+                  vars = vars filter {changedVars.contains}
                 }
                 val args0 = vars.toList 
                 val args = args0

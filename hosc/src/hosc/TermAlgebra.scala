@@ -88,14 +88,21 @@ object TermAlgebra {
       getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
   }
   
-  def getFreeVars(t: Expression): Set[Variable] = t match {
-    case v: Variable => if (v.global) Set() else Set(v)
-    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getFreeVars(term)}
+  def getFreeVars(t: Expression): List[Variable] = t match {
+    case v: Variable => if (v.global) List() else List(v)
+    case Constructor(_, args) => (List[Variable]() /: args) {(vs, exp) =>  vs ++ (getFreeVars(exp) -- vs)}
     case LambdaAbstraction(x, term) => getFreeVars(term) - x
-    case Application(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
+    case Application(head, arg) => {
+      val headVars = getFreeVars(head)
+      headVars ++ (getFreeVars(arg) -- headVars)
+    }
     case CaseExpression(sel, bs) => 
-      getFreeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
-    case LetRecExpression((f, e), e0) => getFreeVars(e) ++ getFreeVars(e0) - f
+       (getFreeVars(sel) /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args -- vs)}
+    case LetRecExpression((f, e), e0) => {
+      val eVars = getFreeVars(e) 
+      eVars ++ (getFreeVars(e0) -- eVars) - f
+    }
+    case LetExpression(_, _) => List()
   }
   
   def compareB(b1: Branch, b2: Branch) = b1.pattern.name.compareTo(b2.pattern.name) < 0
