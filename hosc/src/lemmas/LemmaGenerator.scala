@@ -1,7 +1,8 @@
-package hosc
+package hosc.lemmas
 
-import HLanguage._
+import hosc.HLanguage._
 import LemmaGenerator._
+
 class LemmaGenerator(val funs: List[Variable], val cons: List[Ctr]) {
  
   def genAllExprs(maxSize: Int, vars: List[Variable]): List[Expression] =

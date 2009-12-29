@@ -3,6 +3,7 @@ package hosc
 import Util._
 import HLanguage._
 import LangUtils._
+import hosc.lemmas.LemmaGenerator
 
 object TestLemmas {
   def main(args : Array[String]) : Unit = {
