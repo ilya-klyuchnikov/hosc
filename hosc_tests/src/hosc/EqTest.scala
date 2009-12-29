@@ -28,8 +28,12 @@ class EqTest {
   @Test def rep() = testEq("eq/rep1.hs", "eq/rep2.hs")  
   
   def testEq(f1: String, f2: String) = {
+    println("***")
+    println(f1)
     val p1 = supercompile(f1)
     val p2 = supercompile(f2)
+    println(p1.toDocString)
+    println(p2.toDocString)
     assertTrue(f1 + " and " + f2 + " should be equivalent", Eq.equivalent(p1.goal, p2.goal))
   }
   

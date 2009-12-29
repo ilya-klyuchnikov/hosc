@@ -93,4 +93,9 @@ class SuperCompiler1Test {
   
   @Test def rev() = 
     SCP1.main(Array("-si", "sc/rev.hs", "-t", "sc/out1/rev.svg", "-p", "sc/out1/rev.hs"))
+  
+  @Test def church_mult() = {
+    SCP1.main(Array("-si", "eq/churchMult1.hs", "-t", "sc/out1/churchMult1.svg", "-p", "sc/out1/churchMult1.hs"))
+    SCP1.main(Array("-si", "eq/churchMult2.hs", "-t", "sc/out1/churchMult2.svg", "-p", "sc/out1/churchMult2.hs"))
+  }
 }
