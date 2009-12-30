@@ -1,7 +1,6 @@
 package hosc
 
 import HLanguage._
-import LangUtils._
 import ProcessTree._
 import MSG._
 import TermAlgebra._
