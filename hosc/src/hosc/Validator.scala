@@ -7,12 +7,12 @@ import HParsers._
 
 object Validator {
   case class ValidatorError(error: HError) extends Exception(error.toString) {}
-  def validate(s: Success[Program]) =  {
+  def validate(s: Success[Program]): ParseResult[Program] =  {
     val p = s.get
-    var typeNames = Set.empty[String]
-    var dataConNames = Set.empty[String]
-    var fNames = Set.empty[String]
-    var allFNames = Set.empty[String] ++ (p.fs map (_.name))
+    var typeNames = Set[String]()
+    var dataConNames = Set[String]()
+    var fNames = Set[String]()
+    val fNamesInDefs = Set.empty[String] ++ (p.fs map (_.name))
     
     def valTD(td: TypeDefinition) = {
       var tvs = Set.empty[TypeVariable]
@@ -62,20 +62,20 @@ object Validator {
     
     def valFD(f: Function) = {
       if (fNames contains f.name) err("duplicate function " + f.name, f)
-      valTerm(allFNames, f.lam, p)
+      valTerm(fNamesInDefs, f.lam, p)
     }
     
     try {     
       for(td <- p.ts) valTD(td)
       for(f <- p.fs) valFD(f)
-      valTermWithFreeVars(allFNames, p.goal, p)
+      valTermWithFreeVars(fNamesInDefs, p.goal, p)
       s
     } catch {
       case ValidatorError(he) => he
     }
   }
   
-  def err(msg: String, pos: Positional) = {
+  private def err(msg: String, pos: Positional) = {
     throw ValidatorError(error(msg, pos))
   }
   
@@ -99,7 +99,7 @@ object Validator {
     case c: CaseExpression => valCase(boundedVars, c, p)
   }
   
-  def valCase(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
+  private def valCase(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
     valTerm(boundedVars, c.selector, p);
     val pat = c.branches.head.pattern
     val dcn = pat.name
@@ -123,8 +123,8 @@ object Validator {
           }
           valTerm(boundedVars ++ pVars, b.term, p)
         }
-        val unused = consNames -- usedNames
-        if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+        //val unused = consNames -- usedNames
+        //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
       }
     }
   }
@@ -144,12 +144,15 @@ object Validator {
       if (boundedVars contains l.v.name) err("variable " + l.v.name + " is already bound", l.v)
       valTermWithFreeVars(boundedVars + l.v.name, l.t, p)
     }
-    case a: Application => {valTermWithFreeVars(boundedVars, a.head, p); valTermWithFreeVars(boundedVars, a.arg, p);}
+    case a: Application => {
+      valTermWithFreeVars(boundedVars, a.head, p); 
+      valTermWithFreeVars(boundedVars, a.arg, p);
+    }
     case c: CaseExpression => valCaseWithFreeVars(boundedVars, c, p)
     case LetRecExpression((v, e), e0) => {valTermWithFreeVars(boundedVars, e, p);valTermWithFreeVars(boundedVars, e0, p)}
   }
   
-  def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
+  private def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
     valTermWithFreeVars(boundedVars, c.selector, p);
     val pat = c.branches.head.pattern
     val dcn = pat.name
@@ -173,8 +176,8 @@ object Validator {
           }
           valTermWithFreeVars(boundedVars ++ pVars, b.term, p)
         }
-        val unused = consNames -- usedNames
-        if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+        //val unused = consNames -- usedNames
+        //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
       }
     }
   }

@@ -54,7 +54,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def parseType(r: Reader[Char]) = strong(`type`) (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program) (new lexical.Scanner(r))))
   
-  def validate(pr: ParseResult[Program]) = pr match {
+  def validate(pr: ParseResult[Program]): ParseResult[Program] = pr match {
     case n: NoSuccess => n;
     case s @ Success(_, _) => Validator.validate(s)
   }
@@ -78,7 +78,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   
   /* customized error: validation error */
   case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
-    override def toString = "[" + pos.pos +"] error: "+msg+"\n\n"+pos.pos.longString
+    override def toString = "[" + pos.pos +"] error: " + msg + "\n\n" + pos.pos.longString
   }
   
   def error(msg: String, pos: Positional) = {

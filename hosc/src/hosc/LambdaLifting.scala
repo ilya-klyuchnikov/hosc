@@ -24,7 +24,7 @@ object LambdaLifting {
   }
   
   // eliminates free variables from letrecs' bodies
-  def lift (e: Expression) : Expression = {
+  private def lift (e: Expression) : Expression = {
     var letrecOpt = findLetRec(e)
     var result = e
     while (letrecOpt.isDefined) {
@@ -51,7 +51,7 @@ object LambdaLifting {
     }  
   }
   
-  def injectArgument(e: Expression, f: Variable, v0: Variable): Expression = e match {
+  private def injectArgument(e: Expression, f: Variable, v0: Variable): Expression = e match {
     case v@Variable(_) => 
       if (v==f) Application(f, v0) else v
     case Constructor(name, args) => 
@@ -71,7 +71,7 @@ object LambdaLifting {
       }
   }
   
-  def extractGlobals(e1: Expression, p: ListBuffer[Function]): Expression = e1 match {
+  private def extractGlobals(e1: Expression, p: ListBuffer[Function]): Expression = e1 match {
     case v@Variable(_) => v
     case Constructor(n, args) => Constructor(n, args map {e => extractGlobals(e, p)})
     case LambdaAbstraction(v, e) => LambdaAbstraction(v, extractGlobals(e, p))
@@ -86,7 +86,7 @@ object LambdaLifting {
   // because of infinite data structures
   // need to decide how to do it - maybe we need to allow general definitions -
   // not just functions
-  def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = { 
+  private def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = { 
     Function(letrec.binding._1.name, extractGlobals(letrec.binding._2, p).asInstanceOf[LambdaAbstraction]) +: p
     extractGlobals(letrec.expr, p)
   }
