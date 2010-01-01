@@ -160,6 +160,13 @@ class TermAlgebraTest {
     assertFalse(heByCoupling(t01, t02))
   }
   
+  @Test def he16(): Unit = {
+    val program = programFromFile(inputFile)
+    val t01 = termFromString("""k""", program)
+    val t02 = termFromString("""\y -> k (S y)""", program)
+    assertTrue(he(t01, t02))
+  }
+  
   @Test def msg1(): Unit = {
     val program = programFromFile(inputFile)
     val term = termFromString("app x", program)

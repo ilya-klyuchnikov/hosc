@@ -197,8 +197,7 @@ class HParsersTest {
         "wrong number of parameters for constructor Cons should be reported");
     assertValidationError("parser/err16.hs",
         "duplicate var z should be reported");
-    assertValidationError("parser/err17.hs",
-        "non exhaustive should be reported");
+    //assertValidationError("parser/err17.hs", "non exhaustive should be reported");
   }
   
   @Test def caseError(): Unit = {
