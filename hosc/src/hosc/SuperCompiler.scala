@@ -11,31 +11,26 @@ class SuperCompiler(program: Program){
   val emptyMap = Map[Variable, Expression]()
   val debug = false
   
-  def driveExp(expr: Expression): List[Pair[Expression, Map[Variable, Expression]]] = expr match {
-    case LetExpression(bs, t) => {
-      (t, Map[Variable, Expression](bs map {p => (p._1, p._2)} :_*)) :: 
-        (bs map {b => (b._2, emptyMap)}) 
-    }
+  def driveExp(expr: Expression): List[Expression] = expr match {
+    case LetExpression(bs, t) => t :: (bs map {_._2})
     case t => decompose(t) match {
       case ObservableVar(_) => Nil
-      case ObservableCon(c) => c.args map {a => (a, emptyMap)}
-      case ObservableVarApp(_, app) => extractAppArgs(app) map {a => (a, emptyMap)}
-      case ObservableLam(l) => (l.t, emptyMap) :: Nil
+      case ObservableCon(c) => c.args
+      case ObservableVarApp(_, app) => extractAppArgs(app)
+      case ObservableLam(l) => l.t :: Nil
       case context: Context => context.redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.lam
-          (context.replaceHole(freshBinders(lam)), emptyMap) :: Nil 
+          context.replaceHole(freshBinders(lam)) :: Nil 
         }
-        case RedexLamApp(lam, app) => 
-          (context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))), emptyMap) :: Nil
+        case RedexLamApp(lam, app) => context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))) :: Nil
         case RedexCaseCon(c, ce) => {
           val b = ce.branches.find(_.pattern.name == c.name).get
           val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
-          (context.replaceHole(applySubstitution(b.term, sub)), emptyMap) :: Nil          
+          context.replaceHole(applySubstitution(b.term, sub)) :: Nil          
         }
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
-          (sel, emptyMap) :: (bs map 
-            {b => (replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)), emptyMap)})
+          sel :: (bs map {b => replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args))})
       }
     }
   }  
