@@ -110,4 +110,7 @@ class SuperCompilerTest {
    
    @Test def rev() = 
     SCP.main(Array("-si", "sc/rev.hs", "-t", "sc/out0/rev.svg", "-p", "sc/out0/rev.hs"))
+   
+   @Test def synapse0() = 
+    SCP.main(Array("-si", "sc/synapse0.hs",  "-t", "sc/out0/synapse0.svg", "-p", "sc/out0/synapse0.hs"))
 }
