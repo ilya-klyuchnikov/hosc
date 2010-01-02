@@ -7,6 +7,11 @@ object EnrichedLambdaCalculus {
    val ED: scala.text.Document = empty
    sealed abstract class Expression {
      def toDoc: Document
+     def toDocString = {    
+       val writer1 = new java.io.StringWriter()
+       toDoc.format(150, writer1)
+       writer1.toString
+     }
    }
    case class Variable(name: String) extends Expression {
      override def toString = name

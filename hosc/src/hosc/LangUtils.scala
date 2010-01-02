@@ -10,7 +10,7 @@ import HLanguage.{Application => Application0, Variable => Variable0, CaseExpres
 import scala.collection.mutable.ListBuffer
 
 object LangUtils {
-  def hl0ToELC(expr: Expression0): Expression = expr match {
+  private def hl0ToELC(expr: Expression0): Expression = expr match {
     case Variable0(n) => Variable(n)
     case Constructor0(n, args) => Constructor(n, args map hl0ToELC)
     case LambdaAbstraction0(v, e) => LambdaAbstraction(Variable(v.name), hl0ToELC(e))
@@ -24,22 +24,22 @@ object LangUtils {
       LetRecExpression((Variable(b._1.name), hl0ToELC(b._2)) :: Nil, hl0ToELC(lexpr))
   }
   
-  def normalize(p: Program0): Expression0 = {
+  private def normalize(p: Program0): Expression = {
     val fs = (Map[String, Function0]() /: p.fs) {(m, f) => m + (f.name -> f)}
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
     var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
     val sccs = analyzeDependencies(g)
-    var expr: Expression0 = p.goal
+    var expr: Expression = hl0ToELC(p.goal)
     for (scc <- sccs){
-      val bs = scc.vs.toList map (x => (Variable0(x.name), fs(x.name).lam))
+      val bs = scc.vs.toList map (x => (Variable(x.name), hl0ToELC(fs(x.name).lam)))
       if (scc.recursive){
-        expr = bs.foldRight(expr){(b, e) => LetRecExpression0(b, e)}
+        expr = LetRecExpression(bs, expr)
       } else {
-        expr = LetExpression0(bs, expr)
+        expr = LetExpression(bs, expr)
       }
     }
-    //println(format(expr))
+    println(format(expr))
     expr
   }
   
@@ -56,11 +56,15 @@ object LangUtils {
   }
   
   def hl0ToELC(p: Program0): Expression = {
-    val r = hl0ToELC(normalize(p))
+    val r = normalize(p)
     r
   }
-  
   def format(expr: Expression0): String = {
+    val writer = new java.io.StringWriter()
+    expr.toDoc.format(120, writer)
+    writer.toString
+  }  
+  def format(expr: Expression): String = {
     val writer = new java.io.StringWriter()
     expr.toDoc.format(120, writer)
     writer.toString
