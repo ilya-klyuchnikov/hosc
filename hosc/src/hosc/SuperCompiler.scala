@@ -21,16 +21,17 @@ class SuperCompiler(program: Program){
       case context: Context => context.redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.lam
-          context.replaceHole(freshBinders(lam)) :: Nil 
+          freshBinders(context.replaceHole(freshBinders(lam))) :: Nil 
         }
-        case RedexLamApp(lam, app) => context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))) :: Nil
+        case RedexLamApp(lam, app) => freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil
         case RedexCaseCon(c, ce) => {
           val b = ce.branches.find(_.pattern.name == c.name).get
           val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
-          context.replaceHole(applySubstitution(b.term, sub)) :: Nil          
+          freshBinders(context.replaceHole(applySubstitution(b.term, sub))) :: Nil          
         }
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
-          sel :: (bs map {b => replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args))})
+          freshBinders(sel) :: 
+            (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))})
       }
     }
   }  

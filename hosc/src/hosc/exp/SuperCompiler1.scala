@@ -9,7 +9,7 @@ import hosc.LangUtils._
 
 class SuperCompiler1(program: Program){
   val emptyMap = Map[Variable, Expression]()
-  val debug = false
+  val debug = true
   val useControl = true
   
   def driveExp(expr: Expression): List[Expression] = expr match {
@@ -22,21 +22,36 @@ class SuperCompiler1(program: Program){
       case context: Context => context.redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.lam
-          context.replaceHole(freshBinders(lam)) :: Nil 
+          freshBinders(context.replaceHole(freshBinders(lam))) :: Nil 
         }
-        case RedexLamApp(lam, app) => context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))) :: Nil
+        case RedexLamApp(lam, app) => freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil
         case RedexCaseCon(c, ce) => {
           val b = ce.branches.find(_.pattern.name == c.name).get
           val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
-          context.replaceHole(applySubstitution(b.term, sub)) :: Nil          
+          freshBinders(context.replaceHole(applySubstitution(b.term, sub))) :: Nil          
         }
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
-          sel :: (bs map {b => replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args))})
+          freshBinders(sel) :: 
+            (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))})
       }
     }
-  }  
+  } 
   
   def buildProcessTree(e: Expression): ProcessTree = {
+    /*
+    try {
+      return buildSuperPureProcessTree(e)
+    } catch {
+      case _ =>
+    }
+                                                  
+    try {
+      return buildPureProcessTree(e)
+    } catch {
+      case _ =>
+    }
+    */
+    
     val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
@@ -77,6 +92,76 @@ class SuperCompiler1(program: Program){
     renameVars(p)
   }
   
+  def buildPureProcessTree(e: Expression): ProcessTree = {
+    val p = ProcessTree(e)
+    if (debug) {
+      println(program.toDocString)
+    }
+    var i = 0;
+    while (!p.isClosed) {
+      i = i + 1
+      if (i > 10000) throw new Exception()
+      println(i)
+      if (debug) { 
+        println(p)
+        println("==========")
+      }
+      val beta = p.leafs.find(!_.isProcessed).get
+      val bExpr = beta.expr
+      beta.expr match {
+        case LetExpression(_, _) => drive(p, beta)
+        case bTerm if canBeEnhanced_?(bTerm) => {
+          beta.ancestors find equivalenceTest(beta) match {
+            case Some(alpha) => beta.repeatedOf = alpha; 
+            case None => {
+              beta.ancestors find instanceTest(beta) match {
+                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case None => drive(p, beta)
+              }
+            }
+          }
+        }
+        case _ => drive(p, beta)
+      }      
+    }
+    renameVars(p)
+  }
+  
+  def buildSuperPureProcessTree(e: Expression): ProcessTree = {
+    val p = ProcessTree(e)
+    if (debug) {
+      println(program.toDocString)
+    }
+    var i = 0;
+    while (!p.isClosed) {
+      i = i + 1
+      if (i > 1000) throw new Exception()
+      println(i)
+      if (debug) { 
+        println(p)
+        println("==========")
+      }
+      val beta = p.leafs.find(!_.isProcessed).get
+      val bExpr = beta.expr
+      beta.expr match {
+        case LetExpression(_, _) => drive(p, beta)
+        case bTerm if canBeEnhanced1_?(bTerm) => {
+          beta.ancestors find equivalenceTest(beta) match {
+            case Some(alpha) => beta.repeatedOf = alpha; 
+            case None => {
+              beta.ancestors find instanceTest(beta) match {
+                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case None => drive(p, beta)
+              }
+            }
+          }
+        }
+        case _ => drive(p, beta)
+      }      
+    }
+    renameVars(p)
+  }
+  
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => sameRedex(aTerm, bNode.expr) && instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode);
@@ -92,14 +177,13 @@ class SuperCompiler1(program: Program){
     case LetExpression(_, _) => false
     case aTerm if (sameRedex(aTerm, bNode.expr) && heByCoupling(aTerm, bNode.expr)) && checkControl(aNode, bNode) => { 
       //return true;
-      val sca = sc(aTerm);
-      val scb = sc(bNode.expr);
-      val r = HE1.heByCoupling(sca, scb)
-      println(r)
+      
       println(format(canonize(aTerm)))
       println("------")
       println(format(canonize(bNode.expr)))
       println("------")
+      val sca = sc(aTerm);
+      val scb = sc(bNode.expr);
       
       println(format(sca))
       println("------")
@@ -107,7 +191,8 @@ class SuperCompiler1(program: Program){
       println("------")
       println("------")
       
-      
+      val r = HE1.heByCoupling(sca, scb)
+      println(r)
       r
     };
     case _ => false
@@ -177,7 +262,7 @@ class SuperCompiler1(program: Program){
   }
   
   def sameRedex(t1: Expression, t2: Expression) : Boolean = (decompose(t1), decompose(t2)) match {
-    case (c1: Context, c2: Context) => true//c1.redex.getClass() == c2.redex.getClass()
+    case (c1: Context, c2: Context) => c1.redex.getClass() == c2.redex.getClass()
     case _ => false
   }
   
