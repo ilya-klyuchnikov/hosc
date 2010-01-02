@@ -131,6 +131,7 @@ object TermAlgebra {
     constructLambda_(vs)
   }
   
+  // TODO: maybe move to de Brujin indices 
   // During unfolding we always rename functions 
   // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
   // This method assumes that binders always have different names.
@@ -172,6 +173,7 @@ object TermAlgebra {
   }
   
   def freshBinders(term: Expression): Expression = term match {
+    case LetExpression(bs, expr) => LetExpression(bs map {case (k, v) => (k, freshBinders(v))}, freshBinders(expr))
     case Constructor(name, args) => Constructor(name, args map (freshBinders(_)))
     case Application(h, a) => Application(freshBinders(h), freshBinders(a))
     case LambdaAbstraction(v, t) => {
