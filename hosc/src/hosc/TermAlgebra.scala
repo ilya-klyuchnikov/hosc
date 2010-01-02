@@ -27,7 +27,7 @@ object TermAlgebra {
   // The global control
   case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)  
   
-  sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
+  sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
   }  
   case class ContextHole(override val redex: Redex) extends Context(redex) {

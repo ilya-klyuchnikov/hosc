@@ -46,7 +46,8 @@ object HE {
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB
       val bs2_ = bs2 sort compareB
-      he(sel1, sel2, binders) && 
+      val samePatterns = (bs1_ map (_.pattern.name)) == (bs2_ map (_.pattern.name))
+      samePatterns && he(sel1, sel2, binders) && 
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders)))
     }

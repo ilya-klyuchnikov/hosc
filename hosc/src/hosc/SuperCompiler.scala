@@ -11,27 +11,32 @@ class SuperCompiler(program: Program){
   val emptyMap = Map[Variable, Expression]()
   val debug = false
   
-  def driveExp(expr: Expression): List[Expression] = expr match {
-    case LetExpression(bs, t) => t :: (bs map {_._2})
+  // None means case C of with missing pattern for C
+  def driveExp(expr: Expression): Option[List[Expression]] = expr match {
+    case LetExpression(bs, t) => Some(t :: (bs map {_._2}))
     case t => decompose(t) match {
-      case ObservableVar(_) => Nil
-      case ObservableCon(c) => c.args
-      case ObservableVarApp(_, app) => extractAppArgs(app)
-      case ObservableLam(l) => l.t :: Nil
+      case ObservableVar(_) => Some(Nil)
+      case ObservableCon(c) => Some(c.args)
+      case ObservableVarApp(_, app) => Some(extractAppArgs(app))
+      case ObservableLam(l) => Some(l.t :: Nil)
       case context: Context => context.redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.lam
-          freshBinders(context.replaceHole(freshBinders(lam))) :: Nil 
+          Some(freshBinders(context.replaceHole(freshBinders(lam))) :: Nil) 
         }
-        case RedexLamApp(lam, app) => freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil
+        case RedexLamApp(lam, app) => Some(freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil)
         case RedexCaseCon(c, ce) => {
-          val b = ce.branches.find(_.pattern.name == c.name).get
-          val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
-          freshBinders(context.replaceHole(applySubstitution(b.term, sub))) :: Nil          
+          ce.branches.find(_.pattern.name == c.name) match {
+            case Some(b) => {
+              val sub = Map[Variable, Expression]() ++ (b.pattern.args zip c.args)
+              Some(freshBinders(context.replaceHole(applySubstitution(b.term, sub))) :: Nil)
+            }
+            case None => None
+          }
         }
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
-          freshBinders(sel) :: 
-            (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))})
+          Some(freshBinders(sel) :: 
+            (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))}))
       }
     }
   }  
@@ -126,7 +131,51 @@ class SuperCompiler(program: Program){
   }
   
   def drive(t: ProcessTree, n: Node): Unit = {
-    t.addChildren(n, driveExp(n.expr))
+    if (debug) {
+    	println("driving...")
+    	println(n.expr)
+    }
+    driveExp(n.expr) match {
+      case Some(es) => t.addChildren(n, es)
+      case None => propagateMatchError(t, n)
+    }
+  }
+  
+  private def propagateMatchError(t: ProcessTree, n: Node): Unit = {
+    if (debug) {
+    	println("propagating match error...")
+    	println(n.expr)
+    }
+    val ancs = n.ancestors 
+    ancs find isGlobal match {
+      case Some(globalNode) => {
+        // finding corresponding globalNode
+        val Context(RedexCaseVar(_, CaseExpression(sel, bs))) = decompose(globalNode.expr)
+        // finding 'missing' childNode
+        println("missing node:")
+        println(globalNode)
+        val missingChildNode = globalNode.children.find{(n:: ancs).contains(_)}.get
+        // finding branch with 'missing' pattern
+        val (missingBranch, _) = bs.zip(globalNode.children.tail).find{case (b, childNode) => childNode == missingChildNode}.get
+        val newBs = bs remove {_ == missingBranch}
+        val newCaseExp = CaseExpression(sel, newBs)
+        t.replace(globalNode, newCaseExp)
+      }
+      // TODO: we need more elegant missing case propagation
+      // for now it is good to have just exception
+      case None => throw new Exception("No patterns will be matched at all..")
+    }
+  }
+  
+  private def isGlobal(n: Node): Boolean = n.expr match {
+    case LetExpression(_, _) => false
+    case e => decompose(e) match {
+      case c: Context => c.redex match {
+        case RedexCaseVar(_, _) => true
+        case _ => false
+      }
+      case _ => false
+    }
   }
   
   def makeAbstraction(t: ProcessTree, alpha: Node, beta: Node): Unit = {
