@@ -10,7 +10,7 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
   
   def this() = this(Map())
   def compose(s: Subst) = new Subst(s.map.transform((k, v) => this(v)) ++ this.map)
-  def excl(vs: List[TypeVariable]) = new Subst(map -- vs)
+  def exclude(vs: List[TypeVariable]) = new Subst(map -- vs)
     
   def apply(t: Type): Type = t match {
     case tv : TypeVariable => map.getOrElse(tv, tv)
@@ -20,7 +20,6 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
 
   def extend(x: TypeVariable, t: Type) =
     if (tyvars(t) contains x)
-      // substitution should be idempotent!
       throw TypeError("recursive binding: " + x + " = " + t)
     else if (x == t) this
     else new Subst(Map(x -> t)) compose this
@@ -29,7 +28,7 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
 case class TypeScheme(genericVars: List[TypeVariable], t: Type) {
   def newInstance = (new Subst(Map(genericVars map {(_, newTyvar)}:_*))) (t)
   def nonGenericVars = tyvars(t) -- genericVars
-  def sub(sub: Subst) = TypeScheme(genericVars, (sub excl genericVars) (t))
+  def sub(sub: Subst) = TypeScheme(genericVars, (sub exclude genericVars) (t))
 }
 
 case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
@@ -46,7 +45,7 @@ object TypeInferrer {
     case (a:TypeVariable, b: TypeVariable) if a == b =>
       s
     case (a:TypeVariable, _) if s(a) == a =>
-      s.extend(a, u)
+      s.extend(a, s(u))
     case (a:TypeVariable, _) =>
       mgu(s(t), s(u), s)
     case (_, a:TypeVariable) =>
@@ -54,13 +53,13 @@ object TypeInferrer {
     case (Arrow(t1, t2), Arrow(u1, u2)) =>
       mgu(t1, u1, mgu(t2, u2, s))
     case (TypeConstructor(k1, ts), TypeConstructor(k2, us)) if (k1 == k2) =>
-      (s /: (ts zip us)) ((s, tu) => mgu(tu._1, tu._2, s))
+     mgu(ts zip us, s)
     case _ =>
       throw new TypeError("cannot unify " + s(t) + " with " + s(u))
   }
   
   private def mgu(ts: List[Pair[Type, Type]], s: Subst): Subst = {
-    (s /: ts) {(s, p) => mgu(p._1, p._2, s)}
+    (s /: ts) {case (s1, (t1, t2)) => mgu(t1, t2, s1)}
   }
   
 }
