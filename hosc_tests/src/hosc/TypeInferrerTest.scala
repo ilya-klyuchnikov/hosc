@@ -2,7 +2,6 @@ package hosc
 
 import org.junit.Test
 import org.junit.Assert._
-import TypeInferrer._
 import scala.util.parsing.input.{CharArrayReader, Reader}
 
 class TypeInferrerTest {
@@ -36,12 +35,18 @@ class TypeInferrerTest {
   @Test def drec() =
     println(Util.inferGoalType("sc/encoding.hs"))
   
+  @Test def evalErr() =
+    testTypeError("types/evalErr.hs")
+  
+  @Test def eval() =
+     testTyping("types/eval.hs", "Exp -> Val")
+  
   def testTyping(fileName: String, typeString: String) = {
     val actualType = Util.inferGoalType(fileName)
     val expectedType = HParsers.parseType(new CharArrayReader(typeString.toCharArray)).get
-    println("actual")
+    println("actual:")
     println(actualType)
-    println("expected")
+    println("expected:")
     println(expectedType)
     assertTrue(TypeAlgebra.equivalent(actualType, expectedType))
   }

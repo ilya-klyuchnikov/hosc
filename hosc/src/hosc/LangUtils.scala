@@ -39,7 +39,7 @@ object LangUtils {
         expr = LetExpression(bs, expr)
       }
     }
-    println(format(expr))
+    //println(format(expr))
     expr
   }
   
