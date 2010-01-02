@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude#-}
+
 --dRec1  (dRec2 (dRec2 id id) (dRec1 id id))   (dRec1 (dRec1 id id) (dRec2 id id))
 
 --sf id id
