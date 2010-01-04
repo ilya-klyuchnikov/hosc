@@ -154,7 +154,9 @@ object TermAlgebra {
         eq1(h1, h2) && eq1(a1, a2)
       case (LambdaAbstraction(b1, v1), LambdaAbstraction(b2, v2)) =>
         eq1(b1, b2) && eq1(v1, v2)
-      case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
+      case (CaseExpression(sel1, Nil), CaseExpression(sel2, Nil)) =>
+        eq1(sel1, sel2)
+      case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) if bs1.size == bs2.size => {
         val bs1s = bs1 sort compareB
         val bs2s = bs2 sort compareB
         if (bs1s.head.pattern.name == bs2s.head.pattern.name){

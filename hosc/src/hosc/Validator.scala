@@ -100,7 +100,10 @@ object Validator {
   }
   
   private def valCase(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
-    valTerm(boundedVars, c.selector, p);
+    valTerm(boundedVars, c.selector, p)
+    if (c.branches.isEmpty) {
+      return
+    }
     val pat = c.branches.head.pattern
     val dcn = pat.name
     p.getTypeDefinitionForDC(dcn) match {
@@ -154,6 +157,9 @@ object Validator {
   
   private def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
     valTermWithFreeVars(boundedVars, c.selector, p);
+    if (c.branches.isEmpty) {
+      return
+    }
     val pat = c.branches.head.pattern
     val dcn = pat.name
     p.getTypeDefinitionForDC(dcn) match {
@@ -177,6 +183,7 @@ object Validator {
           valTermWithFreeVars(boundedVars ++ pVars, b.term, p)
         }
         //val unused = consNames -- usedNames
+        // TODO: warning
         //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
       }
     }

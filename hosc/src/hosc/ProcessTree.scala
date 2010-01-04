@@ -28,6 +28,7 @@ object ProcessTree {
       (expr match {
       case Constructor(_, Nil) => true
       case v : Variable if v.global == false => true
+      case CaseExpression(Constructor(_, _), Nil) => true
       case _ => false
     }))
     

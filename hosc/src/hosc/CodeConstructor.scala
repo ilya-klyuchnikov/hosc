@@ -35,6 +35,9 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
         } else {
           context.redex match {        
         	case RedexLamApp(lam, app) => construct(node.children.head)
+        	case RedexCaseCon(c, CaseExpression(sel, Nil)) => {
+        	  CaseExpression(sel, Nil)
+            }
         	case RedexCaseCon(c, ce) => construct(node.children.head)
         	case ntr@NonTrivialRedex(x) => {
         	  lazy val traversed = ntr match {

@@ -141,7 +141,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   }
   
   private def check(te: TypeEnv, expressions: List[Expression]): (Subst, List[Type]) = expressions match {
-    case Nil => (new Subst(), Nil) 
+    case Nil => (new Subst(), Nil)
     case e :: es => {
       val (sub1, type1) = check(te, e)
       val (sub2, type2s) = check(te sub sub1, es)
@@ -150,7 +150,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   }
   
   private def checkB(te: TypeEnv, expressions: List[Branch]): (Subst, List[Type]) = expressions match {
-    case Nil => (new Subst(), Nil) 
+    case Nil => (new Subst(), List(Arrow(newTyvar, newTyvar))) 
     case e :: es => {
       val (sub1, type1) = checkB(te, e)
       val (sub2, type2s) = checkB(te sub sub1, es)

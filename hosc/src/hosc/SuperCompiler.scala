@@ -11,7 +11,7 @@ class SuperCompiler(program: Program){
   val emptyMap = Map[Variable, Expression]()
   val debug = false
   
-  // None means case C of with missing pattern for C
+  // None means case C of {...} with missing pattern for C
   def driveExp(expr: Expression): Option[List[Expression]] = expr match {
     case LetExpression(bs, t) => Some(t :: (bs map {_._2}))
     case t => decompose(t) match {
@@ -137,11 +137,11 @@ class SuperCompiler(program: Program){
     }
     driveExp(n.expr) match {
       case Some(es) => t.addChildren(n, es)
-      case None => propagateMatchError(t, n)
+      case None => processMissingMatch(t, n)
     }
   }
   
-  private def propagateMatchError(t: ProcessTree, n: Node): Unit = {
+  private def processMissingMatch(t: ProcessTree, n: Node): Unit = {
     if (debug) {
     	println("propagating match error...")
     	println(n.expr)
@@ -152,8 +152,8 @@ class SuperCompiler(program: Program){
         // finding corresponding globalNode
         val Context(RedexCaseVar(_, CaseExpression(sel, bs))) = decompose(globalNode.expr)
         // finding 'missing' childNode
-        println("missing node:")
-        println(globalNode)
+        //println("missing node:")
+        //println(globalNode)
         val missingChildNode = globalNode.children.find{(n:: ancs).contains(_)}.get
         // finding branch with 'missing' pattern
         val (missingBranch, _) = bs.zip(globalNode.children.tail).find{case (b, childNode) => childNode == missingChildNode}.get
@@ -161,9 +161,12 @@ class SuperCompiler(program: Program){
         val newCaseExp = CaseExpression(sel, newBs)
         t.replace(globalNode, newCaseExp)
       }
-      // TODO: we need more elegant missing case propagation
-      // for now it is good to have just exception
-      case None => throw new Exception("No patterns will be matched at all..")
+      case None => {
+        // no proparagition to top is possible 
+        // removing all patterns from the current node - it becomes complete one
+        val CaseExpression(sel, _) = n.expr
+        t.replace(n, CaseExpression(sel, Nil))
+      }
     }
   }
   
