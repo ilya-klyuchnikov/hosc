@@ -6,3 +6,4 @@ LambdaLiftingTest		lifting/
 SuperCompilerTest		sc/
 
 TermAlgebraTest			term_algebra/
+MissingPattern			mp/

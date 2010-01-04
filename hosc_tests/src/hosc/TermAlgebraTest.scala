@@ -162,9 +162,13 @@ class TermAlgebraTest {
   
   @Test def he16(): Unit = {
     val program = programFromFile(inputFile)
-    val t01 = termFromString("""k""", program)
-    val t02 = termFromString("""\y -> k (S y)""", program)
+    val t01 = termFromString("""\x -> S x""", program)
+    val t02 = termFromString("""\y -> (\z -> S z) (S y) """, program)
     assertTrue(he(t01, t02))
+    
+    val t03 = termFromString("""k""", program)
+    val t04 = termFromString("""\y -> k (S y)""", program)
+    assertTrue(he(t03, t04))
   }
   
   @Test def msg1(): Unit = {

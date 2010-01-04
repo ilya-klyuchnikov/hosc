@@ -27,11 +27,21 @@ class Experiments {
   
   @Test def fo_dsl_1_b =
     SCP0.main(Array("-si", "exp/fo_dsl_1_b.hs", "-t", "exp/out0/fo_dsl_1_b.svg","-p", "exp/out0/fo_dsl_1_b.hs"))
-  @Ignore
+  
   @Test def fo_dsl_2_a =
-    SCP1.main(Array("-si", "exp/fo_dsl_2_a.hs", "-t", "exp/out0/fo_dsl_2_a.svg","-p", "exp/out0/fo_dsl_2_a.hs"))
+    SCP0.main(Array("-si", "exp/fo_dsl_2_a.hs", "-t", "exp/out0/fo_dsl_2_a.svg","-p", "exp/out0/fo_dsl_2_a.hs"))
+  
+  @Test def ho_dsl =
+    SCP0.main(Array("-si", "exp/ho_dsl.hs", "-t", "exp/out0/ho_dsl.svg","-p", "exp/out0/ho_dsl.hs"))
+  
   @Ignore
   @Test def fo_dsl_2_b = {
     SCP0.main(Array("-si", "exp/fo_dsl_2_b.hs", "-t", "exp/out0/fo_dsl_2_b.svg","-p", "exp/out0/fo_dsl_2_b.hs"))
   }
+  
+  @Test def fo_dsl_3_a =
+    SCP0.main(Array("-si", "exp/fo_dsl_3_a.hs", "-t", "exp/out0/fo_dsl_3_a.svg","-p", "exp/out0/fo_dsl_3_a.hs"))
+  
+  @Test def fo_dsl_3_b =
+    SCP0.main(Array("-si", "exp/fo_dsl_3_b.hs", "-t", "exp/out0/fo_dsl_3_b.svg","-p", "exp/out0/fo_dsl_3_b.hs"))
 }

@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude#-}
+
 data Unit = U;
 data Bool = True | False;
 data Nat = Z | S Nat;
@@ -6,21 +8,22 @@ data VarName = VZ | VS VarName;
 
 data Exp = NatZ | NatS Exp | Var VarName | App Exp Exp | Lam VarName Exp | Fix VarName Exp;
 
-data Env a
+data Env
   = Empty
   | Bind VarName
-    ((Unit -> a) -> (Nat -> a) -> (VarName -> Exp -> Env a -> a) -> a)
-    (Env a);
+    ((Unit -> Val) -> (Nat -> Val) -> (VarName -> Exp -> Env -> Val) -> Val) Env;
 
-data Val a = Error | N Nat | C VarName Exp (Env a);
+data Val = Error | N Nat | C VarName Exp Env;
 
---run (App (Fix VZ (Lam (VS VZ) (NatS  (App (Var VZ) (Var (VS VZ)))))) (NatZ))
+-- eval where
 
---run (Fix VZ (NatS (Var VZ)))
+-- eval (Fix VZ (NatS (Var VZ))) Empty (\u -> Error) (\n -> N n) (\v1 e1 env1 -> C v1 e1 env1) where
 
-(((((eval (Var (VZ ))) (Bind (VZ ) (((evalFix (VZ )) (NatS (Var (VZ )))) (Empty )) (Empty ))) (\v2 -> (Error ))) 
-k) 
-(\v163 -> (\v164 -> (\v165 -> ((\v2 -> (Error )) (U ))))))
+-- e where
+
+run (Fix VZ (NatS (Var VZ)))
+--run g (Fix VZ (NatS (Var VZ)))
+--run (App (Lam VZ (NatS (Var VZ))) NatZ)
 
 where
 
@@ -45,17 +48,19 @@ eval = \e env ke kn kc ->
     NatZ -> kn Z;
     NatS e1 -> (eval e1 env) ke (\n1 -> kn (S n1)) (\v0 e0 env0 -> ke U);
     Var v -> lookup v env ke kn kc;
-    Lam v body -> 
-      kc v body env;
+    Lam v body -> kc v body env;
     App e1 e2 ->
       (eval e1 env) ke (\n -> ke U)
-        (\v body env1 ->
-          eval body (Bind v (eval e2 env) env1) ke kn kc);
+        (\v body env1 -> eval body (Bind v (eval e2 env) env1) ke kn kc);
     Fix v body -> evalFix v body env ke kn kc;
+    -- Fix v body -> eval body (Bind v (evalFix v body env) env) ke kn kc;
+    -- Fix v body -> eval body (Bind v (eval (Fix v body) env) env) ke kn kc;
   };
 
-evalFix = \v body env ke kn kc->
-  eval body (Bind v (evalFix v body env) env) ke kn kc;
+evalFix = \v body env ke kn kc-> eval body (Bind v (evalFix v body env) env) ke kn kc;
+--evalFix = \v body env ke kn kc-> eval body (Bind v (eval (Fix v body) env) env) ke kn kc;
 -- evalFix = \v body env ke kn kc -> eval (App (Lam v body) (Fix v body)) ke kn kc;
 
-run = \e -> eval e Empty (\u -> Error)(\n -> N n)(\v1 e1 env1 -> C v1 e1 env1);
+run = \e -> eval e Empty (\u -> Error) (\n -> N n) (\v1 e1 env1 -> C v1 e1 env1);
+--run = \f -> \e -> eval e Empty (\u -> Error) f (\v1 e1 env1 -> Error);
+--run = \e -> eval e Empty (\u -> Error) (\n -> N n) (\v1 e1 env1 -> Error);

@@ -19,6 +19,7 @@ public class AllHoscTests {
 		suite.addTest(new JUnit4TestAdapter(hosc.EqTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.SmartEmbeddingTest.class));
 		suite.addTest(new JUnit4TestAdapter(hosc.LambdaLiftingTest.class));
+		suite.addTest(new JUnit4TestAdapter(hosc.MissingPattern.class));
 		// $JUnit-END$
 		return suite;
 	}
