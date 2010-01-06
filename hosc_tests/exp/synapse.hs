@@ -4,7 +4,7 @@ data State = State Number Number Number | Stop;
 data Boolean = True | False;
 data List a = Nil | Cons a (List a);
 
-test (loop (State (S x) Z Z) y add)
+test (loop (State (S x) Z Z) add)
 
 where
 
@@ -19,30 +19,12 @@ test = \state -> case state of {
   Stop -> True;
 };
 
-loop = \state acts add ->
-    case acts of {
-      Nil -> state;
-      Cons a as -> loop (act state a add) as add;
-    };
+loop = \state add ->
+	[state | loop (act state add) add]; --non-det
 
-act = \state a f -> case state of {
+act = \state f -> case state of {
 	Stop -> Stop;
-	State i d v -> case a of {
-		RM -> case i of {
-			Z -> Stop; 
-			S x-> State (f x d) Z (S v);
-		};
-		WH -> case i of {
-			Z -> case v of {
-				Z -> Stop; 
-				S x-> State (f (f i d) x) (S Z) Z;
-			};
-			S x -> case v of {
-				Z -> State (f (f i d) v) (S Z) Z; 
-				S y -> State (f (f i d) y) (S Z) Z;
-			};
-       	};
-	};
+	State i d v -> [actRM i d v f | actWH i d v f]; -- non-det!!
 };
 
 
@@ -51,7 +33,6 @@ actRM = \i d v f ->
 		Z -> Stop; 
 		S x -> State (f x d) Z (S v);
 	};
-
 
 actWH = \i d v f -> 
 	case i of {
@@ -64,4 +45,3 @@ actWH = \i d v f ->
 			S y -> State (f (f i d) y) (S Z) Z;
 		};
 	};
-	--}

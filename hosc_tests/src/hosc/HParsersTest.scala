@@ -124,6 +124,12 @@ class HParsersTest {
         L(V("x"), L(V("y"), C("Cons", List(V("x"), V("y")))))) ; 
   }
   
+  @Test def choice(): Unit = {
+    testSTerm(
+        "[a|b]", 
+        Choice(V("a"), V("b")));
+  }
+  
   @Test def typeConstructor(): Unit = {
       // TC1 TC2 a TC2 a = TC1 (tC2) a (TC2) a
       testSType(
