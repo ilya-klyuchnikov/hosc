@@ -13,8 +13,6 @@ object LambdaLifting {
     Variable("_" + i) 
   }
   
-  val none: Option[LetRecExpression] = None
-  
   def lift(p: Program): Program = {
     val liftedGoal = lift(p.goal)
     val functions = new ListBuffer[Function]()
@@ -41,14 +39,19 @@ object LambdaLifting {
   // traverses expression top-down and finds the first letrec with free variable in its body
   def findLetRec(e: Expression) : Option[LetRecExpression] = e match {
     case Variable(_) => None
-    case Constructor(_, args) => args.foldLeft(none){(r, expr) => r.orElse(findLetRec(expr))}
+    case Constructor(_, args) => args.foldLeft(None: Option[LetRecExpression]){(r, expr) => r.orElse(findLetRec(expr))}
     case LambdaAbstraction(_, expr) => findLetRec(expr)
     case Application(head, arg) => findLetRec(head).orElse(findLetRec(arg))
     case CaseExpression(sel, branches) => branches.foldLeft(findLetRec(sel)){(r, branch) => r.orElse(findLetRec(branch.term))}
+    case Choice(e1, e2) => findLetRec(e1) orElse findLetRec(e2)
     case letrec@LetRecExpression((f, e1), e2) => {
       val e1FreeVars = TermAlgebra.getFreeVars(e1) - f
-      if (e1FreeVars.isEmpty) findLetRec(e1).orElse(findLetRec(e2)) else Some(letrec)
-    }  
+      if (e1FreeVars.isEmpty) 
+        findLetRec(e1).orElse(findLetRec(e2)) 
+      else 
+        Some(letrec)
+    }
+    case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }
   
   private def injectArgument(e: Expression, f: Variable, v0: Variable): Expression = e match {
@@ -62,6 +65,7 @@ object LambdaLifting {
       Application(injectArgument(head, f, v0), injectArgument(arg, f, v0))
     case CaseExpression(sel, branches) => 
       CaseExpression(injectArgument(sel, f, v0), branches map {b => Branch(b.pattern, injectArgument(b.term, f, v0))})
+    case Choice(e1, e2) => Choice(injectArgument(e1, f, v0), injectArgument(e2, f, v0))
     case LetRecExpression((f1, e1), e2) => 
       if (f1==f) {
         val nv = newVar()
@@ -69,8 +73,14 @@ object LambdaLifting {
       } else {
         LetRecExpression((f1, injectArgument(e1, f, v0)), injectArgument(e2, f, v0))
       }
+    case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }
   
+  // TODO: 
+  // 1. to use buffer is not pure functional way
+  // 2. ideally a type of this function should be something like:
+  //   extractG[T <:Expression](e1: T): T
+  // that is the type of the result = the type of the first argument
   private def extractGlobals(e1: Expression, p: ListBuffer[Function]): Expression = e1 match {
     case v@Variable(_) => v
     case Constructor(n, args) => Constructor(n, args map {e => extractGlobals(e, p)})
@@ -79,16 +89,19 @@ object LambdaLifting {
     case CaseExpression(sel, bs) => 
       CaseExpression(extractGlobals(sel, p), 
           bs map {b => Branch(b.pattern, extractGlobals(b.term, p))})
+    case Choice(e1, e2) => Choice(extractGlobals(e1, p), extractGlobals(e2, p))
     case lr: LetRecExpression => letrecToHl(lr, p)
+    case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }
   
-  // TODO!! - cannot be done directly in a correct way
-  // because of infinite data structures
-  // need to decide how to do it - maybe we need to allow general definitions -
-  // not just functions
-  private def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = { 
-    Function(letrec.binding._1.name, extractGlobals(letrec.binding._2, p).asInstanceOf[LambdaAbstraction]) +: p
-    extractGlobals(letrec.expr, p)
+  private def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = {
+    extractGlobals(letrec.binding._2, p) match {
+      case lam: LambdaAbstraction =>  {
+        Function(letrec.binding._1.name, lam) +: p
+        extractGlobals(letrec.expr, p)
+      }
+      case _ => throw new IllegalArgumentException("Expected abstraction in letrec: " + letrec)
+    }
   }
   
 }

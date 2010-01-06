@@ -39,8 +39,15 @@ object MSG {
       }
       case (v, Constructor(n1, a1), Constructor(n2, a2)) if n1 == n2 => {
         val newVars = a1.map(arg => newVar())
-        val addDSubs = ((newVars zip a1) zip (newVars zip a2)) map (pair => (pair._1._1, pair._1._2, pair._2._2)) 
+        val addDSubs = (newVars zip (a1 zip a2)) map { case (nv, (arg1, arg2)) => (nv, arg1, arg2)}
         t = applySubstitution(t, Map(v -> Constructor(n1, newVars)))
+        l2 ++= addDSubs
+      }
+      case (v, Choice(e1a, e2a), Choice(e1b, e2b)) => {
+        val nv1 = newVar()
+        val nv2 = newVar()
+        val addDSubs = List((nv1, e1a, e1b), (nv2, e2a, e2b))
+        t = applySubstitution(t, Map(v -> Choice(nv1, nv2)))
         l2 ++= addDSubs
       }
       case (v, la1@LambdaAbstraction(a1, t1), la2@LambdaAbstraction(a2, t2)) if HE.heByCoupling(la1, la2) || HE.heByCoupling(la2, la1) => {

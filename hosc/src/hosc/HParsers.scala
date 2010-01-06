@@ -10,8 +10,8 @@ import scala.util.parsing.combinator.syntactical.StdTokenParsers
 
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
-  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\")
-  lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
+  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\", "[", "]")
+  lexical.reserved += ("case", "of", "where", "data", "letrec", "in", "choice")
   
   def program = (typeConstrDefinition*) ~ term ~ (("where" ~> strong(function*)) | success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
@@ -20,7 +20,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
     
   // head of application
-  private def tr0: Parser[Expression] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")")) | letrec
+  private def tr0: Parser[Expression] = p(variable | lambdaAbstraction | caseExpression |("(" ~> appl <~ ")")) | letrec | choice
   // argument of or application constructor
   private def tr1 = p(tr0 | uident ^^ {x => Constructor(x, Nil)} | ("(" ~> term <~ ")"))
   // top constructor; cannot be head of application
@@ -29,12 +29,14 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def variable = p(lident ^^ Variable)  
   private def lambdaAbstraction:Parser[LambdaAbstraction] = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda) | "(" ~> lambdaAbstraction <~ ")"
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch*) <~ c("}")) ^^ CaseExpression)
-  private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ 
+  private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(lambdaAbstraction)) ~ (c("in") ~> c(term)) ^^ 
                        {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
+  def choice = "[" ~> c(term) ~ ("|" ~> c(term)) <~ c("]") ^^ Choice
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   
-  def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))  
+  def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))
+  def parseChoice(r: Reader[Char]) = strong(choice) (new lexical.Scanner(r))
   
   def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition)  
   private def typeConstrDefinition = p(("data" ~> uident) ~ (typeVariable*) ~ ("=" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
@@ -167,6 +169,7 @@ trait StrongParsers extends Parsers {
   }
 }
 
+// TODO - this is not functional style, since we mutate Variable
 object Postprocessor {
   def postprocess(program: Program) = {
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
@@ -179,6 +182,8 @@ object Postprocessor {
     case LambdaAbstraction(v, t) => process(t, globals)
     case Application(h, a) => process(h, globals); process(a, globals)
     case CaseExpression(s, bs) => process(s, globals); for (b <- bs) process(b.term, globals)
-    case LetRecExpression((v, e), e0) => {v.global = true; process(e, globals + v); process(e0, globals + v)}                                                   
+    case LetRecExpression((v, e), e0) => {v.global = true; process(e, globals + v); process(e0, globals + v)}   
+    case Choice(e1, e2) => process(e1, globals); process(e2, globals)
+    case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }
 }

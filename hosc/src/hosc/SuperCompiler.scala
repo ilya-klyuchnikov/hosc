@@ -37,6 +37,8 @@ class SuperCompiler(program: Program){
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
           Some(freshBinders(sel) :: 
             (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))}))
+        case RedexChoice(Choice(e1, e2)) => 
+          Some(List(context.replaceHole(freshBinders(e1)),context.replaceHole(freshBinders(e2))))
       }
     }
   }  

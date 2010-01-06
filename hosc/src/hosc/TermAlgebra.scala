@@ -23,9 +23,10 @@ object TermAlgebra {
   case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
   
   abstract case class NonTrivialRedex(term: Expression) extends Redex(term) 
-  case class RedexCall(v: Variable) extends NonTrivialRedex(v)
-  // The global control
-  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)  
+  case class RedexCall(f: Variable) extends NonTrivialRedex(f)
+  // global control - of certain interest!
+  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
+  case class RedexChoice(choice: Choice) extends Redex(choice)
   
   sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
@@ -46,13 +47,13 @@ object TermAlgebra {
     // observable
     case c: Constructor => ObservableCon(c)
     case l: LambdaAbstraction => ObservableLam(l)
-    case app: Application if getCoreLocalVar(app)!=null => ObservableVarApp(getCoreLocalVar(app), app)
+    case app: Application if getCoreLocalVar(app) != null => ObservableVarApp(getCoreLocalVar(app), app)
     case v: Variable if !v.global => ObservableVar(v)
     // context
     case t => createContext(t)
   }
   
-  def createContext(t: Expression): Context = t match {
+  private def createContext(t: Expression): Context = t match {
     case v: Variable if (v.global) => ContextHole(RedexCall(v))
     case app @ Application(l: LambdaAbstraction, arg) => ContextHole(RedexLamApp(l, app))
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
@@ -60,7 +61,12 @@ object TermAlgebra {
     case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
     case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
-    case _ => throw new IllegalArgumentException(t.toString)
+    case ch: Choice => ContextHole(RedexChoice(ch))
+    case v: Variable => throw new IllegalArgumentException("cannot be decomposed as a context: " + v)
+    case lam: LambdaAbstraction => throw new IllegalArgumentException("cannot be decomposed as a context: " + lam)
+    case c: Constructor => throw new IllegalArgumentException("cannot be decomposed as a context: " + c)
+    case let: LetExpression => throw new IllegalArgumentException("cannot be decomposed as a context: " + let)
+    case letrec: LetRecExpression => throw new IllegalArgumentException("cannot be decomposed as a context: " + letrec)
   }
   
   private def getCoreLocalVar(app: Application): Variable = app.head match {
@@ -78,6 +84,9 @@ object TermAlgebra {
     case CaseExpression(sel, bs) => 
       CaseExpression(applySubstitution(sel, s), 
           bs map {b => Branch(b.pattern, applySubstitution(b.term, s -- b.pattern.args))})
+    case Choice(e1, e2) => Choice(applySubstitution(e1, s), applySubstitution(e2, s))
+    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
+    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
   
   private def getBoundedVars(t: Expression): Set[Variable] = t match {
@@ -87,6 +96,9 @@ object TermAlgebra {
     case Application(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
     case CaseExpression(sel, bs) => 
       getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
+    case Choice(e1, e2) => getBoundedVars(e1) ++ getBoundedVars(e2) 
+    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
+    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
   
   def getFreeVars(t: Expression): List[Variable] = t match {
@@ -103,7 +115,11 @@ object TermAlgebra {
       val eVars = getFreeVars(e) 
       eVars ++ (getFreeVars(e0) -- eVars) - f
     }
-    case LetExpression(_, _) => List()
+    case Choice(e1, e2) => {
+      val e1Vars = getFreeVars(e1)
+      e1Vars ++ (getFreeVars(e2) -- e1Vars)
+    }
+    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
   }
   
   def compareB(b1: Branch, b2: Branch) = b1.pattern.name.compareTo(b2.pattern.name) < 0
@@ -152,6 +168,8 @@ object TermAlgebra {
         ((args1 zip args2) forall (args => eq1(args._1, args._2)))
       case (Application(h1, a1), Application(h2, a2)) => 
         eq1(h1, h2) && eq1(a1, a2)
+      case (Choice(e1a, e2a), Choice(e1b, e2b)) =>
+        eq1(e1a, e1b) && eq1(e2a, e2b)
       case (LambdaAbstraction(b1, v1), LambdaAbstraction(b2, v2)) =>
         eq1(b1, b2) && eq1(v1, v2)
       case (CaseExpression(sel1, Nil), CaseExpression(sel2, Nil)) =>
@@ -175,15 +193,17 @@ object TermAlgebra {
   }
   
   def freshBinders(term: Expression): Expression = term match {
+    case v: Variable => v
     case LetExpression(bs, expr) => LetExpression(bs map {case (k, v) => (k, freshBinders(v))}, freshBinders(expr))
     case Constructor(name, args) => Constructor(name, args map (freshBinders(_)))
-    case Application(h, a) => Application(freshBinders(h), freshBinders(a))
+    case Application(e1, e2) => Application(freshBinders(e1), freshBinders(e2))
     case LambdaAbstraction(v, t) => {
       val freshV = newVar()
       LambdaAbstraction(freshV, applySubstitution(freshBinders(t), Map(v -> freshV)))
     }
     case CaseExpression(sel, bs) => CaseExpression(freshBinders(sel), bs map {freshBinders(_)})
-    case v: Variable => v
+    case Choice(e1, e2) => Choice(freshBinders(e1), freshBinders(e2))
+    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
   
   def freshBinders(b: Branch): Branch = {
@@ -197,10 +217,13 @@ object TermAlgebra {
   def replaceTerm(term: Expression, t1: Expression, t2: Expression): Expression = if (term == t1) t2 else term match {
     case v: Variable => v
     case Constructor(n, args) => Constructor(n, args map {a => replaceTerm(a, t1, t2)})
-    case Application(h, a) => Application(replaceTerm(h, t1, t2), replaceTerm(a, t1, t2))
+    case Application(e1, e2) => Application(replaceTerm(e1, t1, t2), replaceTerm(e2, t1, t2))
     case LambdaAbstraction(v, t) => LambdaAbstraction(v, replaceTerm(t, t1, t2))
     case CaseExpression(sel, bs) => 
       CaseExpression(replaceTerm(sel, t1, t2), bs map {b => Branch(b.pattern, replaceTerm(b.term, t1, t2))})
+    case Choice(e1, e2) => Choice(replaceTerm(e1, t1, t2), replaceTerm(e2, t1, t2))
+    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
+    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
   
   def instanceOf(t1: Expression, t2: Expression): Boolean = equivalent(msg(t1, t2).term, t1)
@@ -226,6 +249,7 @@ object TermAlgebra {
        (getAllVars(expr) /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
     case LetRecExpression(bs, expr) =>
        (getAllVars(expr) /: (bs :: Nil)) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
+    case Choice(e1, e2) => getAllVars(e1) ++ getAllVars(e2)
   }
   
 }

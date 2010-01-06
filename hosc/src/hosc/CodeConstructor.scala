@@ -35,6 +35,10 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
         } else {
           context.redex match {        
         	case RedexLamApp(lam, app) => construct(node.children.head)
+        	case RedexChoice(choice) => node.children match {
+        	  case e1 :: e2 :: Nil => Choice(construct(e1), construct(e2))
+              case _ => throw new IllegalStateException("exprected exactly 2 child nodes here...")
+        	}
         	case RedexCaseCon(c, CaseExpression(sel, Nil)) => {
         	  CaseExpression(sel, Nil)
             }

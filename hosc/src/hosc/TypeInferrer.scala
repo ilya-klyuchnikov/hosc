@@ -138,6 +138,11 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       val sub = mgu(selType, type3, sub3 compose sub2)
       (sub, sub(branchBodyType))
     }
+    case Choice(e1, e2) => {
+      val (sub1, List(t1, t2)) = check(te, List(e1, e2))
+      val sub2 = mgu(t1, t2, sub1)
+      (sub2, sub2(t1))
+    }
   }
   
   private def check(te: TypeEnv, expressions: List[Expression]): (Subst, List[Type]) = expressions match {
