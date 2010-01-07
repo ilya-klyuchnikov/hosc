@@ -229,6 +229,10 @@ class SuperCompiler1(program: Program){
   
   private def sc(expr: Expression): Expression = {
     val sc0 = new SuperCompiler(program)
+    if (debug) {
+      println("* sc0 *")
+      println(expr)
+    }
     val pt = sc0.buildProcessTree(expr)
     new CodeConstructor(program, pt, true).generateProgram().goal
   }
