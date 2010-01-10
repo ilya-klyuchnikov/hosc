@@ -171,6 +171,54 @@ class TermAlgebraTest {
     assertTrue(he(t03, t04))
   }
   
+  @Test def he17(): Unit = {
+    val program = programFromFile(inputFile)
+    val t01 = termFromString("""\x -> S x""", program)
+    val t02 = termFromString("""\x -> S (S x) """, program)
+    assertFalse(he(t01, t02))
+    
+    val e01 = termFromString("""a b""", program)
+    val e02 = termFromString("""d e f""", program)
+    assertFalse(he(e01, e02))
+    
+    val e03 = termFromString("""a b""", program)
+    val e04 = termFromString("""d (e f)""", program)
+    assertTrue(he(e03, e04))
+    
+    val e05 = termFromString("""\x -> a b x""", program)
+    val e06 = termFromString("""\x -> d (e f) x""", program)
+    assertTrue(he(e05, e06))
+    
+    val e07 = termFromString("""\x -> a b x""", program)
+    val e08 = termFromString("""\x -> (d e) f x""", program)
+    assertFalse(he(e07, e08))
+    
+    // interesting example -> lifting results of  non-embedding to be embedding!
+    val e09 = termFromString("""\x -> a x""", program)
+    val e10 = termFromString("""\x -> (a b) x """, program)
+    assertFalse(he(e09, e10))
+    
+    val e11 = termFromString("""\x -> ((\y -> y) a) x""", program)
+    val e12 = termFromString("""\x -> ((\y -> y) (a b)) x """, program)
+    assertTrue(he(e11, e12))
+    
+    val e13 = termFromString("""(\fu -> \x -> fu x) a""", program)
+    val e14 = termFromString("""(\fu -> \x -> fu x) (a b)""", program)
+    assertTrue(he(e14, e14))
+    
+    val e15 = termFromString("""k""", program)
+    val e16 = termFromString("""\x -> k x""", program)
+    assertTrue(he(e15, e15))
+    
+    val e17 = termFromString("""k s""", program)
+    val e18 = termFromString("""\x -> k s x""", program)
+    assertFalse(he(e17, e18))
+    
+    val e19 = termFromString("""\x -> x (a b)""", program)
+    val e20 = termFromString("""(\y x -> x y) (a b)""", program)
+    assertFalse(he(e19, e20))
+  }
+  
   @Test def msg1(): Unit = {
     val program = programFromFile(inputFile)
     val term = termFromString("app x", program)
