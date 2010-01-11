@@ -96,11 +96,10 @@ object LambdaLifting {
   
   private def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = {
     extractGlobals(letrec.binding._2, p) match {
-      case lam: LambdaAbstraction =>  {
-        Function(letrec.binding._1.name, lam) +: p
+      case x =>  {
+        Function(letrec.binding._1.name, x) +: p
         extractGlobals(letrec.expr, p)
       }
-      case _ => throw new IllegalArgumentException("Expected abstraction in letrec: " + letrec)
     }
   }
   

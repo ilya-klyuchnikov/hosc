@@ -28,12 +28,12 @@ object LangUtils {
   private def normalize(p: Program0): Expression = {
     val fs = (Map[String, Function0]() /: p.fs) {(m, f) => m + (f.name -> f)}
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
-    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.lam).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
+    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.body).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
     val sccs = analyzeDependencies(g)
     var expr: Expression = hl0ToELC(p.goal)
     for (scc <- sccs){
-      val bs = scc.vs.toList map (x => (Variable(x.name), hl0ToELC(fs(x.name).lam)))
+      val bs = scc.vs.toList map (x => (Variable(x.name), hl0ToELC(fs(x.name).body)))
       if (scc.recursive){
         expr = LetRecExpression(bs, expr)
       } else {
@@ -95,7 +95,7 @@ object LangUtils {
   }
   
   def canonize(p: Program0): Program0 = {
-    Program0(p.ts, canonize(p.goal), p.fs map {f => Function0(f.name, canonize(f.lam).asInstanceOf[LambdaAbstraction0])})
+    Program0(p.ts, canonize(p.goal), p.fs map {f => Function0(f.name, canonize(f.body))})
   }
   
 }

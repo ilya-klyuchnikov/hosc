@@ -94,8 +94,8 @@ object HLanguage {
      def toDoc = text(toString)
    }
    
-   case class Function(name: String, lam: LambdaAbstraction) extends Positional {
-     def toDoc = text(name) :: text(" = ") :: lam.toDoc :: ";" :: ED
+   case class Function(name: String, body: Expression) extends Positional {
+     def toDoc = text(name) :: text(" = ") :: body.toDoc :: ";" :: ED
    }
    
    case class Program(ts: List[TypeConstructorDefinition], goal: Expression, fs: List[Function]) {

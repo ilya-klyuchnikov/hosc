@@ -62,7 +62,7 @@ object Validator {
     
     def valFD(f: Function) = {
       if (fNames contains f.name) err("duplicate function " + f.name, f)
-      valTerm(fNamesInDefs, f.lam, p)
+      valTerm(fNamesInDefs, f.body, p)
     }
     
     try {     

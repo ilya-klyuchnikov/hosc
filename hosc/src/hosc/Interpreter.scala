@@ -30,8 +30,8 @@ class Interpreter(program: Program) {
     case o: Observable => o.term
     case context: Context => context.redex match {
       case RedexCall(v) => {
-        val lam = program.getFunction(v.name).get.lam
-        context.replaceHole(freshBinders(lam)) 
+        val body = program.getFunction(v.name).get.body
+        context.replaceHole(freshBinders(body)) 
       }
       case RedexLamApp(lam, app) => context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))
       case RedexCaseCon(c, ce) => {

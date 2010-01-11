@@ -52,4 +52,9 @@ class Experiments {
   
   @Test def fo_dsl_3_b =
     SCP0.main(Array("-si", "exp/fo_dsl_3_b.hs", "-t", "exp/out0/fo_dsl_3_b.svg","-p", "exp/out0/fo_dsl_3_b.hs"))
+  
+  @Test def no_lambda =
+    SCP0.main(Array("-si", "exp/inf_data.hs", "-t", "exp/out0/inf_data.svg","-p", "exp/out0/inf_data.hs"))
+  @Test def no_lambda2 =
+    SCP0.main(Array("-si", "exp/inf_data2.hs", "-t", "exp/out0/inf_data2.svg","-p", "exp/out0/inf_data2.hs"))	
 }

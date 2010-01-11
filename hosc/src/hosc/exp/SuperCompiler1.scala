@@ -21,7 +21,7 @@ class SuperCompiler1(program: Program){
       case ObservableLam(l) => l.t :: Nil
       case context: Context => context.redex match {
         case RedexCall(v) => {
-          val lam = program.getFunction(v.name).get.lam
+          val lam = program.getFunction(v.name).get.body
           freshBinders(context.replaceHole(freshBinders(lam))) :: Nil 
         }
         case RedexLamApp(lam, app) => freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil

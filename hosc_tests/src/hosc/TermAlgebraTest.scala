@@ -48,7 +48,7 @@ class TermAlgebraTest {
     val program = programFromFile(inputFile)
     val f1 = program.getFunction("f1").get
     val f2 = program.getFunction("f2").get
-    assertTrue(equivalent(f1.lam, f2.lam))
+    assertTrue(equivalent(f1.body, f2.body))
   }
   
   @Test def equivalency07(): Unit = {
@@ -92,42 +92,42 @@ class TermAlgebraTest {
     val program = programFromFile(inputFile)
     val f1 = program.getFunction("f1").get
     val f2 = program.getFunction("f2").get
-    assertTrue(he(f1.lam, f2.lam))
+    assertTrue(he(f1.body, f2.body))
   }
   
   @Test def he07(): Unit = {
     val program = programFromFile(inputFile)
     val f4 = program.getFunction("f4").get
     val f5 = program.getFunction("f5").get
-    assertFalse(he(f4.lam, f5.lam))
+    assertFalse(he(f4.body, f5.body))
   }
   
   @Test def he08(): Unit = {
     val program = programFromFile(inputFile)
     val f1 = program.getFunction("f1").get
     val f6 = program.getFunction("f6").get
-    assertFalse(he(f1.lam, f6.lam))
+    assertFalse(he(f1.body, f6.body))
   }
   
   @Test def he09(): Unit = {
     val program = programFromFile(inputFile)
     val f3 = program.getFunction("f3").get
     val f2 = program.getFunction("f2").get
-    assertFalse(he(f3.lam, f2.lam))
+    assertFalse(he(f3.body, f2.body))
   }
   
   @Test def he10(): Unit = {
     val program = programFromFile(inputFile)
     val f3 = program.getFunction("f3").get
     val f2 = program.getFunction("f2").get
-    assertFalse(he(f2.lam, f3.lam))
+    assertFalse(he(f2.body, f3.body))
   }
   
   @Test def he11(): Unit = {
     val program = programFromFile(inputFile)
     val f7 = program.getFunction("f7").get
     val f8 = program.getFunction("f8").get
-    assertFalse(he(f7.lam, f8.lam))
+    assertFalse(he(f7.body, f8.body))
   }
   
   @Test def he12(): Unit = {

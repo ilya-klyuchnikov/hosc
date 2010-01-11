@@ -14,7 +14,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   lexical.reserved += ("case", "of", "where", "data", "letrec", "in", "choice")
   
   def program = (typeConstrDefinition*) ~ term ~ (("where" ~> strong(function*)) | success(Nil)) ^^ Program
-  def function = p(lident ~ ("=" ~> lambdaAbstraction <~ c(";")) ^^ Function)
+  def function = p(lident ~ ("=" ~> term <~ c(";")) ^^ Function)
   
   def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
@@ -29,7 +29,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def variable = p(lident ^^ Variable)  
   private def lambdaAbstraction:Parser[LambdaAbstraction] = p("\\" ~> c(variable+) ~ ((c("->") ~> term)) ^^ desugarLambda) | "(" ~> lambdaAbstraction <~ ")"
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch*) <~ c("}")) ^^ CaseExpression)
-  private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(lambdaAbstraction)) ~ (c("in") ~> c(term)) ^^ 
+  private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ 
                        {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
   def choice = ("choice" ~ c("{")) ~> c(term) ~ (";" ~> c(term)) <~ c(";" ~ "}") ^^ Choice
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
@@ -173,7 +173,7 @@ trait StrongParsers extends Parsers {
 object Postprocessor {
   def postprocess(program: Program) = {
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
-    for (f <- program.fs) process(f.lam,  globals)
+    for (f <- program.fs) process(f.body,  globals)
     process(program.goal, globals)
   }
   def process(t: Expression, globals: Set[Variable]): Unit = t match {
