@@ -20,11 +20,11 @@ test = \state -> case state of {
 };
 
 loop = \state add ->
-	[state | loop (act state add) add]; --non-det
+	choice {state; loop (act state add) add;}; --non-det
 
 act = \state f -> case state of {
 	Stop -> Stop;
-	State i d v -> [actRM i d v f | actWH i d v f]; -- non-det!!
+	State i d v -> choice{actRM i d v f; actWH i d v f;}; -- non-det!!
 };
 
 

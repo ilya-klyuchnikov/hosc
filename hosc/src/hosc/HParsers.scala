@@ -31,7 +31,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def caseExpression = p("case" ~> c(term) ~ (c("of") ~> c("{")~> (branch*) <~ c("}")) ^^ CaseExpression)
   private def letrec:Parser[LetRecExpression] = ("letrec" ~> c(variable)) ~ (c("=") ~> c(lambdaAbstraction)) ~ (c("in") ~> c(term)) ^^ 
                        {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
-  def choice = "[" ~> c(term) ~ ("|" ~> c(term)) <~ c("]") ^^ Choice
+  def choice = ("choice" ~ c("{")) ~> c(term) ~ (";" ~> c(term)) <~ c(";" ~ "}") ^^ Choice
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
   

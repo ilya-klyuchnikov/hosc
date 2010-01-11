@@ -79,8 +79,8 @@ object HLanguage {
      type termType = Expression
      def \\(s: Map[Variable, Variable]) = Choice(e1\\s, e2\\s)
      def /(s: Map[Variable, Expression]) = Choice(e1/s, e2/s)
-     override def toString = "[" + e1 + " | " + e2 + "]"
-     def toDoc = group("[" :: nest(2, e1.toDoc :/: "|" :/: e2.toDoc :: ED) :: "]" :: ED)
+     override def toString = "choice{" + e1 + "; " + e2 + ";}"
+     def toDoc = group("choice{" :: nest(2, e1.toDoc :/: ";" :/: e2.toDoc :: ";" :: ED) :: "}" :: ED)
    }
    
    case class Branch(pattern: Pattern, term: Expression) extends Positional {

@@ -126,7 +126,7 @@ class HParsersTest {
   
   @Test def choice(): Unit = {
     testSTerm(
-        "[a|b]", 
+        "choice{a;b;}", 
         Choice(V("a"), V("b")));
   }
   

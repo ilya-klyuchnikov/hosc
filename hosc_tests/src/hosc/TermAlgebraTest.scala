@@ -214,6 +214,7 @@ class TermAlgebraTest {
     val e18 = termFromString("""\x -> k s x""", program)
     assertFalse(he(e17, e18))
     
+    // \x -> x (a b) !< (\y x -> x y) (a b)
     val e19 = termFromString("""\x -> x (a b)""", program)
     val e20 = termFromString("""(\y x -> x y) (a b)""", program)
     assertFalse(he(e19, e20))

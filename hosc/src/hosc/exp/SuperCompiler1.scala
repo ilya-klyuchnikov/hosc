@@ -9,7 +9,7 @@ import hosc.LangUtils._
 
 class SuperCompiler1(program: Program){
   val emptyMap = Map[Variable, Expression]()
-  val debug = true
+  val debug = false
   val useControl = true
   
   def driveExp(expr: Expression): List[Expression] = expr match {
