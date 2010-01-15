@@ -101,7 +101,6 @@ class SuperCompiler1(program: Program){
     while (!p.isClosed) {
       i = i + 1
       if (i > 10000) throw new Exception()
-      println(i)
       if (debug) { 
         println(p)
         println("==========")
@@ -136,7 +135,6 @@ class SuperCompiler1(program: Program){
     while (!p.isClosed) {
       i = i + 1
       if (i > 1000) throw new Exception()
-      println(i)
       if (debug) { 
         println(p)
         println("==========")
@@ -178,21 +176,28 @@ class SuperCompiler1(program: Program){
     case aTerm if (sameRedex(aTerm, bNode.expr) && heByCoupling(aTerm, bNode.expr)) && checkControl(aNode, bNode) => { 
       //return true;
       
-      println(format(canonize(aTerm)))
-      println("------")
-      println(format(canonize(bNode.expr)))
-      println("------")
+      if (debug) {
+        println(format(canonize(aTerm)))
+        println("------")
+        println(format(canonize(bNode.expr)))
+        println("------")
+      }
+      
       val sca = sc(aTerm);
       val scb = sc(bNode.expr);
       
-      println(format(sca))
-      println("------")
-      println(format(scb))
-      println("------")
-      println("------")
+      if (debug) {
+        println(format(sca))
+        println("------")
+        println(format(scb))
+        println("------")
+        println("------")
+      }
       
       val r = HE1.heByCoupling(sca, scb)
-      println(r)
+      if (debug) {
+        println(r)
+      }
       r
     };
     case _ => false
