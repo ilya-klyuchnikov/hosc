@@ -9,7 +9,8 @@ import LangUtils._
 
 class SuperCompiler(val program: Program) extends ASupercompiler{
   val emptyMap = Map[Variable, Expression]()
-  val debug = false  
+  val debug = false
+  val useControl = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
     val p = ProcessTree(e)
@@ -26,13 +27,13 @@ class SuperCompiler(val program: Program) extends ASupercompiler{
       beta.expr match {
         case LetExpression(_, _) => drive(p, beta)
         case bTerm if canBeEnhanced_?(bTerm) => {
-          beta.ancestors find equivalenceTest(bTerm) match {
+          beta.ancestors find equivalenceTest(beta) match {
             case Some(alpha) => beta.repeatedOf = alpha; 
             case None => {
-              beta.ancestors find instanceTest(bTerm) match {
+              beta.ancestors find instanceTest(beta) match {
                 case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
                 case None => { 
-                  beta.ancestors find heByCouplingTest(bTerm) match {
+                  beta.ancestors find heByCouplingTest(beta) match {
                     case Some(alpha) => {
                       if (debug) {
                         println("GENERALIZATION FROM SC0")
@@ -52,25 +53,41 @@ class SuperCompiler(val program: Program) extends ASupercompiler{
     renameVars(p)
   }
   
-  private def instanceTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+  private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => instanceOf(aTerm, bTerm);
+    case aTerm => instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode);
   }
   
-  private def equivalenceTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+  private def equivalenceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => equivalent(aTerm, bTerm);
+    case aTerm => equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode);
   }
   
-  private def heByCouplingTest(bTerm: Expression)(aNode: Node): Boolean = aNode.expr match {
+  private def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => heByCoupling(aTerm, bTerm);
+    case aTerm => heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode);
   }
   
   def canBeEnhanced_?(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
     case _ => false
+  }
+  
+  private def checkControl(aNode: Node, bNode: Node): Boolean = {
+    if (!useControl) {
+      return true
+    }
+    if (isGlobal(aNode) == isGlobal(bNode)) {
+      if (isGlobal(bNode)) {
+        true
+      } else {
+        val nodesBetween = bNode.ancestors.takeWhile(_ != aNode)
+        nodesBetween.forall(!isGlobal(_))
+      }
+    } else {
+      false
+    }
   }
   
   def drive(t: ProcessTree, n: Node): Unit = {
