@@ -33,7 +33,9 @@ object MSG {
   private def applyCommonFunctorRule(g: Generalization2): Generalization2 = {
     val l2 = new scala.collection.mutable.ListBuffer[DoubleSubstitution]()
     var t = g.term;
-    for (dSub <- g.dSub) dSub match {
+    for (dSub <- g.dSub) {
+      if (HE.heByCoupling(dSub._2, dSub._3) || HE.heByCoupling(dSub._3, dSub._2)) {
+      dSub match {
       case (v, v1: Variable, v2: Variable) if v1.name == v2.name => {
         t = applySubstitution(t, Map(v -> v1))
       }
@@ -91,6 +93,10 @@ object MSG {
         }
       } 
       case d => l2 += d
+      } 
+      } else {
+        l2 += dSub
+      }
     }
     Generalization2(t, l2.toList)
   }
