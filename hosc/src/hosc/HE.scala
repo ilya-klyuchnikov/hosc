@@ -11,15 +11,7 @@ object HE {
   def strictHe(term1: Expression, term2: Expression) = heByDiving(term1, term2, Nil)
   
   private def he(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
-    heByVar(term1, term2, binders) || heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
-  
-  private def heByVar(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
-    (term1, term2) match {
-    case (v1: Variable, v2: Variable) => (v1.global == true && v2.global == true && v1.name == v2.name) ||
-      (v1.global == false && v2.global == false) && 
-        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))
-    case _ => false
-  }
+    heByDiving(term1, term2, binders) || heByCoupling(term1, term2, binders)
   
   private def heByDiving(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = { 
     val term1Vars = getFreeVars(term1)
@@ -37,6 +29,9 @@ object HE {
   
   private def heByCoupling(term1: Expression, term2: Expression, binders: List[(Variable, Variable)]): Boolean = 
     (term1, term2) match {
+    case (v1: Variable, v2: Variable) => (v1.global == true && v2.global == true && v1.name == v2.name) ||
+      (v1.global == false && v2.global == false) && 
+        ((binders exists {case (b1, b2) => b1 == v1 && b2 == v2}) || (binders forall {case (b1, b2) => b1 != v1 && b2 != v2}))
     case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 => 
       (args1 zip args2) forall (args => he(args._1, args._2, binders))
     case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders)
