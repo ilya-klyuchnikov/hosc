@@ -31,14 +31,14 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
             case Some(alpha) => beta.repeatedOf = alpha; 
             case None => {
               beta.ancestors find instanceTest(beta) match {
-                case Some(alpha1) => makeAbstraction(p, beta, alpha1) 
+                case Some(alpha) => abstractDown(p, alpha, beta) 
                 case None => { 
                   beta.ancestors find heByCouplingTest(beta) match {
                     case Some(alpha) => {
                       if (debug) {
                         println("GENERALIZATION FROM SC0")
                       }
-                      makeAbstraction(p, alpha, beta)
+                      abstractUp(p, alpha, beta)
                     }
                     case None => drive(p, beta)
                   }
@@ -132,6 +132,14 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     }
   }
   
+  def abstractDown(t: ProcessTree, up: Node, down: Node): Unit = {
+    makeAbstraction(t, down, up)
+  }
+  
+  def abstractUp(t: ProcessTree, up: Node, down: Node): Unit = {
+    makeAbstraction(t, up, down)
+  }
+  
   def makeAbstraction(t: ProcessTree, alpha: Node, beta: Node): Unit = {
     val aTerm = alpha.expr
     val bTerm = beta.expr
@@ -150,5 +158,5 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
       }
       t.replace(alpha, LetExpression(g.sub1, g.term))
     }    
-  }  
+  }
 }
