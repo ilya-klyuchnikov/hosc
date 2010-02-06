@@ -252,4 +252,25 @@ object TermAlgebra {
     case Choice(e1, e2) => getAllVars(e1) ++ getAllVars(e2)
   }
   
+  def size(expr: Expression): Int = expr match {
+    case Variable(_) => 
+      1
+    case Constructor(_, args) => 
+      1 + sum(args map size)
+    case LambdaAbstraction(_, body) => 
+      1 + size(body)
+    case Application(e1, e2) =>
+      size(e1) + size(e2)
+    case CaseExpression(sel, bs) =>
+      1 + size(sel) + sum(bs map {b => size(b.term)})
+  }
+  
+  private def sum(ns: List[Int]): Int = {
+    var result = 0
+    for (n <- ns) {
+      result += n
+    }
+    result
+  }
+  
 }
