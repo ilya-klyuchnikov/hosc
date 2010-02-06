@@ -5,6 +5,7 @@ import org.junit.Ignore
 import org.junit.Assert._
 import HLanguage._
 import Util._
+import hosc.lemmas.LemmaFinder
 
 import hosc.{SuperCompilerApp => SCP0}
 import hosc.exp.{SuperCompilerApp1 => SCP1}
@@ -56,5 +57,47 @@ class Experiments {
   @Test def no_lambda =
     SCP0.main(Array("-si", "exp/inf_data.hs", "-t", "exp/out0/inf_data.svg","-p", "exp/out0/inf_data.hs"))
   @Test def no_lambda2 =
-    SCP0.main(Array("-si", "exp/inf_data2.hs", "-t", "exp/out0/inf_data2.svg","-p", "exp/out0/inf_data2.hs"))	
+    SCP0.main(Array("-si", "exp/inf_data2.hs", "-t", "exp/out0/inf_data2.svg","-p", "exp/out0/inf_data2.hs"))
+  
+  @Test def inf_eq =
+    SCP0.main(Array("-si", "exp/inf_eq.hs", "-t", "exp/out0/inf_eq.svg","-p", "exp/out0/inf_eq.hs"))
+  
+  @Test def pred_nat =
+    SCP0.main(Array("-si", "exp/predNat.hs", "-t", "exp/out0/predNat.svg","-p", "exp/out0/predNat.hs"))
+  
+  @Test def join1 =
+    SCP0.main(Array("-si", "exp/join1.hs", "-t", "exp/out0/join1.svg","-p", "exp/out0/join1.hs"))
+  
+  @Test def rev =
+    SCP0.main(Array("-si", "exp/rev.hs", "-t", "exp/out0/rev.svg","-p", "exp/out0/rev.hs"))
+  
+  @Test def church =
+    SCP0.main(Array("-si", "exp/church.hs", "-t", "exp/out0/church.svg","-p", "exp/out0/church.hs"))
+  
+  @Test def or_even_odd_1 =
+    SCP0.main(Array("-si", "exp/or_even_odd_1.hs", "-t", "exp/out0/or_even_odd_1.svg","-p", "exp/out0/or_even_odd_1.hs"))
+  
+  @Test def or_even_odd_2 =
+    SCP0.main(Array("-si", "exp/or_even_odd_2.hs", "-t", "exp/out0/or_even_odd_2.svg","-p", "exp/out0/or_even_odd_2.hs"))
+  
+  @Ignore
+  @Test def or_even_odd: Unit = {
+    val program = programFromFile("exp/or_even_odd_2.hs")
+    val finder = new LemmaFinder(program)
+    finder.findEqExpressions(program.goal)
+  }
+  
+  @Test def even_doubleAcc_1 =
+    SCP0.main(Array("-si", "exp/even_doubleAcc_1.hs", "-t", "exp/out0/even_doubleAcc_1.svg","-p", "exp/out0/even_doubleAcc_1.hs"))
+  
+  @Test def even_doubleAcc_2 =
+    SCP0.main(Array("-si", "exp/even_doubleAcc_2.hs", "-t", "exp/out0/even_doubleAcc_2.svg","-p", "exp/out0/even_doubleAcc_2.hs"))
+  
+  @Ignore
+  @Test def even_doubleAcc: Unit = {
+    val program = programFromFile("exp/even_doubleAcc_2.hs")
+    val finder = new LemmaFinder(program)
+    finder.findEqExpressions(program.goal)
+  }
+    
 }
