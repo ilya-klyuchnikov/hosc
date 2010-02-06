@@ -27,7 +27,7 @@ object HLanguage {
      type termType = Constructor
      def \\(s: Map[Variable, Variable]) = Constructor(name, args map {_\\s})
      def / (s: Map[Variable, Expression]) = Constructor(name, args map {_/s})
-     override def toString = "(" + name + " " + args.mkString(" ") + ")"
+     override def toString = "(" + name + (args match {case Nil => ""; case _ => args.mkString(" ", " ","")}) + ")"
      def toDoc = args match {
        case Nil => text(name)
        case _ => group(("(" + name) :: nest(2, ED :: args.foldRight(ED){(x, y) => ED :/: x.toDoc :: y}) :: ")" :: ED)
