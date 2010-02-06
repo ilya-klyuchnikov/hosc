@@ -11,6 +11,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
   val emptyMap = Map[Variable, Expression]()
   val debug = false
   val useControl = true
+  var renameVars = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
     val p = ProcessTree(e)
@@ -50,7 +51,11 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
         case _ => drive(p, beta)
       }      
     }
-    renameVars(p)
+    if (renameVars) {
+      renameVars(p)
+    } else {
+      p
+    }
   }
   
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
