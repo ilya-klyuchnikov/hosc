@@ -10,6 +10,7 @@ import java.io.FileReader
 import java.io.FileWriter
 import java.io.BufferedReader
 
+import hosc.CodeConstructor
 import hosc.ProcessTreeSVG
 import hosc.HLanguage._
 import hosc.Util._

@@ -4,6 +4,9 @@ import hosc.HLanguage._
 import hosc.HE._
 import hosc.MSG._
 import hosc.TermAlgebra._
+import hosc.ProcessTree
+import hosc.CodeConstructor
+import hosc.SuperCompiler
 import hosc.ProcessTree._
 import hosc.LangUtils._
 
