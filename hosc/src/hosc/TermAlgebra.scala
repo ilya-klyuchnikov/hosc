@@ -214,7 +214,7 @@ object TermAlgebra {
   }
 
   // replace all occurrences of t1 in term by t2 
-  def replaceTerm(term: Expression, t1: Expression, t2: Expression): Expression = if (term == t1) t2 else term match {
+  def replaceTerm(term: Expression, t1: Expression, t2: Expression): Expression = if (Eq.equivalent(term, t1)) t2 else term match {
     case v: Variable => v
     case Constructor(n, args) => Constructor(n, args map {a => replaceTerm(a, t1, t2)})
     case Application(e1, e2) => Application(replaceTerm(e1, t1, t2), replaceTerm(e2, t1, t2))
