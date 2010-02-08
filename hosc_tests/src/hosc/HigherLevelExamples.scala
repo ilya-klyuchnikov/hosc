@@ -1,6 +1,7 @@
 package hosc
 
 import hosc.exp.{HigherLevelSuperCompilerApp => HLSC}
+import hosc.exp.{FullPositiveSuperCompilerApp => FPSC}
 
 object HigherLevelExamples {
   def main(args : Array[String]) : Unit = {
@@ -10,5 +11,6 @@ object HigherLevelExamples {
     HLSC.main(Array("-si", "hl/add_x_x.hs", "-t", "hl/out/add_x_x.svg","-p", "hl/out/add_x_x.hs"))
     
     //HLSC.main(Array("-si", "hl/app_rev.hs", "-t", "hl/out/app_rev.svg","-p", "hl/out/app_rev.hs"))
+    //FPSC.main(Array("-si", "hl/church.hs", "-t", "hl/out/church.svg","-p", "hl/out/church.hs"))
   }
 }

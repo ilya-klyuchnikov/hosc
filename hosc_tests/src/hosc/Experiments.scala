@@ -84,7 +84,8 @@ class Experiments {
   @Test def or_even_odd: Unit = {
     val program = programFromFile("exp/or_even_odd_2.hs")
     val finder = new LemmaFinder(program)
-    finder.findEqExpressions(program.goal)
+    //finder.findEqExpressions(program.goal)
+    null
   }
   
   @Test def even_doubleAcc_1 =
@@ -97,7 +98,8 @@ class Experiments {
   @Test def even_doubleAcc: Unit = {
     val program = programFromFile("exp/even_doubleAcc_2.hs")
     val finder = new LemmaFinder(program)
-    finder.findEqExpressions(program.goal)
+    //finder.findEqExpressions(program.goal)
+    null
   }
     
 }
