@@ -134,7 +134,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     }
   }
   
-  private def isGlobal(n: Node): Boolean = n.expr match {
+  def isGlobal(n: Node): Boolean = n.expr match {
     case LetExpression(_, _) => false
     case e => decompose(e) match {
       case Context(RedexCaseVar(_, _)) => true
