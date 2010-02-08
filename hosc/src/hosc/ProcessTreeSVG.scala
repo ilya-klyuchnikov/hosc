@@ -50,15 +50,15 @@ class ProcessTreeSVG(tree: ProcessTree) {
         val child = out.child
         children += 
           <svg:line x1={"" + (trX+width(node)/2)} y1={""+(trY+30)} x2={"" + (trX+trChX+width(child)/2)} y2={""+(trY+100)}/>
-        /*
-        if (!out.substitution.isEmpty)
+        
+        if (!out.narrowing.isEmpty)
         children += (node.expr match {
           case l : LetExpression =>
-          <svg:text fill="red" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
+          <svg:text fill="red" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.narrowing.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
           case _ =>
-          <svg:text fill="green" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.substitution.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
+          <svg:text fill="green" font-weight="bold" x={"" + (trX + trChX + width(child)/2)} y = {"" + (80 + trY)}>{out.narrowing.toList.map(kv => kv._1 + "=" + kv._2).mkString("", ", ", "")}</svg:text>
         })
-        */
+        
         children ++= nodeToSVG(child, trX + trChX, trY + 100)
         trChX += width(child)
       }

@@ -23,6 +23,16 @@ object ProcessTree {
     def children(): List[Node] = outs map {edge => edge.child}
 
     def ancestors(): List[Node] = if (in == null) Nil else in.parent :: in.parent.ancestors
+    
+    def allNarrowing(): List[(Expression, Expression)] = {
+      if (in == null) Nil
+      else {
+        in.narrowing match {
+          case None => in.parent.allNarrowing()
+          case Some(pair) => pair :: in.parent.allNarrowing()
+        }
+      } 
+    }
 
     def isProcessed: Boolean = (repeatedOf != null || 
       (expr match {
@@ -50,7 +60,11 @@ object ProcessTree {
     }
   }
   
-  class Edge(val parent: Node, var child: Node)
+  class Edge(val parent: Node, var child: Node, val narrowing: Option[(Expression, Expression)]) {
+    def this(p: Node, c: Node) {
+      this(p, c, None)
+    }
+  }
   
 }
 
@@ -73,6 +87,20 @@ class ProcessTree {
     val edges = new scala.collection.mutable.ListBuffer[Edge]
     for (e <- es){
       val edge = new Edge(node, null)
+      val childNode = new Node(e, edge, Nil)
+      leafs_ = childNode :: leafs
+      edge.child = childNode
+      edges += edge
+    }
+    node.outs = edges.toList
+  }
+  
+  def addChildren(node: Node, es: List[Expression], narrowings: List[Option[(Expression, Expression)]]) = {
+    assume(leafs_.contains(node))
+    leafs_ = leafs_.remove(_ == node)
+    val edges = new scala.collection.mutable.ListBuffer[Edge]
+    for ((e, nar) <- (es zip narrowings)){
+      val edge = new Edge(node, null, nar)
       val childNode = new Node(e, edge, Nil)
       leafs_ = childNode :: leafs
       edge.child = childNode
