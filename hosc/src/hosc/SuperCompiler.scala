@@ -9,7 +9,7 @@ import LangUtils._
 
 class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
-  val debug = false
+  var debug = false
   val useControl = true
   var renameVars = true
   
@@ -24,6 +24,17 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
         println("==========")
       }
       val beta = p.leafs.find(!_.isProcessed).get
+      step(p, beta)
+    }
+    if (renameVars) {
+      renameVars(p)
+    } else {
+      p
+    }
+  }
+  
+  def step(p: ProcessTree, beta: Node): Unit = {
+      
       val bExpr = beta.expr
       beta.expr match {
         case LetExpression(_, _) => drive(p, beta)
@@ -49,13 +60,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
           }
         }
         case _ => drive(p, beta)
-      }      
-    }
-    if (renameVars) {
-      renameVars(p)
-    } else {
-      p
-    }
+      }    
   }
   
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
@@ -102,7 +107,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     }
   }
   
-  private def processMissingMatch(t: ProcessTree, n: Node): Unit = {
+  def processMissingMatch(t: ProcessTree, n: Node): Unit = {
     if (debug) {
     	println("propagating match error...")
     	println(n.expr)
