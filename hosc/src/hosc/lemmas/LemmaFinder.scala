@@ -2,7 +2,7 @@ package hosc.lemmas
 
 import scala.collection.mutable.{ArrayBuffer, Buffer}
 
-import hosc.{SuperCompiler, CodeConstructor, TermAlgebra, Eq}
+import hosc.{SuperCompiler, CodeConstructor, TermAlgebra, Eq, ProcessTree, ProcessTreeAlgebra}
 import hosc.HLanguage._
 
 class LemmaFinder(val program: Program) {

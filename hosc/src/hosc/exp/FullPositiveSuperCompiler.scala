@@ -2,8 +2,9 @@ package hosc.exp
 
 import hosc.HLanguage._
 import hosc.SuperCompiler
+import hosc.ProcessTree
 import hosc.ProcessTree._
-import TermAlgebra._
+import hosc.TermAlgebra._
 
 /** 
  * This supercompiler remembers configuration narrowing 
