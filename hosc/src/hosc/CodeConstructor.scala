@@ -46,7 +46,7 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
         	case ntr@NonTrivialRedex(x) => {
         	  lazy val traversed = ntr match {
         	    case RedexCall(_) => 
-        	      construct(node.children.head);
+        	      construct(node.children.head).incrTicks()
         	    case RedexCaseVar(_, CaseExpression(_, bs)) => {
         	      val newBs = (bs zip node.children.tail) map {case (Branch(p, _), n) => Branch(p, construct(n))}
               	  CaseExpression(construct(node.children.head), newBs)

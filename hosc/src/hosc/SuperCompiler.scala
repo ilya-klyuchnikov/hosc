@@ -10,7 +10,7 @@ import LangUtils._
 class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
   var debug = false
-  val useControl = true
+  val useControl = false
   var renameVars = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
