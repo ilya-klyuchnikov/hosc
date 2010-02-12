@@ -40,7 +40,7 @@ class ExpressionGenerator(val program: Program) {
     addExps(buf, generateApp(size, vars))
     addExps(buf, generateVars(size, vars))
     addExps(buf, generateCtrs(size, vars))
-    addExps(buf, generateLams(size, vars))
+    //addExps(buf, generateLams(size, vars))
     addExps(buf, generateCases(size, vars))
     buf
   }
@@ -75,6 +75,7 @@ class ExpressionGenerator(val program: Program) {
       for (e1 <- e1s; e2 <- e2s) {
         e1 match {
           case Constructor(_, _) =>
+          //case LambdaAbstraction(_, _) =>
           case _ => res += Application(e1, e2)
         }
       }
@@ -117,8 +118,12 @@ class ExpressionGenerator(val program: Program) {
         val branchLists = generateBranches(typeCon.cons, size - 1 - i, vars)
         val selectors = generate(i, vars)
         for (selector <- selectors) {
-          for (branchList <- branchLists) {
-            res += CaseExpression(selector, branchList)
+          selector match {
+            case Constructor(_, _) =>
+            case _ => 
+              for (branchList <- branchLists) {
+               res += CaseExpression(selector, branchList)
+              }
           }
         }
       }
