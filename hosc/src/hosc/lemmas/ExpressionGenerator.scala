@@ -24,13 +24,14 @@ class ExpressionGenerator(val program: Program) {
   
   val typeInferrer = new TypeInferrer(program.ts)
   
+  /*
   def generateAll(maxSize: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
     for (i <- 1 to maxSize) {
       buf ++= generate(i, vars)
     }
     buf
-  }
+  }*/
   
   def generate(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
@@ -39,8 +40,53 @@ class ExpressionGenerator(val program: Program) {
     }
     addExps(buf, generateApp(size, vars))
     addExps(buf, generateVars(size, vars))
-    addExps(buf, generateCtrs(size, vars))
+    //addExps(buf, generateCtrs(size, vars))
     //addExps(buf, generateLams(size, vars))
+    addExps(buf, generateCases(size, vars))
+    buf
+  }
+  
+  def generateRecAll(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val buf = new ArrayBuffer[Expression]()
+    if (size == 0) {
+      return buf
+    }
+    addExps(buf, generateApp(size, vars))
+    addExps(buf, generateVars(size, vars))
+    addExps(buf, generateCtrs(size, vars))
+    addExps(buf, generateCases(size, vars))
+    buf
+  }
+  
+  def generateRecWOCtrs(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val buf = new ArrayBuffer[Expression]()
+    if (size == 0) {
+      return buf
+    }
+    addExps(buf, generateApp(size, vars))
+    addExps(buf, generateVars(size, vars))
+    addExps(buf, generateCases(size, vars))
+    buf
+  }
+  
+  def generateRecWOCtrsLVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val buf = new ArrayBuffer[Expression]()
+    if (size == 0) {
+      return buf
+    }
+    addExps(buf, generateApp(size, vars))
+    addExps(buf, generateGVars(size, vars))
+    addExps(buf, generateCases(size, vars))
+    buf
+  }
+  
+  def generateRecWOCtrsGVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val buf = new ArrayBuffer[Expression]()
+    if (size == 0) {
+      return buf
+    }
+    addExps(buf, generateApp(size, vars))
+    addExps(buf, generateLVars(size, vars))
     addExps(buf, generateCases(size, vars))
     buf
   }
@@ -55,6 +101,30 @@ class ExpressionGenerator(val program: Program) {
     }
   }
 
+  // only global vars
+  private def generateGVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val res = new ArrayBuffer[Expression]()
+    size match {
+      case 1 => { 
+        res ++= globals
+      }
+      case _ =>
+	}
+    res
+  }
+  
+  // only local vars
+  private def generateLVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    val res = new ArrayBuffer[Expression]()
+    size match {
+      case 1 => { 
+        res ++= vars
+      }
+      case _ =>
+	}
+    res
+  }
+  
   private def generateVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val res = new ArrayBuffer[Expression]()
     size match {
@@ -70,14 +140,10 @@ class ExpressionGenerator(val program: Program) {
   private def generateApp(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val res = new ArrayBuffer[Expression]()
     for (i <- 1 to (size - 1)) {
-      val e1s = generate(i, vars)
-      val e2s = generate(size - i, vars)
+      val e1s = generateRecWOCtrsLVars(i, vars)
+      val e2s = generateRecAll(size - i, vars)
       for (e1 <- e1s; e2 <- e2s) {
-        e1 match {
-          case Constructor(_, _) =>
-          //case LambdaAbstraction(_, _) =>
-          case _ => res += Application(e1, e2)
-        }
+         res += Application(e1, e2)
       }
     }
     res
@@ -101,7 +167,7 @@ class ExpressionGenerator(val program: Program) {
     val exps = new ArrayBuffer[Expression]()
     val arg = TermAlgebra.newVar
     val extVars = arg :: vars
-    val bodies = generate(size - 1, extVars)
+    val bodies = generateRecAll(size - 1, extVars)
     for (body <- bodies) {
       exps += LambdaAbstraction(arg, body)
     }
@@ -116,15 +182,11 @@ class ExpressionGenerator(val program: Program) {
       val consN = typeCon.cons.size
       for (i <- 1 to (size - consN - 1)) {
         val branchLists = generateBranches(typeCon.cons, size - 1 - i, vars)
-        val selectors = generate(i, vars)
+        val selectors = generateRecWOCtrsGVars(i, vars)
         for (selector <- selectors) {
-          selector match {
-            case Constructor(_, _) =>
-            case _ => 
               for (branchList <- branchLists) {
                res += CaseExpression(selector, branchList)
               }
-          }
         }
       }
     }
@@ -141,7 +203,7 @@ class ExpressionGenerator(val program: Program) {
         val pt = Pattern(d.name, ptVars)
         for (i <- 1 to (totalExpSize - ds.size)) {
           val otherBranchesS = generateBranches(ds, totalExpSize - i, vars)
-          val bodies: Buffer[Expression] = generate(i, ptVars ::: vars)
+          val bodies: Buffer[Expression] = generateRecAll(i, ptVars ::: vars)
           for (body <- bodies) {
             val branch = Branch(pt, body)
             for (otherBranches <- otherBranchesS) {
@@ -161,7 +223,7 @@ class ExpressionGenerator(val program: Program) {
       res += Nil
     } else {
       for (i <- 1 to (totalExpSize - listSize + 1)) {
-        val heads: Buffer[Expression] = generate(i, vars)
+        val heads: Buffer[Expression] = generateRecAll(i, vars)
         val tails: Buffer[List[Expression]] = generateList(listSize - 1, totalExpSize - i, vars)
         for (head <- heads; tail <- tails) {
           res += (head :: tail)
