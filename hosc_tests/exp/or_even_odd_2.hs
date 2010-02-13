@@ -5,7 +5,9 @@ data Nat = Z | S Nat;
 --  case  n  of { S x -> (odd x); Z  -> True; }  
 --of { False  -> (odd (S (S n))); True  -> True; }
 
-case (case (v29) of {Z  -> (True); S v58 -> (odd v58);}) of {True  -> (True); False  -> (odd (S (S v29)));}
+--case (case (v29) of {Z  -> (True); S v58 -> (odd v58);}) of {True  -> (True); False  -> (odd (S (S v29)));}
+
+case ((even v29)) of {True  -> (True); False  -> (odd (S (S v29)));}
 
 where
 

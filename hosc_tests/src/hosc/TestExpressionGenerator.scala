@@ -8,10 +8,10 @@ import hosc.lemmas.ExpressionGenerator
 object TestExpressionGenerator {
   def main(args : Array[String]) : Unit = {
     val start = System.currentTimeMillis
-    val p = programFromFile("sc/list_funcs.hs")
+    val p = programFromFile("hl/or_even_odd.hs")
     val gen = new ExpressionGenerator(p)
-    val vars = List("x", "y", "z") map {Variable(_)}
-    val exps = gen.generateAll(3, vars)
+    val vars = List("v") map {Variable(_)}
+    val exps = gen.generate(8, vars)
     var i = 0
     for (exp <- exps) {
       i += 1

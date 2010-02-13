@@ -1,7 +1,9 @@
 data Bool = True | False;
 data Nat = Z | S Nat;
 
-or (even n) (odd n)
+--or (even n) (odd n)
+
+case (even v29) of {True  -> (True); False  -> (odd v29);}
 
 where
 
