@@ -42,6 +42,9 @@ class ExpressionGenerator(val program: Program) {
     println("genTime: " + time)
     //println("checkerTime: " + timeOfChecker)
     //println("bufferTime: " + timeInBuf)
+    //for(e <- buf) {
+      //assert(TermAlgebra.size(e) == size, "size(" + e +") != " + size)
+    //}
     buf
   }
   
@@ -201,7 +204,11 @@ class ExpressionGenerator(val program: Program) {
     assert(totalExpSize >= dcons.size)
     val res = new ArrayBuffer[List[Branch]]()
     dcons match {
-      case Nil => res += Nil
+      case Nil => {
+        if (totalExpSize == 0) {
+          res += Nil  
+        }
+      }
       case d :: ds => {
         val ptVars = d.args map {_ => TermAlgebra.newVar()}
         val pt = Pattern(d.name, ptVars)
@@ -220,11 +227,14 @@ class ExpressionGenerator(val program: Program) {
     res
   }
   
+  // generate lists of size listSize where total size of expressions = totalExpSize
   def generateList(listSize: Int, totalExpSize: Int, vars: List[Variable]): Buffer[List[Expression]] = {
     assert(totalExpSize >= listSize)
     val res = new ArrayBuffer[List[Expression]]()
     if (listSize == 0) {
-      res += Nil
+      if (totalExpSize == 0) {
+        res += Nil
+      }
     } else {
       for (i <- 1 to (totalExpSize - listSize + 1)) {
         val heads: Buffer[Expression] = generateRecAll(i, vars)
