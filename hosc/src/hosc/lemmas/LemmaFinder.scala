@@ -17,9 +17,6 @@ class LemmaFinder(val program: Program) {
     val exprTreeSize = ProcessTreeAlgebra.size(exprTree)
     val vars = TermAlgebra.getFreeVars(expr)
     println(expr + "\n" + expSize + "\n" + exprTreeSize)
-    for (re <- localExprs) {
-      println(re)
-    }
     for (n <- 1 to (expSize - 1)) {
       println("trying size " + n)
       println("generating...")
@@ -31,16 +28,17 @@ class LemmaFinder(val program: Program) {
         //val candidateTreeSize = ProcessTreeAlgebra.size(candidateTree)
         //if (localExprs.forall(e => !Eq.equivalent(candidate, e))) {
           if (Eq.equivalent(exprSced, candidateSced)) {
-            println(candidate)
+            print(candidate)
             if (TicksAlgebra.isImprovement(candidateSced, exprSced)) {
-              println(candidateSced)
-              println("<=")
-              println(exprSced)
+              //println(candidate)
+              //println(candidateSced)
+              println(" <=")
+              //println(exprSced)
               buf += candidate
             } else {
-              println(candidateSced)
-              println("!<=")
-              println(exprSced)
+              //println(candidateSced)
+              println(" !<=")
+              //println(exprSced)
             }
           }
         //}
