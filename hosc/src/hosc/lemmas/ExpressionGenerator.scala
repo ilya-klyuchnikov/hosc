@@ -24,16 +24,10 @@ class ExpressionGenerator(val program: Program) {
   
   val typeInferrer = new TypeInferrer(program.ts)
   
-  /*
-  def generateAll(maxSize: Int, vars: List[Variable]): Buffer[Expression] = {
-    val buf = new ArrayBuffer[Expression]()
-    for (i <- 1 to maxSize) {
-      buf ++= generate(i, vars)
-    }
-    buf
-  }*/
-  
   def generate(size: Int, vars: List[Variable]): Buffer[Expression] = {
+    //timeOfChecker = 0
+    //timeInBuf = 0
+    val start = System.currentTimeMillis
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
       return buf
@@ -43,10 +37,15 @@ class ExpressionGenerator(val program: Program) {
     //addExps(buf, generateCtrs(size, vars))
     //addExps(buf, generateLams(size, vars))
     addExps(buf, generateCases(size, vars))
+    val time = System.currentTimeMillis - start
+    println("found " + buf.length + " exprs")
+    println("genTime: " + time)
+    //println("checkerTime: " + timeOfChecker)
+    //println("bufferTime: " + timeInBuf)
     buf
   }
   
-  def generateRecAll(size: Int, vars: List[Variable]): Buffer[Expression] = {
+  private def generateRecAll(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
       return buf
@@ -58,7 +57,7 @@ class ExpressionGenerator(val program: Program) {
     buf
   }
   
-  def generateRecWOCtrs(size: Int, vars: List[Variable]): Buffer[Expression] = {
+  private def generateRecWOCtrs(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
       return buf
@@ -69,7 +68,7 @@ class ExpressionGenerator(val program: Program) {
     buf
   }
   
-  def generateRecWOCtrsLVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+  private def generateRecWOCtrsLVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
       return buf
@@ -80,7 +79,7 @@ class ExpressionGenerator(val program: Program) {
     buf
   }
   
-  def generateRecWOCtrsGVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
+  private def generateRecWOCtrsGVars(size: Int, vars: List[Variable]): Buffer[Expression] = {
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
       return buf
@@ -91,10 +90,15 @@ class ExpressionGenerator(val program: Program) {
     buf
   }
   
+  //var timeInBuf: Long = 0
+  
   private def addExps(buf: Buffer[Expression], exps: Buffer[Expression]): Unit = {
     for (exp <- exps) {
       try {
-        buf += typeCheck(exp)
+        typeCheck(exp)
+        //val start = System.currentTimeMillis
+        buf += exp
+        //timeInBuf += System.currentTimeMillis - start
       } catch {
         case e =>
       }
@@ -233,10 +237,14 @@ class ExpressionGenerator(val program: Program) {
     res
   }
   
+  //var timeOfChecker: Long = 0
+  
   private def typeCheck(exp: Expression): Expression = {
+    //val start = System.currentTimeMillis
     val p1 = Program(program.ts, exp, program.fs)
     val e1 = LangUtils.hl0ToELC(p1)
     typeInferrer.inferType(e1)
+    //timeOfChecker += System.currentTimeMillis - start
     exp
   }
 }
