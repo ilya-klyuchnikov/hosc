@@ -10,8 +10,8 @@ object TestExpressionGenerator {
     val start = System.currentTimeMillis
     val p = programFromFile("hl/or_even_odd.hs")
     val gen = new ExpressionGenerator(p)
-    val vars = List("v") map {Variable(_)}
-    val exps = gen.generate(6, Nil)
+    val vars = List("a", "b", "c") map {Variable(_)}
+    val exps = gen.generate(6, vars)
     var i = 0
     
     /*
