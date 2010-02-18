@@ -25,8 +25,8 @@ class ExpressionGenerator(val program: Program) {
   val typeInferrer = new TypeInferrer(program.ts)
   
   def generate(size: Int, vars: List[Variable]): Buffer[Expression] = {
-    //timeOfChecker = 0
-    //timeInBuf = 0
+    timeOfChecker = 0
+    timeInBuf = 0
     val start = System.currentTimeMillis
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
@@ -34,14 +34,14 @@ class ExpressionGenerator(val program: Program) {
     }
     addExps(buf, generateApp(size, vars))
     addExps(buf, generateVars(size, vars))
-    //addExps(buf, generateCtrs(size, vars))
-    //addExps(buf, generateLams(size, vars))
+    addExps(buf, generateCtrs(size, vars))
+    addExps(buf, generateLams(size, vars))
     addExps(buf, generateCases(size, vars))
     val time = System.currentTimeMillis - start
     println("found " + buf.length + " exprs")
     println("genTime: " + time)
-    //println("checkerTime: " + timeOfChecker)
-    //println("bufferTime: " + timeInBuf)
+    println("checkerTime: " + timeOfChecker)
+    println("bufferTime: " + timeInBuf)
     //for(e <- buf) {
       //assert(TermAlgebra.size(e) == size, "size(" + e +") != " + size)
     //}
@@ -93,15 +93,15 @@ class ExpressionGenerator(val program: Program) {
     buf
   }
   
-  //var timeInBuf: Long = 0
+  var timeInBuf: Long = 0
   
   private def addExps(buf: Buffer[Expression], exps: Buffer[Expression]): Unit = {
     for (exp <- exps) {
       try {
         typeCheck(exp)
-        //val start = System.currentTimeMillis
+        val start = System.currentTimeMillis
         buf += exp
-        //timeInBuf += System.currentTimeMillis - start
+        timeInBuf += System.currentTimeMillis - start
       } catch {
         case e =>
       }
@@ -189,11 +189,13 @@ class ExpressionGenerator(val program: Program) {
       val consN = typeCon.cons.size
       for (i <- 1 to (size - consN - 1)) {
         val branchLists = generateBranches(typeCon.cons, size - 1 - i, vars)
-        val selectors = generateRecWOCtrsGVars(i, vars)
-        for (selector <- selectors) {
-              for (branchList <- branchLists) {
-               res += CaseExpression(selector, branchList)
-              }
+        if (!branchLists.isEmpty) {
+          val selectors = generateRecWOCtrsGVars(i, vars)
+          for (selector <- selectors) {
+            for (branchList <- branchLists) {
+              res += CaseExpression(selector, branchList)
+            }
+          }
         }
       }
     }
@@ -214,11 +216,13 @@ class ExpressionGenerator(val program: Program) {
         val pt = Pattern(d.name, ptVars)
         for (i <- 1 to (totalExpSize - ds.size)) {
           val otherBranchesS = generateBranches(ds, totalExpSize - i, vars)
-          val bodies: Buffer[Expression] = generateRecAll(i, ptVars ::: vars)
-          for (body <- bodies) {
-            val branch = Branch(pt, body)
-            for (otherBranches <- otherBranchesS) {
-              res += branch :: otherBranches
+          if (!otherBranchesS.isEmpty)  { 
+            val bodies: Buffer[Expression] = generateRecAll(i, ptVars ::: vars)
+            for (body <- bodies) {
+              val branch = Branch(pt, body)
+              for (otherBranches <- otherBranchesS) {
+                res += branch :: otherBranches
+              }
             }
           }
         }
@@ -228,7 +232,7 @@ class ExpressionGenerator(val program: Program) {
   }
   
   // generate lists of size listSize where total size of expressions = totalExpSize
-  def generateList(listSize: Int, totalExpSize: Int, vars: List[Variable]): Buffer[List[Expression]] = {
+  private def generateList(listSize: Int, totalExpSize: Int, vars: List[Variable]): Buffer[List[Expression]] = {
     assert(totalExpSize >= listSize)
     val res = new ArrayBuffer[List[Expression]]()
     if (listSize == 0) {
@@ -237,24 +241,26 @@ class ExpressionGenerator(val program: Program) {
       }
     } else {
       for (i <- 1 to (totalExpSize - listSize + 1)) {
-        val heads: Buffer[Expression] = generateRecAll(i, vars)
         val tails: Buffer[List[Expression]] = generateList(listSize - 1, totalExpSize - i, vars)
-        for (head <- heads; tail <- tails) {
-          res += (head :: tail)
+        if (!tails.isEmpty) {
+          val heads: Buffer[Expression] = generateRecAll(i, vars)
+          for (head <- heads; tail <- tails) {
+            res += (head :: tail)
+          }
         }
       }
     }
     res
   }
   
-  //var timeOfChecker: Long = 0
+  var timeOfChecker: Long = 0
   
   private def typeCheck(exp: Expression): Expression = {
-    //val start = System.currentTimeMillis
+    val start = System.currentTimeMillis
     val p1 = Program(program.ts, exp, program.fs)
     val e1 = LangUtils.hl0ToELC(p1)
     typeInferrer.inferType(e1)
-    //timeOfChecker += System.currentTimeMillis - start
+    timeOfChecker += System.currentTimeMillis - start
     exp
   }
 }

@@ -11,16 +11,19 @@ object TestExpressionGenerator {
     val p = programFromFile("hl/or_even_odd.hs")
     val gen = new ExpressionGenerator(p)
     val vars = List("v") map {Variable(_)}
-    val exps = gen.generate(8, vars)
+    val exps = gen.generate(6, Nil)
     var i = 0
+    
+    /*
     for (exp <- exps) {
       i += 1
       print(i + ": ")
       println(exp)
-    }
+    }*/
+    
     val end = System.currentTimeMillis
     val time = end - start
-    println(i)
+    //println(i)
     Console.println("Took " + (end-start)/1000.0 + "s")
   }
 }
