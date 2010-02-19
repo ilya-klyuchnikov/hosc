@@ -21,8 +21,8 @@ class ExpressionGenerator(val program: Program) {
     }
   
   val cons: List[DataConstructor] = program.ts flatMap {_.cons}
-  
   val typeInferrer = new TypeInferrer(program.ts)
+  val contextTe = typeInferrer.inferContext(LangUtils.hl0ToELC(program))
   
   def generate(size: Int, vars: List[Variable]): Buffer[Expression] = {
     timeOfChecker = 0
@@ -104,7 +104,7 @@ class ExpressionGenerator(val program: Program) {
     val start0 = System.currentTimeMillis
     for (exp <- exps) {
       try {
-        typeCheck(exp)
+        fastTypeCheck(exp)
         val start = System.currentTimeMillis
         buf += exp
         timeInBuf += System.currentTimeMillis - start
@@ -264,13 +264,24 @@ class ExpressionGenerator(val program: Program) {
   var checkerCalled: Int = 0
   
   private def typeCheck(exp: Expression): Expression = {
-    //val start = System.currentTimeMillis
     checkerCalled += 1
     val p1 = Program(program.ts, exp, program.fs)
     val e1 = LangUtils.hl0ToELC(p1)
     val start = System.currentTimeMillis
     try {
       typeInferrer.inferType(e1)
+    } finally {
+      timeOfChecker += System.currentTimeMillis - start
+    }
+    exp
+  }
+  
+  private def fastTypeCheck(exp: Expression): Expression = {
+    checkerCalled += 1
+    val e1 = LangUtils.hl0ToELC(exp)
+    val start = System.currentTimeMillis
+    try {
+      typeInferrer.inferInContext(contextTe, e1)
     } finally {
       timeOfChecker += System.currentTimeMillis - start
     }
