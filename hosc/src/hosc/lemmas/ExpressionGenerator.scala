@@ -36,8 +36,8 @@ class ExpressionGenerator(val program: Program) {
     }
     addExps(buf, generateApp(size, vars))
     addExps(buf, generateVars(size, vars))
-    addExps(buf, generateCtrs(size, vars))
-    addExps(buf, generateLams(size, vars))
+    //addExps(buf, generateCtrs(size, vars))
+    //addExps(buf, generateLams(size, vars))
     addExps(buf, generateCases(size, vars))
     val time = System.currentTimeMillis - start
     println("found " + buf.length + " exprs")
