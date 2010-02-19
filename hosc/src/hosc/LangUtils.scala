@@ -10,7 +10,7 @@ import HLanguage.{Application => Application0, Variable => Variable0, CaseExpres
 import scala.collection.mutable.ListBuffer
 
 object LangUtils {
-  private def hl0ToELC(expr: Expression0): Expression = expr match {
+  def hl0ToELC(expr: Expression0): Expression = expr match {
     case Variable0(n) => Variable(n)
     case Constructor0(n, args) => Constructor(n, args map hl0ToELC)
     case LambdaAbstraction0(v, e) => LambdaAbstraction(Variable(v.name), hl0ToELC(e))

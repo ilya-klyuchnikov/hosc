@@ -3,7 +3,7 @@ package hosc
 import EnrichedLambdaCalculus._
 
 object TypeAlgebra {
-  private var n: Int = 0
+  private var n: Long = 0
   def newTyvar(): TypeVariable = { n += 1; TypeVariable("$$" + n) }
   
   def tyvars(t: Type): List[TypeVariable] = t match {

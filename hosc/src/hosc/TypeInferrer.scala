@@ -75,6 +75,50 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     check(te, e)._2
   }
   
+  def inferContext(e: Expression): TypeEnv = {
+    val v2scheme = {v: Variable => TypeVariable(v.name) -> TypeScheme(Nil, newTyvar)}
+    val te = TypeEnv(Map(freeVars(e).toList map v2scheme :_*))
+    checkContext(te, e)
+  }
+  
+  def inferInContext(contextTe: TypeEnv, e: Expression): Type = {
+    val fvs = freeVars(e)
+    var env = contextTe
+    for (fv <- fvs) {
+      val tv = TypeVariable(fv.name)
+      if (!env.map.contains(tv))
+        env = env.install(tv, TypeScheme(Nil, newTyvar))
+    }
+    check(env, e)._2
+  }
+  
+  // returns environment that can be used later
+  // for incremental type checking
+  // in expression generator
+  private def checkContext(te: TypeEnv, expr: Expression): TypeEnv = expr match {
+    case LetExpression(bs, e0) => {
+      val (fs, bodies) = List.unzip(bs)
+      val f_types = fs map {x => TypeVariable(x.name)}
+      val (sub1, type1s) = check(te, bodies)
+      // check []
+      val te1 = extend(te.sub(sub1), f_types, type1s)
+      checkContext(te1, e0)
+    }
+    case LetRecExpression(bs, e0) => {
+      val (fs, bodies) = List.unzip(bs)
+      val funTypes = fs map {x => TypeVariable(x.name)}
+      val schemes = fs map {x => TypeScheme(Nil, newTyvar)}
+      val te1 = TypeEnv(te.map ++ (funTypes zip schemes))
+      val (sub1, type1s) = check(te1, bodies)
+      val l_types = schemes map {_.sub(sub1).t}
+      val sub2 = mgu(l_types zip type1s, sub1)
+      // check []
+      val te2 = extend(te.sub(sub2), funTypes, l_types map sub2)
+      checkContext(te2, e0)
+    }
+    case _ => te
+  }
+  
   private def check(te: TypeEnv, expr: Expression): (Subst, Type) = expr match {
     case Variable(name) => 
       (new Subst(), te.value(TypeVariable(name)).newInstance)
