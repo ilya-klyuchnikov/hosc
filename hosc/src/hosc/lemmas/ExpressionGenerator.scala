@@ -27,6 +27,8 @@ class ExpressionGenerator(val program: Program) {
   def generate(size: Int, vars: List[Variable]): Buffer[Expression] = {
     timeOfChecker = 0
     timeInBuf = 0
+    totalInAddExpr = 0
+    checkerCalled = 0
     val start = System.currentTimeMillis
     val buf = new ArrayBuffer[Expression]()
     if (size == 0) {
@@ -42,6 +44,8 @@ class ExpressionGenerator(val program: Program) {
     println("genTime: " + time)
     println("checkerTime: " + timeOfChecker)
     println("bufferTime: " + timeInBuf)
+    println("addExpr: " + totalInAddExpr)
+    println("checkerCalled: " + checkerCalled)
     //for(e <- buf) {
       //assert(TermAlgebra.size(e) == size, "size(" + e +") != " + size)
     //}
@@ -94,8 +98,10 @@ class ExpressionGenerator(val program: Program) {
   }
   
   var timeInBuf: Long = 0
+  var totalInAddExpr: Long = 0
   
   private def addExps(buf: Buffer[Expression], exps: Buffer[Expression]): Unit = {
+    val start0 = System.currentTimeMillis
     for (exp <- exps) {
       try {
         typeCheck(exp)
@@ -106,6 +112,7 @@ class ExpressionGenerator(val program: Program) {
         case e =>
       }
     }
+    totalInAddExpr += System.currentTimeMillis - start0
   }
 
   // only global vars
@@ -254,13 +261,19 @@ class ExpressionGenerator(val program: Program) {
   }
   
   var timeOfChecker: Long = 0
+  var checkerCalled: Int = 0
   
   private def typeCheck(exp: Expression): Expression = {
-    val start = System.currentTimeMillis
+    //val start = System.currentTimeMillis
+    checkerCalled += 1
     val p1 = Program(program.ts, exp, program.fs)
     val e1 = LangUtils.hl0ToELC(p1)
-    typeInferrer.inferType(e1)
-    timeOfChecker += System.currentTimeMillis - start
+    val start = System.currentTimeMillis
+    try {
+      typeInferrer.inferType(e1)
+    } finally {
+      timeOfChecker += System.currentTimeMillis - start
+    }
     exp
   }
 }
