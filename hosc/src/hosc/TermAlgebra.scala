@@ -69,7 +69,7 @@ object TermAlgebra {
     case letrec: LetRecExpression => throw new IllegalArgumentException("cannot be decomposed as a context: " + letrec)
   }
   
-  private def getCoreLocalVar(app: Application): Variable = app.head match {
+  def getCoreLocalVar(app: Application): Variable = app.head match {
     case v: Variable if (!v.global)=> v
     case a: Application => getCoreLocalVar(a)
     case _ => null

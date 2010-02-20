@@ -10,7 +10,7 @@ import LangUtils._
 class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
   var debug = false
-  val useControl = false
+  var useControl = true
   var renameVars = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
@@ -73,7 +73,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     case aTerm => equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode);
   }
   
-  private def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
+  protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode);
   }
@@ -84,7 +84,7 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     case _ => false
   }
   
-  private def checkControl(aNode: Node, bNode: Node): Boolean = {
+  protected def checkControl(aNode: Node, bNode: Node): Boolean = {
     if (!useControl) {
       return true
     }
@@ -113,17 +113,23 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     	println(n.expr)
     }
     val ancs = n.ancestors 
-    ancs find isGlobal match {
+    
+    (ancs takeWhile reducable) find isGlobal match {
       case Some(globalNode) => {
         // finding corresponding globalNode
-        val Context(RedexCaseVar(_, CaseExpression(sel, bs))) = decompose(globalNode.expr)
+        val con@Context(RedexCaseVar(_, CaseExpression(sel, bs))) = decompose(globalNode.expr)
         // finding 'missing' childNode
         val missingChildNode = globalNode.children.find{(n:: ancs).contains(_)}.get
         // finding branch with 'missing' pattern
         val (missingBranch, _) = bs.zip(globalNode.children.tail).find{case (b, childNode) => childNode == missingChildNode}.get
         val newBs = bs remove {_ == missingBranch}
         val newCaseExp = CaseExpression(sel, newBs)
-        t.replace(globalNode, newCaseExp)
+        val newExpr = con.replaceHole(newCaseExp)
+        //println("was:")
+        //println(globalNode.expr)
+        //println("now:")
+        //println(newExpr)
+        t.replace(globalNode, newExpr)
       }
       case None => {
         // no proparagition to top is possible 
@@ -132,6 +138,14 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
         t.replace(n, CaseExpression(sel, Nil))
       }
     }
+  }
+  
+  def reducable(n: Node) = n.expr match {
+    case le: LetExpression => false
+    case c: Constructor => false
+    case a: Application if getCoreLocalVar(a) != null => false
+    case lambda: LambdaAbstraction => false
+    case _ => true
   }
   
   def isGlobal(n: Node): Boolean = n.expr match {
