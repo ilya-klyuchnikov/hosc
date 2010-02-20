@@ -1,17 +1,17 @@
-data Bool = T | F;
+data Bool = True | False;
 data Nat = Z | S Nat;
 
 even (plus x x) where
 
 even = \x ->
   case x of {
-    Z -> T;
+    Z -> True;
     S x1 -> odd x1;
 };
 
 odd = \x ->
   case x of {
-    Z -> F;
+    Z -> False;
     S x1 -> even x1;
 };
 
