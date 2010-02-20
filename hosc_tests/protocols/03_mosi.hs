@@ -6,7 +6,13 @@ data List a = Nil | Cons a (List a);
 data Result = Result Boolean Boolean Boolean;
 
 -- TODO: workaround (f s)
-check (loop (State (S i) Z Z Z) (f s)) where
+--checkAll (loop (State (S i) Z Z Z) (f s)) where
+Result
+	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
+	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
+	(checkState check1 (loop (State (S i) Z Z Z) (f s))) 
+where
+	
 loop = \state actions -> case actions of {
 	Nil -> state;
 	Cons a as -> loop (react state a) as;
@@ -57,10 +63,13 @@ checkAll = \state -> case state of {State invalid modified shared owned ->
 		(check3 invalid modified shared owned);
 };
 check = \state -> case state of {State invalid modified shared owned ->
-	check1 invalid modified shared owned;
+	check3 invalid modified shared owned;
 };
-check1 = \i m s o -> case o of {S o1 -> case o1 of {S o2 -> False;}; Z-> True;};
+
+checkState = \f state -> case state of {State invalid modified shared owned ->
+	f invalid modified shared owned;
+};
+check1 = \i m s o -> case o of {S o1 -> case o1 of {S o2 -> False;};};
 check2 = \i m s o -> case o of {S o1 -> case s of {S s1 -> False;};};
-check3 = \i m s o -> case m of {S m1 -> case m1 of { S m2 -> False;}; Z -> True;
-};
+check3 = \i m s o -> case m of {S m1 -> case m1 of { S m2 -> False;};};
 add = \x y -> case x of { Z -> y; S x1 -> S (add x1 y);};
