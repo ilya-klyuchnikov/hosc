@@ -9,8 +9,8 @@ data Result = Result Boolean Boolean Boolean;
 --checkAll (loop (State (S i) Z Z Z) (f s)) where
 Result
 	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
-	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
-	(checkState check1 (loop (State (S i) Z Z Z) (f s))) 
+	(checkState check2 (loop (State (S i) Z Z Z) (f s)))
+	(checkState check3 (loop (State (S i) Z Z Z) (f s))) 
 where
 	
 loop = \state actions -> case actions of {
