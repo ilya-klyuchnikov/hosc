@@ -14,5 +14,7 @@ object HigherLevelExamples {
     
     //HLSC.main(Array("-si", "hl/app_rev.hs", "-t", "hl/out/app_rev.svg","-p", "hl/out/app_rev.hs"))
     //FPSC.main(Array("-si", "hl/church.hs", "-t", "hl/out/church.svg","-p", "hl/out/church.hs"))
+    HLSC.main(Array("-si", "hl/tree_flatten.hs", "-t", "hl/out/tree_flatten.svg","-p", "hl/out/tree_flatten.hs"))
+
   }
 }
