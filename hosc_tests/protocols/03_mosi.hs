@@ -6,16 +6,22 @@ data List a = Nil | Cons a (List a);
 data Result = Result Boolean Boolean Boolean;
 
 -- TODO: workaround (f s)
---checkAll (loop (State (S i) Z Z Z) (f s)) where
-Result
-	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
-	(checkState check2 (loop (State (S i) Z Z Z) (f s)))
-	(checkState check3 (loop (State (S i) Z Z Z) (f s))) 
-where
+check (loop1 (State (S i) Z Z Z) (f s)) where
+--Result
+--	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
+--	(checkState check2 (loop (State (S i) Z Z Z) (f s)))
+--	(checkState check3 (loop (State (S i) Z Z Z) (f s))) 
+--where
 	
 loop = \state actions -> case actions of {
 	Nil -> state;
 	Cons a as -> loop (react state a) as;
+};
+loop1 = \state actions -> case actions of {
+	Nil -> state;
+	Cons a as -> case (react state a) of {
+		State invalid modified shared owned -> loop1 (State invalid modified shared owned) as;
+	};
 };
 react = \state action -> case state of {State invalid modified shared owned ->
 	case action of {
