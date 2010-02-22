@@ -36,7 +36,7 @@ react = \state action -> case state of {State invalid modified shared owned ->
 };
 rm = \invalid modified shared owned ->
 	case invalid of {
-		S i -> State i Z (S shared) (add owned owned);
+		S i -> State i Z (S shared) (add modified owned);
 	};
 w0 = \invalid modified shared owned ->
 	case owned of {
