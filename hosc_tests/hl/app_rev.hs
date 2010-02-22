@@ -1,6 +1,7 @@
 data List a = Nil | Cons a (List a);
 
-app (rev xs) ys
+--app (rev xs) ys
+appRev u v
 where
 
 app = \xs ys ->
@@ -14,3 +15,5 @@ rev = \xs ->
      Nil -> Nil;
      Cons y ys -> app (rev ys) (Cons y Nil);
    };
+
+appRev = \xs ys -> app (rev xs) ys;

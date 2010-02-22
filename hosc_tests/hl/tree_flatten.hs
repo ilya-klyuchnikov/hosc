@@ -1,7 +1,7 @@
-data Tree a = Leaf a | Node (Tree a) (Tree a);
+data Tree a = Leaf a | Fork (Tree a) (Tree a);
 data List a = Nil | Cons a (List a);
 
-flatten
+flattenAcc
 
 where
 
@@ -12,5 +12,7 @@ append = \xs ys -> case xs of {
 
 flatten = \t -> case t of {
   Leaf x -> Cons x Nil;
-  Node x y -> append (flatten x) (flatten y);
+  Fork x y -> append (flatten x) (flatten y);
   };
+
+flattenAcc = \t u -> append (flatten t) u;

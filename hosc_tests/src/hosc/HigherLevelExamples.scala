@@ -14,7 +14,10 @@ object HigherLevelExamples {
     
     //HLSC.main(Array("-si", "hl/app_rev.hs", "-t", "hl/out/app_rev.svg","-p", "hl/out/app_rev.hs"))
     //FPSC.main(Array("-si", "hl/church.hs", "-t", "hl/out/church.svg","-p", "hl/out/church.hs"))
-    HLSC.main(Array("-si", "hl/tree_flatten.hs", "-t", "hl/out/tree_flatten.svg","-p", "hl/out/tree_flatten.hs"))
+    //HLSC.main(Array("-si", "hl/tree_flatten.hs", "-t", "hl/out/tree_flatten.svg","-p", "hl/out/tree_flatten.hs"))
+    //HLSC.main(Array("-si", "hl/eq_tree_leaves.hs", "-t", "hl/out/eq_tree_leaves.svg","-p", "hl/out/eq_tree_leaves.hs"))
+    //HLSC.main(Array("-si", "hl/eq_tree.hs", "-t", "hl/out/eq_tree.svg","-p", "hl/out/eq_tree.hs"))
+    //HLSC.main(Array("-si", "hl/rev_map.hs", "-t", "hl/out/rev_map.svg","-p", "hl/out/rev_map.hs"))
 
   }
 }
