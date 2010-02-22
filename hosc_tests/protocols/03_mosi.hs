@@ -36,7 +36,7 @@ react = \state action -> case state of {State invalid modified shared owned ->
 };
 rm = \invalid modified shared owned ->
 	case invalid of {
-		S i -> State i Z (S shared) (add modified owned);
+		S i -> State i Z (S shared) (add owned owned);
 	};
 w0 = \invalid modified shared owned ->
 	case owned of {
@@ -68,14 +68,19 @@ checkAll = \state -> case state of {State invalid modified shared owned ->
 		(check2 invalid modified shared owned)
 		(check3 invalid modified shared owned);
 };
+chAll = \state -> Result (ch1 state) (ch2 state) (ch3 state);
 check = \state -> case state of {State invalid modified shared owned ->
-	check3 invalid modified shared owned;
+	check1 invalid modified shared owned;
 };
+
+ch1 = \state -> case state of {State i m s o -> check1 i m s o;};
+ch2 = \state -> case state of {State i m s o -> check2 i m s o;};
+ch3 = \state -> case state of {State i m s o -> check3 i m s o;};
 
 checkState = \f state -> case state of {State invalid modified shared owned ->
 	f invalid modified shared owned;
 };
-check1 = \i m s o -> case o of {S o1 -> case o1 of {S o2 -> False;};};
-check2 = \i m s o -> case o of {S o1 -> case s of {S s1 -> False;};};
-check3 = \i m s o -> case m of {S m1 -> case m1 of { S m2 -> False;};};
+check1 = \i m s o -> case o of {S o1 -> case o1 of {S o2 -> False;Z -> True;};Z -> True;};
+check2 = \i m s o -> case m of {S m1 -> case m1 of { S m2 -> False;Z -> True;};Z -> True;};
+check3 = \i m s o -> case m of {S m1 -> case s of {S s1 -> False;Z -> True;};Z->True;};
 add = \x y -> case x of { Z -> y; S x1 -> S (add x1 y);};
