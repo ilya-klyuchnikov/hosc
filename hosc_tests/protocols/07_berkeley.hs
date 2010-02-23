@@ -12,7 +12,7 @@ where
 loop1 = \state actions -> case actions of {
 	Nil -> state;
 	Cons a as -> case (react state a) of {
-		State invalid dirty shared exclusive -> loop1 (State invalid dirty shared exclusive) as;
+		State i n e u -> loop1 (State i n e u) as;
 	};
 };
 
