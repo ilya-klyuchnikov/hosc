@@ -3,7 +3,7 @@ data Action = GF | PF | GS | PS | RQ | REL | GO;
 --                 trans race busy idle owner handin handout wait
 data State = State Trans Race Nat  Nat  Nat   Nat    Nat     Nat;
 data Race = H0 | H1 | H2 | H3;
-data Boolean = True | False | False1 | False2 | False3;
+data Boolean = True | False;
 data Trans = NotBusy | Busy;
 data List a = Nil | Cons a (List a);
 
@@ -62,10 +62,10 @@ go = \tr r b i o hin hout w ->
 chState = \state -> case state of {State tr r b i o hin hout w -> 
 	case o of {
 		Z -> case hout of {
-			S hout1 -> case hout1 of {S hout2 -> False1;};};
+			S hout1 -> case hout1 of {S hout2 -> False;};};
 		S o1 -> case o1 of {
-			Z -> case hout of {S hout1 -> False2;};
-			S o2 -> False3;
+			Z -> case hout of {S hout1 -> False;};
+			S o2 -> False;
 		};
 	};
 };
