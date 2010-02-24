@@ -7,6 +7,7 @@ data Result = Result Boolean Boolean Boolean;
 
 -- TODO: workaround (f s)
 check (loop1 (State (S i) Z Z Z) (f s)) where
+--(loop2 (State (S a) Z Z Z) (f s)) where
 --Result
 --	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
 --	(checkState check2 (loop (State (S i) Z Z Z) (f s)))
@@ -23,6 +24,18 @@ loop1 = \state actions -> case actions of {
 		State invalid modified shared owned -> loop1 (State invalid modified shared owned) as;
 	};
 };
+loop2 =\state actions -> case state of {
+	State i m s o -> case (check state) of {
+		False -> False;
+		True -> case actions of {
+			Nil -> True;
+			Cons a as -> --loop2 (react state a) as;
+				case react state a of {
+					State i1 m1 s1 o1 -> loop2 (State i1 m1 s1 o1) as;
+				};
+		};
+	};
+};
 react = \state action -> case state of {State invalid modified shared owned ->
 	case action of {
 		RM -> rm invalid modified shared owned;
@@ -34,10 +47,12 @@ react = \state action -> case state of {State invalid modified shared owned ->
 		WB0 -> wb0 invalid modified shared owned;
 	};
 };
+
 rm = \invalid modified shared owned ->
 	case invalid of {
 		S i -> State i Z (S shared) (add modified owned);
 	};
+
 w0 = \invalid modified shared owned ->
 	case owned of {
 		S o -> State (add o (add shared (add modified invalid))) (S Z) Z Z;
@@ -77,9 +92,6 @@ ch1 = \state -> case state of {State i m s o -> check1 i m s o;};
 ch2 = \state -> case state of {State i m s o -> check2 i m s o;};
 ch3 = \state -> case state of {State i m s o -> check3 i m s o;};
 
-checkState = \f state -> case state of {State invalid modified shared owned ->
-	f invalid modified shared owned;
-};
 check1 = \i m s o -> case o of {S o1 -> case o1 of {S o2 -> False;Z -> True;};Z -> True;};
 check2 = \i m s o -> case m of {S m1 -> case m1 of { S m2 -> False;Z -> True;};Z -> True;};
 check3 = \i m s o -> case m of {S m1 -> case s of {S s1 -> False;Z -> True;};Z->True;};
