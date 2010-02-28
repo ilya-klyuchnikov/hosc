@@ -5,35 +5,12 @@ data Boolean = True | False;
 data List a = Nil | Cons a (List a);
 data Result = Result Boolean Boolean Boolean;
 
--- TODO: workaround (f s)
-check (loop1 (State (S i) Z Z Z) (f s)) where
---(loop2 (State (S a) Z Z Z) (f s)) where
---Result
---	(checkState check1 (loop (State (S i) Z Z Z) (f s)))
---	(checkState check2 (loop (State (S i) Z Z Z) (f s)))
---	(checkState check3 (loop (State (S i) Z Z Z) (f s))) 
---where
+check (loop (State (S i) Z Z Z) acts) where
 	
 loop = \state actions -> case actions of {
 	Nil -> state;
-	Cons a as -> loop (react state a) as;
-};
-loop1 = \state actions -> case actions of {
-	Nil -> state;
 	Cons a as -> case (react state a) of {
-		State invalid modified shared owned -> loop1 (State invalid modified shared owned) as;
-	};
-};
-loop2 =\state actions -> case state of {
-	State i m s o -> case (check state) of {
-		False -> False;
-		True -> case actions of {
-			Nil -> True;
-			Cons a as -> --loop2 (react state a) as;
-				case react state a of {
-					State i1 m1 s1 o1 -> loop2 (State i1 m1 s1 o1) as;
-				};
-		};
+		State i m s o -> loop (State i m s o) as;
 	};
 };
 react = \state action -> case state of {State invalid modified shared owned ->
@@ -47,35 +24,33 @@ react = \state action -> case state of {State invalid modified shared owned ->
 		WB0 -> wb0 invalid modified shared owned;
 	};
 };
-
-rm = \invalid modified shared owned ->
-	case invalid of {
-		S i -> State i Z (S shared) (add modified owned);
+rm = \i m s o ->
+	case i of {
+		S i1 -> State i1 Z (S s) (add m o);
 	};
-
-w0 = \invalid modified shared owned ->
-	case owned of {
-		S o -> State (add o (add shared (add modified invalid))) (S Z) Z Z;
+w0 = \i m s o ->
+	case o of {
+		S o1 -> State (add i (add m (add s o1))) (S Z) Z Z;
 	};
-wi = \invalid modified shared owned ->
-	case invalid of {
-		S i -> State (add i (add shared (add modified owned))) (S Z) Z Z;
+wi = \i m s o ->
+	case i of {
+		S i1 -> State (add i1 (add m (add s o))) (S Z) Z Z;
 	};
-ws = \invalid modified shared owned ->
-	case shared of {
-		S s -> State (add s (add invalid (add modified owned))) (S Z) Z Z;
+ws = \i m s o ->
+	case s of {
+		S s1 -> State (add i (add m (add s1 o))) (S Z) Z Z;
 	};
-se = \invalid modified shared owned ->
-	case shared of {
-		S s -> State (S invalid) modified s owned;
+se = \i m s o ->
+	case s of {
+		S s1 -> State (S i) m s1 o;
 	};
-wbm = \invalid modified shared owned ->
-	case modified of {
-		S m -> State (S invalid) m shared owned;
+wbm = \i m s o ->
+	case m of {
+		S m1 -> State (S i) m1 s o;
 	};
-wb0 = \invalid modified shared owned ->
-	case owned of {
-		S o -> State (S invalid) modified shared o;
+wb0 = \i m s o ->
+	case o of {
+		S o1 -> State (S i) m s o1;
 	};
 checkAll = \state -> case state of {State invalid modified shared owned ->
 	Result
