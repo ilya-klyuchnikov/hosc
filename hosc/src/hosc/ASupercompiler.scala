@@ -23,10 +23,10 @@ trait ASupercompiler {
       case context@Context(redex) => redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.body
-          Some(freshBinders(context.replaceHole(freshBinders(lam))) :: Nil) 
+          Some(betaReduce(context.replaceHole(freshBinders(lam))) :: Nil) 
         }
         case RedexLamApp(lam, app) => 
-          Some(freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg)))) :: Nil)
+          Some(betaReduce(expr) :: Nil)
         case RedexCaseCon(c, ce) => {
           ce.branches.find(_.pattern.name == c.name) match {
             case Some(b) => {
@@ -43,5 +43,11 @@ trait ASupercompiler {
           Some(List(context.replaceHole(freshBinders(e1)),context.replaceHole(freshBinders(e2))))
       }
     }
-  } 
+  }
+  
+  def betaReduce(expr: Expression): Expression = decompose (expr) match {
+    case context@Context(RedexLamApp(lam, app)) =>  
+      betaReduce(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))))
+    case _ => freshBinders(expr)
+  }
 }
