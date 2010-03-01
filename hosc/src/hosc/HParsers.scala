@@ -10,13 +10,14 @@ import scala.util.parsing.combinator.syntactical.StdTokenParsers
 
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
   
-  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\", "[", "]")
+  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\", "[", "]", "=>")
   lexical.reserved += ("case", "of", "where", "data", "letrec", "in", "choice")
   
   def program = (typeConstrDefinition*) ~ term ~ (("where" ~> strong(function*)) | success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> term <~ c(";")) ^^ Function)
   
   def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")
+  def term1 = p(tr2 | appl)
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
     
   // head of application
@@ -34,6 +35,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def choice = ("choice" ~ c("{")) ~> c(term) ~ (";" ~> c(term)) <~ c(";" ~ "}") ^^ Choice
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)  
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
+  private def lemma = (term1 <~ "=>") ~ (term1 <~ ";") ^^ Lemma
   
   def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))
   def parseChoice(r: Reader[Char]) = strong(choice) (new lexical.Scanner(r))
@@ -54,17 +56,16 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
   def parseType(r: Reader[Char]) = strong(`type`) (new lexical.Scanner(r))
-  def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program) (new lexical.Scanner(r))))
+  def parseLemmasForProgram(p: Program, r: Reader[Char]) = 
+    (lemma*)(new lexical.Scanner(r)) map {Postprocessor.postprocessLemmasForProgram(_, p)}
+  def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program)(new lexical.Scanner(r))))
   
   def validate(pr: ParseResult[Program]): ParseResult[Program] = pr match {
     case n: NoSuccess => n;
     case s @ Success(_, _) => Validator.validate(s)
   }
   
-  def postprocess(pr: ParseResult[Program]) = pr match {
-    case n: NoSuccess => n;
-    case s @ Success(_, _) => Postprocessor.postprocess(s.get); s
-  }
+  def postprocess(pr: ParseResult[Program]) = pr map Postprocessor.postprocess
   
   def p[T <: Positional](p: => Parser[T]): Parser[T] = positioned(p)
   
@@ -175,6 +176,7 @@ object Postprocessor {
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
     for (f <- program.fs) process(f.body,  globals)
     process(program.goal, globals)
+    program
   }
   def process(t: Expression, globals: Set[Variable]): Unit = t match {
     case v: Variable => v.global = (globals contains v)
@@ -185,5 +187,10 @@ object Postprocessor {
     case LetRecExpression((v, e), e0) => {v.global = true; process(e, globals + v); process(e0, globals + v)}   
     case Choice(e1, e2) => process(e1, globals); process(e2, globals)
     case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
+  }
+  def postprocessLemmasForProgram(ls: List[Lemma], program: Program) = {
+    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
+    ls map {case Lemma(from, to) => process(from, globals); process(to, globals);}
+    ls
   }
 }
