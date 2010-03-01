@@ -29,8 +29,7 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
           val fNode = node.getRepParent()
           val (f, args) = fNode.signature
           val app = constructApplication(f, args)
-          val msg = strongMsg(fNode.expr, t)
-          val sub = Map[Variable, Expression]() ++ msg.sub2
+          val sub = Map[Variable, Expression]() ++ Instance.findSubst(fNode.expr, t)
           applySubstitution(app, sub)
         } else {
           context.redex match {        
@@ -75,8 +74,8 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
       var changedVars = Set[Variable]()
       for (n <- recNodes) {
         val betaT = n.expr
-        val msg = strongMsg(fNode.expr, betaT)
-        val args0 = msg.sub2 map {p => p._1}
+        val sub = Instance.findSubst(fNode.expr, betaT)
+        val args0 = sub map {p => p._1}
         changedVars = changedVars ++ args0
       }
       vars = vars filter {changedVars.contains}

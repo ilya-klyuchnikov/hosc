@@ -34,24 +34,18 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
   }
   
   def step(p: ProcessTree, beta: Node): Unit = {
-      
       val bExpr = beta.expr
       beta.expr match {
         case LetExpression(_, _) => drive(p, beta)
         case bTerm if canBeEnhanced_?(bTerm) => {
           beta.ancestors find equivalenceTest(beta) match {
-            case Some(alpha) => beta.repeatedOf = alpha; 
+            case Some(alpha) => beta.repeatedOf = alpha
             case None => {
               beta.ancestors find instanceTest(beta) match {
                 case Some(alpha) => abstractDown(p, alpha, beta) 
                 case None => { 
                   beta.ancestors find heByCouplingTest(beta) match {
-                    case Some(alpha) => {
-                      if (debug) {
-                        println("GENERALIZATION FROM SC0")
-                      }
-                      abstractUp(p, alpha, beta)
-                    }
+                    case Some(alpha) => abstractUp(p, alpha, beta)
                     case None => drive(p, beta)
                   }
                 }
@@ -65,17 +59,17 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
   
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode);
+    case aTerm => Instance.instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   private def equivalenceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode);
+    case aTerm => equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode);
+    case aTerm => HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   def canBeEnhanced_?(t: Expression) = decompose(t) match {
@@ -112,6 +106,10 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
     	println("propagating match error...")
     	println(n.expr)
     }
+    val Context(RedexCaseCon(_, CaseExpression(sel, _))) = decompose(n.expr)
+    val newExp = CaseExpression(sel, Nil)
+    t.replace(n, newExp) 
+    return
     val ancs = n.ancestors 
     
     (ancs takeWhile reducable) find isGlobal match {
@@ -157,30 +155,32 @@ class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTre
   }
   
   def abstractDown(t: ProcessTree, up: Node, down: Node): Unit = {
-    makeAbstraction(t, down, up)
+    val a = up.expr
+    val b = down.expr
+    val sub = Instance.findSubst(a, b)
+    val keyMap = Map(sub.keys.toList map {k => (k, TermAlgebra.newVar())}:_*)
+    val eg = a/keyMap
+    val sub1 = (sub map {case (k, v) => (keyMap(k), v)}).toList
+    t.replace(down, LetExpression(sub1, eg))
   }
   
   def abstractUp(t: ProcessTree, up: Node, down: Node): Unit = {
-    makeAbstraction(t, up, down)
-  }
-  
-  def makeAbstraction(t: ProcessTree, alpha: Node, beta: Node): Unit = {
-    val aTerm = alpha.expr
-    val bTerm = beta.expr
-    val g = msg(aTerm, bTerm)
+    val upTerm = up.expr
+    val downTerm = down.expr
+    val g = msg(upTerm, downTerm)
     if (g.sub1.isEmpty){
-      t.replace(alpha, g.term)
+      t.replace(up, g.term)
     } else {
       if (debug){
-        println(format(canonize(aTerm)))
-        println(format(canonize(bTerm)))
+        println(format(canonize(upTerm)))
+        println(format(canonize(downTerm)))
       }
       var term = g.term
       var subs = g.sub1
       if (debug) {
         println(format((LetExpression(g.sub1, g.term))))
       }
-      t.replace(alpha, LetExpression(g.sub1, g.term))
-    }    
+      t.replace(up, LetExpression(g.sub1, g.term))
+    }
   }
 }
