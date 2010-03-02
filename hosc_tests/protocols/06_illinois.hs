@@ -5,27 +5,13 @@ data Boolean = True | False;
 data List a = Nil | Cons a (List a);
 data Result = Result Boolean Boolean Boolean Boolean Boolean Boolean Boolean;
 
---Result 
-(chState2 (loop1 (State (S i) Z Z Z) (f s)))
---(loop2 (State (S i) Z Z Z) (f s))
+(chState2 (loop (State (S i) Z Z Z) acts))
 where
 
-loop1 = \state actions -> case actions of {
+loop = \state actions -> case actions of {
 	Nil -> state;
 	Cons a as -> case (react state a) of {
-		State invalid dirty shared exclusive -> loop1 (State invalid dirty shared exclusive) as;
-	};
-};
-loop2 =\state actions -> case state of {
-	State i d s o -> case (chState2 state) of {
-		False -> False;
-		True -> case actions of {
-			Nil -> True;
-			Cons a as -> --loop2 (react state a) as;
-				case react state a of {
-					State i1 d1 s1 o1 -> loop2 (State i1 d1 s1 o1) as;
-				};
-		};
+		State invalid dirty shared exclusive -> loop (State invalid dirty shared exclusive) as;
 	};
 };
 
@@ -84,5 +70,4 @@ chState2 = \state -> case state of {State invalid dirty shared exclusive ->
 };
 check1 = \i d s e -> case d of {S d1 -> case s of {S s1 -> False;Z->True;};Z->True;};
 check2 = \i d s e -> case d of {S d1 -> case d1 of {S d2 -> False;Z->True;};Z->True;};
---add = \x y -> case x of { Z -> y; S x1 -> S (add x1 y);};
-add = \x y -> case x of { Z -> y; S x1 ->  add x1 (S y);};
+add = \x y -> case x of { Z -> y; S x1 -> S (add x1 y);};
