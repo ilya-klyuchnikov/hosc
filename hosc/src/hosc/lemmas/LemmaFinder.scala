@@ -2,12 +2,12 @@ package hosc.lemmas
 
 import scala.collection.mutable.{ArrayBuffer, Buffer}
 
-import hosc.{SuperCompiler, CodeConstructor, TermAlgebra, Eq, ProcessTree, ProcessTreeAlgebra}
+import hosc.{SuperCompiler0, CodeConstructor, TermAlgebra, Eq, ProcessTree, ProcessTreeAlgebra}
 import hosc.HLanguage._
 import hosc.TicksAlgebra
 
 class LemmaFinder(val program: Program) {
-  val scp = new SuperCompiler(program)
+  val scp = new SuperCompiler0(program)
   scp.renameVars = false
   val gen = new ExpressionGenerator(program)
   

@@ -1,12 +1,12 @@
 package hosc.exp
 
 import hosc.HLanguage._
-import hosc.SuperCompiler
+import hosc.SuperCompiler0
 import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.lemmas.LemmaFinder
 
-class HigherLevelSuperCompiler(program: Program) extends SuperCompiler(program){
+class HigherLevelSuperCompiler(program: Program) extends SuperCompiler0(program){
   val finder = new LemmaFinder(program)
   debug = true
   override def abstractUp(t: ProcessTree, up: Node, down: Node): Unit = {

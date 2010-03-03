@@ -7,7 +7,7 @@ import TermAlgebra._
 import ProcessTree._
 import LangUtils._
 
-class SuperCompiler(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
+class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
   var debug = false
   var useControl = true

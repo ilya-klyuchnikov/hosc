@@ -2,7 +2,7 @@ package hosc
 
 import HLanguage._
 
-class SCLem(program: Program, lemmas: List[Lemma]) extends SuperCompiler(program){
+class SCLem(program: Program, lemmas: List[Lemma]) extends SuperCompiler0(program){
   override def driveExp(expr: Expression): Option[List[Expression]] = {
     super.driveExp(expr) map {_ map {e =>
       var currentExpr = e

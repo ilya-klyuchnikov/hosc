@@ -1,7 +1,7 @@
 package hosc.exp
 
 import hosc.HLanguage._
-import hosc.SuperCompiler
+import hosc.SuperCompiler0
 import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra._
@@ -13,7 +13,7 @@ import hosc.TermAlgebra._
  * This is useful in higher-order setting
  * (since we can narrow f x1 x2 x3 = C e1 e2 e3 when function f is unknown).
  */
-class FullPositiveSuperCompiler(program: Program) extends SuperCompiler(program) {
+class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program) {
   renameVars = false
   def fullDriveExp(tree: ProcessTree, n: Node): Boolean = {
   var res = true

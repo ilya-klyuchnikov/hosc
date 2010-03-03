@@ -6,7 +6,7 @@ import hosc.MSG._
 import hosc.TermAlgebra._
 import hosc.ProcessTree
 import hosc.CodeConstructor
-import hosc.SuperCompiler
+import hosc.SuperCompiler0
 import hosc.ProcessTree._
 import hosc.LangUtils._
 

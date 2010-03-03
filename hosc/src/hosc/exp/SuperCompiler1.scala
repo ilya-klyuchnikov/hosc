@@ -6,11 +6,11 @@ import hosc.MSG._
 import hosc.TermAlgebra._
 import hosc.ProcessTree
 import hosc.CodeConstructor
-import hosc.SuperCompiler
+import hosc.SuperCompiler0
 import hosc.ProcessTree._
 import hosc.LangUtils._
 
-class SuperCompiler1(program: Program) extends SuperCompiler(program){
+class SuperCompiler1(program: Program) extends SuperCompiler0(program){
   debug = false
   useControl = true
   
@@ -59,7 +59,7 @@ class SuperCompiler1(program: Program) extends SuperCompiler(program){
   */
   
   private def sc(expr: Expression): Expression = {
-    val sc0 = new SuperCompiler(program)
+    val sc0 = new SuperCompiler0(program)
     sc0.renameVars = false
     if (debug) {
       println("* sc0 *")

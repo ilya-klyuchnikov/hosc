@@ -39,7 +39,7 @@ object SuperCompilerApp {
     }
     
     val program = programFromFile(fileName)
-    val sc = new SuperCompiler(program)
+    val sc = new SuperCompiler0(program)
     val pt = sc.buildProcessTree(program.goal)    
     val svg = new ProcessTreeSVG(pt).treeToSVG
     
