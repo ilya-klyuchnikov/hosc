@@ -2,12 +2,13 @@ package hosc.sc
 
 import hosc.HLanguage._
 import hosc.ProcessTree._
+import hosc.TermAlgebra._
 
-trait SuperCompiler {
+trait SuperCompilerAlgorithm {
+  
   def renaming:  PartialOrdering[Node]
   def embedding: PartialOrdering[Node]
   def instance:  PartialOrdering[Node]
-  def trivial(node: Node): Boolean
   
   def driveNode(tree: ProcessTree, node: Node): ProcessTree
   def fold(tree: ProcessTree, funNode: Node, recNode:Node): ProcessTree
@@ -35,4 +36,14 @@ trait SuperCompiler {
     } getOrElse {
       driveNode(tree, beta)
     }
+  
+  def trivial(node: Node) = node.expr match {
+    case LetExpression(_, _) => true
+    case e => decompose(e) match {
+      case Context(RedexCall(_)) => true
+      case Context(RedexCaseVar(_, _)) => true
+      case _ => false
+    }
+  }
+
 }
