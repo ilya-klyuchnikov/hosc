@@ -81,7 +81,7 @@ class ProcessTree {
   
   def leafs = leafs_
   
-  def addChildren(node: Node, es: List[Expression]) = {
+  def addChildren(node: Node, es: List[Expression]): ProcessTree = {
     assume(leafs_.contains(node))
     leafs_ = leafs_.remove(_ == node)
     val edges = new scala.collection.mutable.ListBuffer[Edge]
@@ -93,9 +93,10 @@ class ProcessTree {
       edges += edge
     }
     node.outs = edges.toList
+    this
   }
   
-  def addChildren(node: Node, es: List[Expression], narrowings: List[Option[(Expression, Expression)]]) = {
+  def addChildren(node: Node, es: List[Expression], narrowings: List[Option[(Expression, Expression)]]): ProcessTree = {
     assume(leafs_.contains(node))
     leafs_ = leafs_.remove(_ == node)
     val edges = new scala.collection.mutable.ListBuffer[Edge]
@@ -107,9 +108,10 @@ class ProcessTree {
       edges += edge
     }
     node.outs = edges.toList
+    this
   }
   
-  def replace(node: Node, exp: Expression): Node = {
+  def replace(node: Node, exp: Expression): ProcessTree = {
     // the node can be not leaf - but from any part of tree
     leafs_ = leafs_.remove(_ == node)
     leafs_ = leafs_.remove(_.ancestors.contains(node))
@@ -121,7 +123,7 @@ class ProcessTree {
       node.in.child = childNode
     }
     leafs_ = childNode :: leafs
-    childNode
+    this
   }
   
   def isClosed = leafs_.forall(_.isProcessed)

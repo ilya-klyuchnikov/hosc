@@ -60,7 +60,6 @@ class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program
     var expr = beta.expr
     var before = expr
     val init = expr
-    var b1 = beta
     println("-----")
     do {
       before = expr 
@@ -75,9 +74,10 @@ class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program
     	println("after:")
     	println(expr)
     	println("-----")
-    	b1 = p.replace(beta, expr)
+    	p.replace(beta, expr)
+    } else {
+    	super.step(p, beta)
     }
-    super.step(p, b1)
   }
   
   override def drive(t: ProcessTree, n: Node): Unit = {
