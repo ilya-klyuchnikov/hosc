@@ -1,0 +1,8 @@
+syntax: glob
+hosc_tests/*/out*/*
+*/bin/*
+*/.manager/*
+*.orig
+*~
+*.o
+
