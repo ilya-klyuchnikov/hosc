@@ -1,5 +1,8 @@
 syntax: glob
-hosc_tests/*/out*/*
+#hosc_tests/*/out*/*
+hosc_tests/*/out*/*.hs
+hosc_tests/*/out*/*.svg
+hosc_tests/*/out*/*.hl1
 */bin/*
 */.manager/*
 *.orig
