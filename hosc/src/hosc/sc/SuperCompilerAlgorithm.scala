@@ -21,7 +21,6 @@ trait SuperCompilerAlgorithm {
     while (unprocessedNodeOpt.isDefined) {
       tree = processNode(tree, unprocessedNodeOpt.get)
       unprocessedNodeOpt = tree.leafs.find(!_.isProcessed)
-      println(tree)
     }
     tree
   }
