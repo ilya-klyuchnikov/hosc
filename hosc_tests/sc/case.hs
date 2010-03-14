@@ -7,20 +7,4 @@ g (\x -> case x of {
 
 where
 
-f1 = \x -> S x;
-
-g1 = \x ->
-  case f1 x of {
-    Z -> Z;
-    S y -> g2 (g1 y);
-  };
-
-g2 = \x ->
-  case f1 x of {
-    Z -> Z;
-    S y -> g1 x;
-  };
-
-
-
 g = \x -> g (g x);
