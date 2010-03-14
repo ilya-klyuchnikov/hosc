@@ -20,6 +20,8 @@ trait SuperCompilerAlgorithm {
     var unprocessedNodeOpt = tree.leafs.find(!_.isProcessed)
     while (unprocessedNodeOpt.isDefined) {
       tree = processNode(tree, unprocessedNodeOpt.get)
+      unprocessedNodeOpt = tree.leafs.find(!_.isProcessed)
+      println(tree)
     }
     tree
   }
@@ -40,9 +42,9 @@ trait SuperCompilerAlgorithm {
   def trivial(node: Node) = node.expr match {
     case LetExpression(_, _) => true
     case e => decompose(e) match {
-      case Context(RedexCall(_)) => true
-      case Context(RedexCaseVar(_, _)) => true
-      case _ => false
+      case Context(RedexCall(_)) => false
+      case Context(RedexCaseVar(_, _)) => false
+      case _ => true
     }
   }
 
