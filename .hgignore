@@ -8,4 +8,4 @@ hosc_tests/*/out*/*.hl1
 *.orig
 *~
 *.o
-
+*.class
