@@ -33,7 +33,20 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
           applySubstitution(app, sub)
         } else {
           context.redex match {        
-        	case RedexLamApp(lam, app) => construct(node.children.head)
+        	case RedexLamApp(lam, app) => {
+        	  lazy val traversed = construct(node.children.head)
+              tree.leafs.filter(_.repeatedOf == node) match {
+                case Nil => traversed
+                case repeatNodes => {
+                  val (f, vars) = createSignature(node, repeatNodes) 
+              	  node.signature = (f, vars)
+              	  val newVars = vars map {p => createVar()}
+              	  val sub = Map[Variable, Expression]() ++ ((vars zip newVars))
+              	  val body = traversed/sub
+              	  LetRecExpression((f, constructLambda(newVars, body)), constructApplication(f, vars))
+                }
+              }
+            }
         	case RedexChoice(choice) => node.children match {
         	  case e1 :: e2 :: Nil => Choice(construct(e1), construct(e2))
               case _ => throw new IllegalStateException("exprected exactly 2 child nodes here...")
@@ -41,7 +54,20 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
         	case RedexCaseCon(c, CaseExpression(sel, Nil)) => {
         	  CaseExpression(sel, Nil)
             }
-        	case RedexCaseCon(c, ce) => construct(node.children.head)
+        	case RedexCaseCon(c, ce) => {
+        	  lazy val traversed = construct(node.children.head)
+              tree.leafs.filter(_.repeatedOf == node) match {
+                case Nil => traversed
+                case repeatNodes => {
+                  val (f, vars) = createSignature(node, repeatNodes) 
+              	  node.signature = (f, vars)
+              	  val newVars = vars map {p => createVar()}
+              	  val sub = Map[Variable, Expression]() ++ ((vars zip newVars))
+              	  val body = traversed/sub
+              	  LetRecExpression((f, constructLambda(newVars, body)), constructApplication(f, vars))
+                }
+              }
+            }
         	case ntr@NonTrivialRedex(x) => {
         	  lazy val traversed = ntr match {
         	    case RedexCall(_) => 
