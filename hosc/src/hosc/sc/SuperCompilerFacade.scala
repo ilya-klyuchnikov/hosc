@@ -1,5 +1,6 @@
 package hosc.sc
 
+import hosc.CodeConstructor
 import hosc.HLanguage._
 import hosc.Util
 

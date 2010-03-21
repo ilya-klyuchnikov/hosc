@@ -1,6 +1,7 @@
 package hosc.sc
 
 import hosc.HLanguage._
+import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra._
 
@@ -44,16 +45,16 @@ trait SuperCompilerAlgorithm {
       case Context(RedexCall(_)) => false
       case Context(RedexCaseVar(_, _)) => false
       case Context(RedexLamApp(lam, app)) => {
-        val sizeBefore = TermAlgebra.size(app)
-        val sizeAfter = TermAlgebra.size(TermAlgebra.applySubstitution(lam.t, Map(lam.v -> app.arg)))
+        val sizeBefore = size(app)
+        val sizeAfter = size(applySubstitution(lam.t, Map(lam.v -> app.arg)))
         sizeBefore > sizeAfter
       }
       case Context(RedexCaseCon(c, ce)) => {
         ce.branches.find(_.pattern.name == c.name) match {
           case Some(b) => {
             val sub = Map(b.pattern.args zip c.args:_*)
-            val sizeBefore = TermAlgebra.size(ce)
-            val sizeAfter = TermAlgebra.size(applySubstitution(b.term, sub))
+            val sizeBefore = size(ce)
+            val sizeAfter = size(applySubstitution(b.term, sub))
             sizeBefore > sizeAfter
           }
           case None => true

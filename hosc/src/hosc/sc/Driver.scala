@@ -1,6 +1,7 @@
 package hosc.sc
 
 import hosc.HLanguage._
+import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra._
 
