@@ -43,6 +43,22 @@ trait SuperCompilerAlgorithm {
     case e => decompose(e) match {
       case Context(RedexCall(_)) => false
       case Context(RedexCaseVar(_, _)) => false
+      case Context(RedexLamApp(lam, app)) => {
+        val sizeBefore = TermAlgebra.size(app)
+        val sizeAfter = TermAlgebra.size(TermAlgebra.applySubstitution(lam.t, Map(lam.v -> app.arg)))
+        sizeBefore > sizeAfter
+      }
+      case Context(RedexCaseCon(c, ce)) => {
+        ce.branches.find(_.pattern.name == c.name) match {
+          case Some(b) => {
+            val sub = Map(b.pattern.args zip c.args:_*)
+            val sizeBefore = TermAlgebra.size(ce)
+            val sizeAfter = TermAlgebra.size(applySubstitution(b.term, sub))
+            sizeBefore > sizeAfter
+          }
+          case None => true
+        }
+      }
       case _ => true
     }
   }
