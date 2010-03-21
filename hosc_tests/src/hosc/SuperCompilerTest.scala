@@ -113,4 +113,7 @@ class SuperCompilerTest {
    
    @Test def synapse0() = 
     SCP.main(Array("-si", "sc/synapse0.hs",  "-t", "sc/out0/synapse0.svg", "-p", "sc/out0/synapse0.hs"))
+   
+   @Test def fix_con = 
+    SCP.main(Array("-si", "sc/fix_con.hs", "-t", "sc/out0/fix_con.svg", "-p", "sc/out0/fix_con.hs"))
 }
