@@ -262,6 +262,8 @@ object TermAlgebra {
       size(e1) + size(e2)
     case CaseExpression(sel, bs) =>
       1 + size(sel) + sum(bs map {b => size(b.term)})
+    case Choice(e1, e2) =>
+      size(e1) + size(e2)
   }
   
   private def sum(ns: List[Int]): Int = {
