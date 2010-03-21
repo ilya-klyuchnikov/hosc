@@ -9,6 +9,10 @@ import hosc.sc.{SuperCompilerApp, SuperCompilerWithControlApp}
  */
 class Termination {
   @Test//{val timeout=5000}
+  def ack = 
+    run("hll/ack.hs")
+  
+  @Test//{val timeout=5000}
   def eqnumxx = 
     run("hll/eqnumxx.hs")
   
