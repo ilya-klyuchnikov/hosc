@@ -17,7 +17,7 @@ class Termination {
     run("hll/even_double_acc.hs")
   
   @Test{val timeout=5000}
-  def fib = 
+  def fib =
     run("hll/fib.hs")
   
   @Test{val timeout=5000}
