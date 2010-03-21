@@ -41,7 +41,6 @@ object Control {
   def checkControl(up: Node, down: Node): Boolean = {
     val globalUp = isGlobal(up)
     val globalDown = isGlobal(down)
-    (globalUp == globalDown) && 
-      (globalUp || down.ancestors.takeWhile(_ != up).forall(!isGlobal(_)))
+    (globalUp == globalDown) && (globalUp || down.ancestors.takeWhile(_ != up).forall(!isGlobal(_)))
   }
 }

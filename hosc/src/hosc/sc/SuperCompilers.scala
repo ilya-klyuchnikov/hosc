@@ -10,7 +10,7 @@ class SuperCompiler(val program: Program) extends SuperCompilerAlgorithm with Dr
 }
 
 class SuperCompilerWithControl(val program: Program) extends SuperCompilerAlgorithm with Driver with TreeOperations {
-  val renaming  = RenamingOrdering
+  val renaming  = RenamingOrderingWithControl
   val embedding = EmbeddingOrderingWithControl
   val instance  = InstanceOrderingWithControl
 }
