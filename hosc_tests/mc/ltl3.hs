@@ -34,7 +34,10 @@ kFand1 = \f1 f2 k ss ->
 	f1 (\v -> case v of {True -> (\z -> f2 k ss) v; False -> k v;}) ss;
 
 kU1 :: KBF k -> KBF k -> KBF k;
-kU1 = \f1 f2 k ss -> kFor1 f1 (kFand1 f1 (kX1 (kU1 f1 f2))) k ss;  
+kU1 = \f1 f2 k ss -> kFor1 f1 (kFand1 f1 (kX1 (kU1 f1 f2))) k ss;
+
+kF1 = \f1 k ss -> kFor1 f1 (kX1 (kF1 f1)) k ss;
+kG1 = \f1 k ss -> kAnd1 f1 (kX1 (kG1 f1)) k ss;   
 
 -- X (not kP)
 xNotF = \k-> kX k (\z -> (kFnot z kP));
