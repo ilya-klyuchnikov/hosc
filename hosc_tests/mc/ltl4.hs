@@ -13,7 +13,12 @@ data Bool = True | False;
 
 --kX1 (kFnot1 kP) return states
 
-kFnot1 (kFnot1 (kX1 kP)) return states
+--kFnot1 (kFnot1 (kX1 kP)) return states
+
+--kFor1 (kFnot1 kP) (kFnot1 kP) return states
+--kFand1 kP (kFnot1 kP) return states
+
+kFand1 s (kFnot1 (kFnot1 s)) return states
 
 where
 
@@ -22,6 +27,12 @@ kFnot = \k f ss -> f (knot k) ss;
 
 kX1 = \f k ss -> ktail (f k) ss;
 kFnot1 = \f k ss -> f (knot k) ss;
+
+kFor1 = \f1 f2 k ss -> 
+	f1 (\v -> case v of {True -> k True; False -> f2 k ss;}) ss;
+kFand1 = \f1 f2 k ss -> 
+	f1 (\v -> case v of {True -> (\z -> f2 k ss) v; False -> k v;}) ss;
+kU1 = \f1 f2 k ss -> kFor1 f1 (kFand1 f1 (kX1 (kU1 f1 f2))) k ss;
 
 xNotF = \k-> kX k (\z -> (kFnot z kP));
 
