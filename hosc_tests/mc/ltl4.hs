@@ -28,7 +28,14 @@ data Bool = True | False;
 --kX1 (kFor1 p q) return states
 
 --kF1 (kFor1 p q) return states
-kFor1 (kF1 p) (kF1 q) return states
+--kFor1 (kF1 p) (kF1 q) return states
+
+{-
+interesting example, showing that it is good to fold in 
+f x y z also
+when f is unknown!  
+-}
+kF1 p return states
 
 where
 
