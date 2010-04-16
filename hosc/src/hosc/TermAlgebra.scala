@@ -30,15 +30,16 @@ object TermAlgebra {
   
   sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
-  }  
+  }
+  // <>
   case class ContextHole(override val redex: Redex) extends Context(redex) {
     def replaceHole(t: Expression) = t
   }
-  // app = con e 
+  // con e 
   case class ContextApp(head: Context, app: Application) extends Context(head.redex) {
     def replaceHole(t: Expression) = Application(head.replaceHole(t), app.arg)
   }
-  // ce = case selector of ....
+  // case con of {}
   case class ContextCase(selector: Context, ce: CaseExpression) extends Context(selector.redex) {
     def replaceHole(t: Expression) = CaseExpression(selector.replaceHole(t), ce.branches)
   }  
@@ -59,8 +60,8 @@ object TermAlgebra {
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
     case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => ContextHole(RedexCaseVar(a, ce))
     case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
-    case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
+    case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ch: Choice => ContextHole(RedexChoice(ch))
     case v: Variable => throw new IllegalArgumentException("cannot be decomposed as a context: " + v)
     case lam: LambdaAbstraction => throw new IllegalArgumentException("cannot be decomposed as a context: " + lam)
