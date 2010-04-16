@@ -10,6 +10,7 @@ import LangUtils._
 class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
   var debug = false
+  var info = true
   var useControl = true
   var renameVars = true
   
@@ -42,10 +43,30 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
             case Some(alpha) => beta.repeatedOf = alpha
             case None => {
               beta.ancestors find instanceTest(beta) match {
-                case Some(alpha) => abstractDown(p, alpha, beta) 
+                case Some(alpha) => {
+                  if (info) {
+                    println(p)
+                    println("==========")
+                  }
+                  abstractDown(p, alpha, beta)
+                  if (info) {
+                    println(p)
+                    println("==========")
+                  }
+                }
                 case None => { 
                   beta.ancestors find heByCouplingTest(beta) match {
-                    case Some(alpha) => abstractUp(p, alpha, beta)
+                    case Some(alpha) => {
+                      if (info) {
+                        println(p)
+                        println("==========")
+                      }
+                      abstractUp(p, alpha, beta)
+                      if (info) {
+                        println(p)
+                        println("==========")
+                      }
+                    }
                     case None => drive(p, beta)
                   }
                 }
