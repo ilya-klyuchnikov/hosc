@@ -4,6 +4,8 @@ data List a = Nil | Cons a (List a) deriving Show;
 type Word = List Alphabet;
 type Parser = Word -> List Word;
 
+orAB = \w -> match (orP a b) w;
+
 match :: Parser -> Word -> Bool;
 match = \p w -> case (p w) of {
 	Nil -> False;
@@ -39,6 +41,12 @@ b = \w -> case w of {
 
 nilP :: Parser;
 nilP = \w -> Cons w Nil;
+
+eow :: Parser;
+eow = \w -> case w of {
+	Nil -> Cons Nil Nil;
+	Cons l w1 -> Nil;
+};
 
 ---------------
 -- list utility
