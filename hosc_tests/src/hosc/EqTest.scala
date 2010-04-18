@@ -25,7 +25,8 @@ class EqTest {
   @Test def orEven() = testEq("eq/orEven1.hs", "eq/orEven2.hs")
   @Test def orEvenOdd() = testEq("eq/orEvenOdd1.hs", "eq/orEvenOdd2.hs")
   @Test def pairs() = testEq("eq/pairs1.hs", "eq/pairs2.hs")
-  @Test def rep() = testEq("eq/rep1.hs", "eq/rep2.hs")  
+  @Test def rep() = testEq("eq/rep1.hs", "eq/rep2.hs")
+  @Test def re() = testEq("eq/re1.hs", "eq/re2.hs")
   
   def testEq(f1: String, f2: String) = {
     println("***")
