@@ -15,9 +15,15 @@ data Option a = None | Some a;
 
 --concat (or a b) eow return w
 
---concat a (concat (rep a) eow) return w
+--concat a (concat a (concat (rep a) eow)) return w
 
-notEmpty (concat (rep a) (concat a eow) return w)
+--concat (rep a) (concat a eow) return w
+
+--concat (concat (rep a) a) eow return w
+
+--concat (rep a) (concat (rep a) eow) return w
+
+(concat (rep a) eow) return w
 
 where
 
