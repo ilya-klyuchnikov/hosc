@@ -26,9 +26,43 @@ case  case  v26  of { Cons v60 v61 -> None; Nil  -> (return Nil); }  of {
 
 -- (a+b)* == (a*b*)* .
 
-concat (rep (or a b)) eow return w
+--concat (rep (or a b)) eow return w
+
+--match (rep (or a a)) w
+
+task7a w
 
 where
+
+-- a* | nil == a*
+task1a =\w -> match (concat (rep a) nilP) w;
+task1b =\w -> match (rep a) w;
+
+-- aa* | nil = a*
+task2a = \w -> match (or (concat a (rep a)) nilP) w;
+task2b = \w -> match (rep a) w;
+
+-- a*a* == a*
+task3a = \w -> match (concat (rep a) (rep a)) w;
+task3b = \w -> match (rep a) w;
+
+-- (a | nil) a* == a*
+task4a = \w -> match (concat (or a nilP) (rep a)) w;
+task4b = \w -> match (rep a) w;
+
+-- (a | nil)* == a*
+task5a = \w -> match (rep (or a nilP)) w;
+task5b = \w -> match (rep a) w;
+
+-- a a* == a* a
+task6a = \w -> match (concat a (rep a)) w;
+task6b = \w -> match (concat (rep a) a) w;
+
+-- (a+b)* == (a*b*)*
+task7a = \w -> match (rep (or a b)) w;
+task7b = \w -> match (rep (concat (rep a) (rep b))) w;
+
+match = \p w -> concat p eow return w;
 
 concat = \p1 p2 k w -> p1 (p2 k) w;
 
