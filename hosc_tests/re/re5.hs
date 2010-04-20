@@ -28,56 +28,37 @@ task4b = \w -> match (rep a) w;
 task7a = \w -> match (rep (or a b)) w;
 task7b = \w -> match (rep (concat (rep a) (rep b))) w;  
 
+-- combinator for A letter
 a = \next force w -> case w of {
 	Nil -> Fail;
 	Cons l w1 -> case l of { A -> next False w1; B -> Fail;};
 };
-
+-- combinator for B letter
 b = \next force w -> case w of {
 	Nil -> Fail;
 	Cons l w1 -> case l of { A -> Fail; B -> next False w1;};
 };
-
+-- or combinator
 or = \p1 p2 next force w -> case p1 next force w of {
 	Parsed w1 -> Parsed w1;
 	Fail -> p2 next force w;
 };
-
-nil = \next force w -> case force of {
-	True -> Fail;
-	False -> next False w;
+-- Kleene star combinator
+rep = \p next force w -> case (p return True w) of {
+	Parsed y -> rep p next False y;
+	Fail -> next force w;	
 };
-
-concat = \p1 p2 next force w -> case force of {
-	False -> p1 (p2 next) force w;
-	True -> case (p1 return True w) of {
-		Parsed w2 -> p2 next False w2;
-		Fail -> case (p1 return False w) of {
-			Fail -> Fail;
-			Parsed w3 -> p2 next True w3;
-		};
-	}; 
-};
-
-concat1 = \p1 p2 next force w -> p1 (p2 next) force w;
-
-rep = \p next force w -> case next force w of {
-	Parsed y -> Parsed y;
-	Fail -> case (p return True w) of {
-		Fail -> Fail;
-		Parsed w1 -> rep p next False w1;
-	}
-}; 
-
+-- empty word combinator
+nil = \next force w -> next force w;
+-- concatenation combinator
+concat = \p1 p2 next force w -> p1 (p2 next) force w;
+-- success combinator
 return = \force y -> case force of {
 	False -> Parsed y;
 	True -> Fail;
 };
-
-eow = \next force w -> case force of {
-	True -> Fail;
-	False -> case w of {
-		Nil -> next False Nil;
-		Cons l w1 -> Fail;
-	};
+-- end of word combinator
+eow = \next force w -> case w of {
+	Cons l w1 -> Fail;
+	Nil -> next force Nil;
 };
