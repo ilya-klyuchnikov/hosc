@@ -5,14 +5,7 @@ data List a = Nil | Cons a (List a) ;
 data Bool = True | False ;
 data Result a = Fail | Parsed a ; 
 
---match (rep (or a b)) w
---match (or (concat b (concat (rep a) (rep b))) (concat a (concat (rep a) (rep b)))) w
-
---match (concat (concat (or a b) (rep a)) (rep b)) (Cons x y)
-
---match (concat (rep (concat (rep a) (rep b))) (or a b)) (Cons x y)
-
-match (concat (or a b) (rep (concat (rep a) (rep b)))) w
+(rep (rep a)) eow1 False False w
 
 where
 
@@ -37,6 +30,13 @@ eow = \next f1 f w -> case w of {
 		False -> next False f Nil;
 	};
 };
+eow1 = \f1 f w -> case w of {
+	Cons l w1 -> Fail;
+	Nil -> case f of {
+		True -> Fail;
+		False -> Parsed Nil;
+	};
+};
 
 or = \p1 p2 next f1 f w -> case p1 next f1 f w of {
 	Parsed w1 -> Parsed w1;
@@ -54,7 +54,7 @@ concat = \p1 p2 next f1 f w -> case f1 of {
 };
 
 -- alternative for concat1
-concatS = \p1 p2 next w -> or (\z -> p1 (p2 z)) (nullAnd p1 p2) next True True w; 
+concatS = \p1 p2 next w -> or (\z -> p1 (p2 z)) (nullAnd p1 p2)  next True True w; 
 	
 nullAnd = \p1 p2 next f1 f2 w -> case p1 return False False Nil of {
 	Fail -> Fail;
@@ -67,7 +67,12 @@ rep0 = \p next f w -> case next False f w of {
 	Fail -> p (rep p next) True True w;
 };
 
-rep = \p next f1 f -> case f1 of {
-	True -> p (rep p next) True True;
-	False -> rep0 p next f;
+rep1 = \p next f w -> case p (rep p next) True True w of {
+	Parsed y -> Parsed y;
+	Fail -> next False f w;
+};
+
+rep = \p next f1 f w -> case f1 of {
+	True -> p (rep p next) True True w;
+	False -> rep1 p next f w;
 };
