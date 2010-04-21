@@ -5,7 +5,14 @@ data List a = Nil | Cons a (List a) ;
 data Bool = True | False ;
 data Result a = Fail | Parsed a ; 
 
-a w
+--match (rep (or a b)) w
+--match (or (concat b (concat (rep a) (rep b))) (concat a (concat (rep a) (rep b)))) w
+
+--match (concat (concat (or a b) (rep a)) (rep b)) (Cons x y)
+
+--match (concat (rep (concat (rep a) (rep b))) (or a b)) (Cons x y)
+
+match (concat (or a b) (rep (concat (rep a) (rep b)))) w
 
 where
 
@@ -43,26 +50,24 @@ return = \f1 f y -> case f of {
 -- it seems now a bit tricky?
 concat = \p1 p2 next f1 f w -> case f1 of {
 	False -> p1 (p2 next) f1 f w;
-	True -> concat1 p1 p2 next w;
+	True -> concatS p1 p2 next w;
 };
 
-concat1 = \p1 p2 next w -> 
-	case p1 (p2 next) True True w of {
-		Parsed y -> Parsed y;
-		-- now we check whether p1 is nullable!
-		Fail -> case p1 return False False Nil of {
-			Fail -> Fail;
-			Parsed y1 -> p2 next True True w; 
-		};
-	}; 
+-- alternative for concat1
+concatS = \p1 p2 next w -> or (\z -> p1 (p2 z)) (nullAnd p1 p2) next True True w; 
+	
+nullAnd = \p1 p2 next f1 f2 w -> case p1 return False False Nil of {
+	Fail -> Fail;
+	Parsed y1 -> p2 next True True w;
+};
 
 -- not necessary to eat
 rep0 = \p next f w -> case next False f w of {
 	Parsed y -> Parsed y;
-	-- this is wrong!
-	Fail -> concat p (rep p) next True True w;
+	Fail -> p (rep p next) True True w;
 };
-rep = \p next f1 f w -> case f1 of {
-	True -> p (rep p next) True True w;
-	False -> rep0 p next f w;
+
+rep = \p next f1 f -> case f1 of {
+	True -> p (rep p next) True True;
+	False -> rep0 p next f;
 };
