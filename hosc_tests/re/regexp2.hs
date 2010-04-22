@@ -5,12 +5,11 @@ data List a = Nil | Cons a (List a) ;
 data Bool = True | False ;
 data Result a = Fail | Parsed a ; 
 
-(rep (rep a)) eow1 False False w
+match (rep (rep a)) w
 
 where
 
-match = \p w -> concat p eow return False False w;
-
+match = \p w -> p eow False False w;
 a = \next f1 f w -> case w of {
 	Nil -> Fail;
 	Cons l w1 -> case l of { A -> next False False w1; B -> Fail;};
@@ -19,60 +18,21 @@ b = \next f1 f w -> case w of {
 	Nil -> Fail;
 	Cons l w1 -> case l of { A -> Fail; B -> next False False w1;};
 };
-nil = \next f1 f w -> case f1 of {
-	True -> Fail;
-	False -> next False f w;
-};
-eow = \next f1 f w -> case w of {
+eow = \f1 f w -> case w of {
 	Cons l w1 -> Fail;
-	Nil -> case f1 of {
-		True -> Fail;
-		False -> next False f Nil;
-	};
+	Nil -> return f1 f Nil;		
 };
-eow1 = \f1 f w -> case w of {
-	Cons l w1 -> Fail;
-	Nil -> case f of {
-		True -> Fail;
-		False -> Parsed Nil;
-	};
-};
+nil = \next f1 f w -> if f1 Fail (next False f w);
 
-or = \p1 p2 next f1 f w -> case p1 next f1 f w of {
-	Parsed w1 -> Parsed w1;
-	Fail -> p2 next f1 f w;
-};
-
-return = \f1 f y -> case f of {
-	False -> Parsed y;
-	True -> Fail;
-};
--- it seems now a bit tricky?
-concat = \p1 p2 next f1 f w -> case f1 of {
-	False -> p1 (p2 next) f1 f w;
-	True -> concatS p1 p2 next w;
-};
-
--- alternative for concat1
-concatS = \p1 p2 next w -> or (\z -> p1 (p2 z)) (nullAnd p1 p2)  next True True w; 
-	
+return = \f1 f y -> if f Fail (Parsed y);
+concat = \p1 p2 next f1 f w -> if f1 (concatS p1 p2 next w) (concatS p1 p2 next w);
+concatS = \p1 p2 next w -> or (\z -> p1 (p2 z)) (nullAnd p1 p2) next True True w;
 nullAnd = \p1 p2 next f1 f2 w -> case p1 return False False Nil of {
 	Fail -> Fail;
 	Parsed y1 -> p2 next True True w;
 };
-
--- not necessary to eat
-rep0 = \p next f w -> case next False f w of {
-	Parsed y -> Parsed y;
-	Fail -> p (rep p next) True True w;
-};
-
-rep1 = \p next f w -> case p (rep p next) True True w of {
-	Parsed y -> Parsed y;
-	Fail -> next False f w;
-};
-
-rep = \p next f1 f w -> case f1 of {
-	True -> p (rep p next) True True w;
-	False -> rep1 p next f w;
-};
+rep0 = \p next f -> pipe (p (rep p next) True True) (next False f); 
+rep = \p next f1 -> if f1 (p (rep p next) True) (rep0 p next);
+or = \p1 p2 next f1 f -> pipe (p1 next f1 f) (p2 next f1 f);
+pipe = \r1 r2 w -> case (r1 w) of { Parsed y -> Parsed y; Fail -> (r2 w);};
+if = \cond a1 a2 -> case cond of {True -> a1; False -> a2;};
