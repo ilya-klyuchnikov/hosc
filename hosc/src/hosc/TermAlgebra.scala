@@ -26,6 +26,8 @@ object TermAlgebra {
   case class RedexCall(f: Variable) extends NonTrivialRedex(f)
   // global control - of certain interest!
   case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
+  // nested case - also very interesting
+  case class RedexNestedCase(innerCase: CaseExpression, outerCase: CaseExpression) extends Redex(outerCase)
   case class RedexChoice(choice: Choice) extends Redex(choice)
   
   sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
@@ -42,7 +44,7 @@ object TermAlgebra {
   // case con of {}
   case class ContextCase(selector: Context, ce: CaseExpression) extends Context(selector.redex) {
     def replaceHole(t: Expression) = CaseExpression(selector.replaceHole(t), ce.branches)
-  }  
+  }
   
   def decompose(t: Expression): ExpressionDecomposition = t match {
     // observable
@@ -60,6 +62,8 @@ object TermAlgebra {
     case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
     case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => ContextHole(RedexCaseVar(a, ce))
     case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
+    //new logic here: towards more normalization
+    //case outer@CaseExpression(inner: CaseExpression, _) => ContextHole(RedexNestedCase(inner, outer))
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
     case a @ Application(h, _) => ContextApp(createContext(h), a)
     case ch: Choice => ContextHole(RedexChoice(ch))
