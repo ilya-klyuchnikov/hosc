@@ -12,7 +12,7 @@ import hosc.LangUtils._
 
 class SuperCompiler1(program: Program) extends SuperCompiler0(program){
   debug = false
-  useControl = true
+  useControl = false
   
   override protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
