@@ -23,7 +23,8 @@ trait ASupercompiler {
       case context@Context(redex) => redex match {
         case RedexCall(v) => {
           val lam = program.getFunction(v.name).get.body
-          Some(betaReduce(context.replaceHole(freshBinders(lam))) :: Nil) 
+          //Some(betaReduce(context.replaceHole(freshBinders(lam))) :: Nil)
+          Some(context.replaceHole(freshBinders(lam)) :: Nil)
         }
         case RedexLamApp(lam, app) => 
           Some(betaReduce(expr) :: Nil)
@@ -36,6 +37,11 @@ trait ASupercompiler {
             case None => None
           }
         }
+        case RedexNestedCase(CaseExpression(innerSel, innerBs), CaseExpression(_, outerBs)) => {
+          val newBs = innerBs map {case Branch(pat, exp) => Branch(pat, freshBinders(CaseExpression(exp, outerBs)))}
+          val result = context.replaceHole(freshBinders(CaseExpression(innerSel, newBs)))
+          Some(result :: Nil)
+        }
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
           Some(freshBinders(sel) :: 
             (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))}))
@@ -46,8 +52,9 @@ trait ASupercompiler {
   }
   
   def betaReduce(expr: Expression): Expression = decompose (expr) match {
-    case context@Context(RedexLamApp(lam, app)) =>  
-      betaReduce(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))))
+    case context@Context(RedexLamApp(lam, app)) =>
+     //betaReduce(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))))
+     freshBinders(context.replaceHole(applySubstitution(lam.t, Map(lam.v -> app.arg))))
     case _ => freshBinders(expr)
   }
 }
