@@ -10,8 +10,8 @@ import LangUtils._
 class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTreeRenamer {
   val emptyMap = Map[Variable, Expression]()
   var debug = false
-  var info = true
-  var useControl = true
+  var info = false
+  var useControl = false
   var renameVars = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
@@ -27,11 +27,16 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
       val beta = p.leafs.find(!_.isProcessed).get
       step(p, beta)
     }
+    val res = 
     if (renameVars) {
       renameVars(p)
     } else {
       p
     }
+    if (info) {
+      println(res)
+    }
+    res
   }
   
   def step(p: ProcessTree, beta: Node): Unit = {
@@ -40,18 +45,29 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
         case LetExpression(_, _) => drive(p, beta)
         case bTerm if canBeEnhanced_?(bTerm) => {
           beta.ancestors find equivalenceTest(beta) match {
-            case Some(alpha) => beta.repeatedOf = alpha
+            case Some(alpha) => { 
+              beta.repeatedOf = alpha
+              if (info) {
+              		println("==========RENAMING")
+                    println(format(canonize(alpha.expr)))
+                    println(format(canonize(beta.expr)))
+                    println("==========")
+              }
+            }
             case None => {
               beta.ancestors find instanceTest(beta) match {
                 case Some(alpha) => {
                   if (info) {
                     println(p)
+                    println("==========INSTANCE")
+                    println(format(canonize(alpha.expr)))
+                    println(format(canonize(beta.expr)))
                     println("==========")
                   }
                   abstractDown(p, alpha, beta)
                   if (info) {
-                    println(p)
-                    println("==========")
+                    //println(p)
+                    //println("==========")
                   }
                 }
                 case None => { 
@@ -59,11 +75,15 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
                     case Some(alpha) => {
                       if (info) {
                         println(p)
+                        println("==========HE")
+                        println(format(canonize(alpha.expr)))
+                        println(format(canonize(beta.expr)))
                         println("==========")
                       }
                       abstractUp(p, alpha, beta)
+                      //abstractUp(p, beta, alpha)
                       if (info) {
-                        println(p)
+                        //println(p)
                         println("==========")
                       }
                     }
@@ -97,11 +117,16 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
   def canBeEnhanced_?(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
+    //case ObservableVarApp(_, _) => true
+    //case Context(RedexNestedCase(_, _)) => true
+    
+    
     case Context(RedexLamApp(lam, app)) => {
       val sizeBefore = TermAlgebra.size(app)
       val sizeAfter = TermAlgebra.size(TermAlgebra.applySubstitution(lam.t, Map(lam.v -> app.arg)))
       sizeBefore <= sizeAfter
     }
+    
     case Context(RedexCaseCon(c, ce)) => {
       ce.branches.find(_.pattern.name == c.name) match {
         case Some(b) => {
@@ -209,14 +234,17 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     if (g.sub1.isEmpty){
       t.replace(up, g.term)
     } else {
-      if (debug){
+      if (false){
         println(format(canonize(upTerm)))
+        println("----------")
         println(format(canonize(downTerm)))
+        println("----------")
       }
       var term = g.term
       var subs = g.sub1
-      if (debug) {
+      if (info) {
         println(format((LetExpression(g.sub1, g.term))))
+        println("==========")
       }
       t.replace(up, LetExpression(g.sub1, g.term))
     }
