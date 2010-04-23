@@ -5,6 +5,9 @@ import ProcessTree._
 import MSG._
 import TermAlgebra._
 
+// TODO: make it working with tree as calculus
+// CodeConstructor should not rely on HOSC details
+// it should accept any good process tree
 class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
   private val vNames = "xyzuvwprst".toArray
   private val fNames = "fgh".toArray
@@ -22,6 +25,7 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
     case t => decompose(t) match {
       case ObservableVar(v) => Variable(v.name)
       case ObservableCon(c) => Constructor(c.name, node.children map construct)
+      // it's bug for calculus (not for the current HOSC)
       case ObservableVarApp(v, app) => constructApplication(Variable(v.name), node.children map construct)
       case ObservableLam(l) => LambdaAbstraction(Variable(l.v.name), construct(node.children.head))
       case context: Context =>
