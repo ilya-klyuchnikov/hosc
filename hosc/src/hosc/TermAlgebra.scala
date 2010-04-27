@@ -30,6 +30,7 @@ object TermAlgebra {
   case class RedexNestedCase(innerCase: CaseExpression, outerCase: CaseExpression) extends Redex(outerCase)
   case class RedexChoice(choice: Choice) extends Redex(choice)
   
+  // TODO: remove case -> make Context Object!
   sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
   }
@@ -192,6 +193,8 @@ object TermAlgebra {
           false
         }
       }
+      case (LetRecExpression((f1, b1), in1), LetRecExpression((f2, b2), in2)) => 
+        eq1(f1, f2) && eq1(b1, b2) && eq1(in1, in2)
       case _ => 
         false
     }    
