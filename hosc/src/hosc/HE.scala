@@ -36,8 +36,9 @@ object HE {
       (args1 zip args2) forall (args => he(args._1, args._2, binders))
     case (LambdaAbstraction(v1, t1), LambdaAbstraction(v2, t2)) => he(t1, t2, (v1, v2)::binders)
     case (a1: Application, a2: Application) => {
-      val (line1, line2) = (lineApp(a1), lineApp(a2)) 
-      line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders)))
+      //val (line1, line2) = (lineApp(a1), lineApp(a2)) 
+      //line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2, binders)))
+      he(a1.arg, a2.arg, binders) && heByCoupling(a1.head, a2.head, binders)
     }
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
       val bs1_ = bs1 sort compareB

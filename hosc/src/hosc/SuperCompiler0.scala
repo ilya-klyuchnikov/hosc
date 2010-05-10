@@ -11,7 +11,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
   val emptyMap = Map[Variable, Expression]()
   var debug = false
   var info = false
-  var useControl = false
+  var useControl = true
   var renameVars = true
   
   def buildProcessTree(e: Expression): ProcessTree = {
