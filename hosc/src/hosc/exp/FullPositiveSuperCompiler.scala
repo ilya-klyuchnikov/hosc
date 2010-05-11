@@ -55,12 +55,15 @@ class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program
   res
   }
   
-  override def step(p: ProcessTree, beta: Node): Unit = {
+  override 
+  def step(p: ProcessTree, beta: Node): Unit = {
     val narrowings = beta.allNarrowing()
     var expr = beta.expr
     var before = expr
     val init = expr
     println("-----")
+    
+    
     do {
       before = expr 
       for ((e1, e2) <- narrowings) {
@@ -80,7 +83,8 @@ class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program
     }
   }
   
-  override def drive(t: ProcessTree, n: Node): Unit = {
+  override
+  def drive(t: ProcessTree, n: Node): Unit = {
     fullDriveExp(t, n) match {
       case false => processMissingMatch(t, n)
       case _ =>
