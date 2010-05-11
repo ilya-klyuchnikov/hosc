@@ -41,7 +41,7 @@ object HigherLevelSuperCompilerApp {
     }
     
     val program = programFromFile(fileName)
-    val sc = new HigherLevelSuperCompiler(program)
+    val sc = new HLSC1(program)
     val pt = sc.buildProcessTree(program.goal)    
     val svg = new ProcessTreeSVG(pt).treeToSVG
     
