@@ -13,13 +13,29 @@ import hosc.LangUtils._
 class SuperCompiler1(program: Program) extends SuperCompiler0(program){
   debug = false
   useControl = false
+  info = false
   
   override protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm if heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode) => {
+    case aTerm if super.heByCouplingTest(bNode)(aNode) => {
       val sca = sc(aTerm)
       val scb = sc(bNode.expr)
-      HE1.heByCoupling(sca, scb)
+      val res = HE1.heByCoupling(sca, scb)
+      
+      if (res) {
+        println(res)
+        println(format(canonize(aTerm)))
+        println("------")
+        println(format(canonize(bNode.expr)))
+        println("------")
+      
+        println(format(sca))
+        println("------")
+        println(format(scb))
+        println("------")
+        println("------")
+      }
+      res
     }
     case _ => false
   }
@@ -60,6 +76,7 @@ class SuperCompiler1(program: Program) extends SuperCompiler0(program){
   
   private def sc(expr: Expression): Expression = {
     val sc0 = new SuperCompiler0(program)
+    sc0.info = false
     sc0.renameVars = false
     if (debug) {
       println("* sc0 *")

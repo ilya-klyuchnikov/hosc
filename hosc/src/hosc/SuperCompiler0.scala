@@ -43,7 +43,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
       val bExpr = beta.expr
       beta.expr match {
         case LetExpression(_, _) => drive(p, beta)
-        case bTerm if canBeEnhanced_?(bTerm) => {
+        case bTerm => {
           beta.ancestors find equivalenceTest(beta) match {
             case Some(alpha) => { 
               beta.repeatedOf = alpha
@@ -65,10 +65,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
                     println("==========")
                   }
                   abstractDown(p, alpha, beta)
-                  if (info) {
-                    //println(p)
-                    //println("==========")
-                  }
+                  
                 }
                 case None => { 
                   beta.ancestors find heByCouplingTest(beta) match {
@@ -82,10 +79,6 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
                       }
                       abstractUp(p, alpha, beta)
                       //abstractUp(p, beta, alpha)
-                      if (info) {
-                        //println(p)
-                        println("==========")
-                      }
                     }
                     case None => drive(p, beta)
                   }
@@ -94,23 +87,22 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
             }
           }
         }
-        case _ => drive(p, beta)
       }    
   }
   
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => Instance.instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode)
+    case aTerm => eligibleForInstance(bNode.expr) && Instance.instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   private def equivalenceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode)
+    case aTerm => eligibleForFold(bNode.expr) && equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
+    case aTerm => eligibleForWhistle(bNode.expr) && HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   // non-trivial expression
@@ -120,13 +112,13 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     //case ObservableVarApp(_, _) => true
     //case Context(RedexNestedCase(_, _)) => true
     
-    
     case Context(RedexLamApp(lam, app)) => {
       val sizeBefore = TermAlgebra.size(app)
       val sizeAfter = TermAlgebra.size(TermAlgebra.applySubstitution(lam.t, Map(lam.v -> app.arg)))
       sizeBefore <= sizeAfter
     }
     
+    /*
     case Context(RedexCaseCon(c, ce)) => {
       ce.branches.find(_.pattern.name == c.name) match {
         case Some(b) => {
@@ -138,6 +130,27 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
         case None => true
       }
     }
+     */
+    case _ => false
+  }
+  
+  def eligibleForFold(t: Expression) = decompose(t) match {
+    case Context(RedexCall(_)) => true
+    case Context(RedexCaseVar(_, _)) => true 
+    case Context(RedexLamApp(lam, app)) => true
+    case _ => false
+  }
+  
+  def eligibleForInstance(t: Expression) = decompose(t) match {
+    case Context(RedexCall(_)) => true
+    case Context(RedexCaseVar(_, _)) => true
+    case Context(RedexLamApp(lam, app)) => true
+    case _ => false
+  }
+  
+  def eligibleForWhistle(t: Expression) = decompose(t) match {
+    case Context(RedexCall(_)) => true
+    case Context(RedexCaseVar(_, _)) => true
     case _ => false
   }
   
