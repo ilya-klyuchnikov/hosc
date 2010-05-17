@@ -98,4 +98,7 @@ class SuperCompiler1Test {
     SCP1.main(Array("-si", "eq/churchMult1.hs", "-t", "sc/out1/churchMult1.svg", "-p", "sc/out1/churchMult1.hs"))
     SCP1.main(Array("-si", "eq/churchMult2.hs", "-t", "sc/out1/churchMult2.svg", "-p", "sc/out1/churchMult2.hs"))
   }
+ 
+  @Test def ltl1 = 
+    SCP1.main(Array("-si", "mc/ltl1.hs", "-t", "sc/out1/ltl1.svg", "-p", "sc/out1/ltl1.hs"))
 }

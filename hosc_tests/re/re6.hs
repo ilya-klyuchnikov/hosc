@@ -1,12 +1,12 @@
 {-# LANGUAGE NoImplicitPrelude#-}
 
 
-data Alphabet = A | B;
+data Alphabet = A | B | C;
 data List a = Nil | Cons a (List a);
 data Bool = True | False;
 data Result a = Fail | Parsed a; 
 
-task9a w
+match (concat1 (rep (concat1 (rep a) (rep b))) (or a b)) (Cons v1 Nil)
 
 where
 
@@ -19,6 +19,7 @@ match = \p w -> concat1 p eow return False w;
 -- DONE
 task1a = \w -> match (or nil1 (rep1 a)) w;
 task1b = \w -> match (rep1 (or nil1 a)) w;
+task1c = \w -> match (or (rep1 a) nil1) w;
 task1e = \w -> match (rep1 a) w;
 
 -- aa* | nil == a*
@@ -61,18 +62,23 @@ task8b = \w -> match (or (concat1 b (concat1 (rep1 a) (rep1 b))) (concat1 a (con
 -- a with control 
 -- b -- without
 -- See notes
-task9a = \w -> match (concat (or a b) (rep (concat1 (rep a) (rep b)))) w;
+task9a = \w -> match (concat1 (or a b) (rep1 (concat1 (rep a) (rep b)))) w;
 task9b = \w -> match (concat (rep (concat (rep a) (rep b))) (or a b)) w;
 
 
 a = \next force w -> case w of {
 	Nil -> Fail;
-	Cons l w1 -> case l of { A -> next False w1; B -> Fail;};
+	Cons l w1 -> case l of { A -> next False w1; B -> Fail; C -> Fail;};
 };
 
 b = \next force w -> case w of {
 	Nil -> Fail;
-	Cons l w1 -> case l of { A -> Fail; B -> next False w1;};
+	Cons l w1 -> case l of { A -> Fail; B -> next False w1; C -> Fail;};
+};
+
+c = \next force w -> case w of {
+	Nil -> Fail;
+	Cons l w1 -> case l of { A -> Fail; B -> Fail; C -> next False w1;};
 };
 
 or = \p1 p2 next force w -> case p1 next force w of {
@@ -110,8 +116,8 @@ rep = \p next force w -> case next force w of {
 };
 
 rep1 = \p next force w -> case (p return True w) of {
-	Fail -> next force w;
 	Parsed y -> rep1 p next False y;
+	Fail -> next force w;	
 };
 
 return = \force y -> case force of {

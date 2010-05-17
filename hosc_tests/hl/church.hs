@@ -1,9 +1,12 @@
+{-# LANGUAGE NoImplicitPrelude#-}
 data Nat = Z | S Nat;
 data Boolean = False | True;
 
 --eq (add (unchurch x) (unchurch y)) (unchurch (churchAdd y x))
 
-eq (add (unchurch x) (unchurch (\f z -> z))) (unchurch (churchAdd (\f z -> z) x))
+--eq (unchurch (churchAdd x x)) (add (unchurch x) (unchurch x))
+
+ 
 
 where
 
@@ -15,9 +18,15 @@ church = \n -> case n of {
   Z    -> \f x -> x;
   S n1 -> \f x -> f (church n1 f x);
 };
-unchurch = \n -> n (\x -> S x) Z;
+unchurch = \n -> n s Z;
+s = \x -> S x;
 churchAdd = \m n -> (\f x -> m f (n f x));
 add = \x y -> case x of {
   Z -> y;
   S x1 -> S (add x1 y);
+};
+
+sx = \f n -> case n of {
+	S n1 -> Z;
+	Z -> S Z;
 };

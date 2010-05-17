@@ -43,11 +43,6 @@ or = \p1 p2 next force w -> case p1 next force w of {
 	Parsed w1 -> Parsed w1;
 	Fail -> p2 next force w;
 };
--- Kleene star combinator
-rep = \p next force w -> case (p return True w) of {
-	Parsed y -> rep p next False y;
-	Fail -> next force w;	
-};
 -- empty word combinator
 nil = \next force w -> next force w;
 -- concatenation combinator
@@ -61,4 +56,30 @@ return = \force y -> case force of {
 eow = \next force w -> case w of {
 	Cons l w1 -> Fail;
 	Nil -> next force Nil;
+};
+
+{-
+rep = \p next force w -> case next force w of {
+	Parsed y -> Parsed y;
+	Fail -> case (p return True w) of {
+		Fail -> Fail;
+		Parsed w1 -> rep p next False w1;
+	};
+};
+-}
+{-
+rep = \p next force w -> case next force w of {
+	Parsed y -> Parsed y;
+	Fail -> concat p (rep p) next force w;
+};
+-}
+
+rep = \p next force w -> case next force w of {
+	Parsed y -> Parsed y;
+	Fail -> (forceEat p) (rep p next) False w;
+};
+
+forceEat = \p next force w -> case (p return True w) of {
+	Fail -> Fail;
+	Parsed y -> next False y;
 };

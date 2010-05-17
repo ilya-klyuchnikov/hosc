@@ -12,6 +12,9 @@ match = \p w -> case (p w) of {
 	Cons w1 ws -> True;
 };
 
+allWordsA = Cons Nil (mapL (append (Cons A Nil)) allWordsA);
+allWordsAB = Cons Nil (merge (mapL (append (Cons A Nil)) (allWordsAB)) (mapL (append (Cons B Nil)) (allWordsAB)));
+
 ---------------
 -- combinators
 ---------------
@@ -23,6 +26,7 @@ conP = \p1 p2 w -> join (mapL p2 (p1 w));
 
 repP :: Parser -> Parser;
 repP = \p w -> orP nilP (conP p (repP p)) w;
+repK = \p w -> Cons w (join (mapL (repK p) (p w)));
 
 --------------
 -- parsers

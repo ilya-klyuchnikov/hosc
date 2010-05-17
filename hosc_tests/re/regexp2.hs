@@ -5,7 +5,11 @@ data List a = Nil | Cons a (List a) ;
 data Bool = True | False ;
 data Result a = Fail | Parsed a ; 
 
-match (rep (rep a)) w
+--match (rep (rep (rep (rep x)))) w
+
+match (or x (rep x)) w
+
+--match (concat (rep x) x) w
 
 where
 
@@ -31,8 +35,8 @@ nullAnd = \p1 p2 next f1 f2 w -> case p1 return False False Nil of {
 	Fail -> Fail;
 	Parsed y1 -> p2 next True True w;
 };
-rep0 = \p next f -> pipe (p (rep p next) True True) (next False f); 
-rep = \p next f1 -> if f1 (p (rep p next) True) (rep0 p next);
+rep0 = \p next f w -> pipe (p (rep p next) True True) (next False f) w; 
+rep = \p next f1 f w -> if f1 (p (rep p next) True True w) (rep0 p next f w);
 or = \p1 p2 next f1 f -> pipe (p1 next f1 f) (p2 next f1 f);
 pipe = \r1 r2 w -> case (r1 w) of { Parsed y -> Parsed y; Fail -> (r2 w);};
 if = \cond a1 a2 -> case cond of {True -> a1; False -> a2;};

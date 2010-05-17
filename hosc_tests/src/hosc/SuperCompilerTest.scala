@@ -116,4 +116,29 @@ class SuperCompilerTest {
    
    @Test def fix_con = 
     SCP.main(Array("-si", "sc/fix_con.hs", "-t", "sc/out0/fix_con.svg", "-p", "sc/out0/fix_con.hs"))
+   
+   @Test def ltl1 = 
+    SCP.main(Array("-si", "mc/ltl1.hs", "-t", "sc/out0/ltl1.svg", "-p", "sc/out0/ltl1.hs"))
+   
+   @Ignore
+   @Test def ltl2 = 
+    SCP.main(Array("-si", "mc/ltl2.hs", "-t", "sc/out0/ltl2.svg", "-p", "sc/out0/ltl2.hs"))
+   
+   @Test def ltl4 = 
+    SCP.main(Array("-si", "mc/ltl4.hs", "-t", "sc/out0/ltl4.svg", "-p", "sc/out0/ltl4.hs"))
+   
+   @Test def ltl5 = 
+    SCP.main(Array("-si", "mc/ltl5.hs", "-t", "sc/out0/ltl5.svg", "-p", "sc/out0/ltl5.hs"))
+   
+   @Test def kripke1 = 
+    SCP.main(Array("-si", "mc/kripke1.hs", "-t", "sc/out0/kripke1.svg", "-p", "sc/out0/kripke1.hs"))
+   
+   @Test def iterate = 
+    SCP.main(Array("-si", "sc/iterate.hs", "-t", "sc/out0/iterate.svg", "-p", "sc/out0/iterate.hs"))
+   
+   @Test def fixDouble = 
+    SCP.main(Array("-si", "sc/fixDouble.hs", "-t", "sc/out0/fixDouble.svg", "-p", "sc/out0/fixDouble.hs"))
+   
+    @Test def iter2 = 
+    SCP.main(Array("-si", "sc/iter2.hs", "-t", "sc/out0/iter2.svg", "-p", "sc/out0/iter2.hs"))
 }
