@@ -1,9 +1,11 @@
 package hosc.exp
 
 import hosc.HLanguage._
+import hosc.CodeConstructor
 import hosc.SuperCompiler0
 import hosc.ProcessTree
 import hosc.ProcessTree._
+import hosc.TermAlgebra
 import hosc.lemmas.LemmaFinder
 
 class HLSC1(program: Program) extends SuperCompiler0(program){
