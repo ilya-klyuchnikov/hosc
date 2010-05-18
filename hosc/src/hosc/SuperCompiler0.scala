@@ -102,7 +102,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
   
   protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
-    case aTerm => eligibleForWhistle(bNode.expr) && HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
+    case aTerm => eligibleForWhistle(bNode.expr) && sameRedex(aNode.expr, bNode.expr) && HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
   
   // non-trivial expression
@@ -138,6 +138,12 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true 
     case Context(RedexLamApp(lam, app)) => true
+    case Context(RedexCaseCon(_, _)) => true
+    case _ => false
+  }
+  
+  def sameRedex(t1: Expression, t2: Expression): Boolean = (decompose(t1), decompose(t2)) match {
+    case (Context(redex1), Context(redex2)) => redex1.getClass == redex2.getClass
     case _ => false
   }
   
@@ -145,12 +151,14 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
     case Context(RedexLamApp(lam, app)) => true
+    case Context(RedexCaseCon(_, _)) => true
     case _ => false
   }
   
   def eligibleForWhistle(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
+    case Context(RedexCaseCon(_, _)) => true
     case _ => false
   }
   
