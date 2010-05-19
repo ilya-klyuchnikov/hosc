@@ -8,6 +8,8 @@ data Pair a b = P a b;
 
 x where
 
+swap = \f x y -> f y x;
+
 outl = \p -> case p of {
 	P a b -> a;
 };
@@ -63,6 +65,12 @@ appendR = \xs ys ->
 		NilR -> ys;
 		Cons x1 xs1 -> Cons x1 (appendR xs1 ys);
 	};
+	
+appendL = \xs ys -> 
+	case ys of {
+		NilL -> xs;
+		Snoc ys1 y1 -> Snoc (appendL xs ys1) y1;
+	};
 
 -- == map
 listR = \f xs ->
@@ -75,6 +83,12 @@ foldR = \c h xs ->
 	case xs of {
 		NilR -> c;
 		Cons y ys -> h y (foldR c h ys); 
+	};
+	
+foldL = \c h xs -> 
+	case xs of {
+		NilL -> c;
+		Snoc ys y -> h (foldL c h ys) y; 
 	};
 	
 foldR1 = \c h xs -> 

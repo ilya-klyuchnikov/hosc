@@ -1,6 +1,6 @@
 package hosc.spec
 
-import org.junit.Test
+import org.junit.{Test, Ignore}
 import org.junit.Assert._
 
 import hosc.Util._
@@ -12,25 +12,40 @@ class EqualitySpec {
   
   val in = "lists"
   
-  @Test def append =
+  @Test def appendR =
     testEq(in, 
            "appendR (appendR xs ys) zs", 
            "appendR xs (appendR ys zs)")
+  
+  @Test def appendL =
+    testEq(in, 
+           "appendL (appendL xs ys) zs", 
+           "appendL xs (appendL ys zs)")
+  
+  @Test def appendR1 =
+    testEq(in, 
+           "appendR xs ys", 
+           "foldR ys cons xs")
+  
+  @Test def appendL1 =
+    testEq(in, 
+           "appendL xs ys", 
+           "foldL xs snoc ys")
+  
+  @Test def appendR2 =
+    testEq(in, 
+           "appendR xs ys", 
+           """foldR id (\x f a -> cons x (f a)) xs ys""")
+  
+  @Test def appendL2 =
+    testEq(in, 
+           "appendL xs ys", 
+           """foldL id (\f x a -> snoc (f a) x) ys xs""")
   
   @Test def map =
     testEq(in, 
            """listR f xs""", 
            """foldR NilR (\a x -> Cons (f a) x) xs""")
-  
-  @Test def append1 =
-    testEq(in, 
-           "appendR xs ys", 
-           "foldR ys cons xs")
-  
-  @Test def append2 =
-    testEq(in, 
-           "appendR xs ys", 
-           """foldR id (\x f y -> cons x (f y)) xs ys""")
   
   @Test def concat =
     testEq(in, 
