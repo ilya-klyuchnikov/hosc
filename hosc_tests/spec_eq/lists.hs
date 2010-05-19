@@ -91,6 +91,13 @@ foldL = \c h xs ->
 		Snoc ys y -> h (foldL c h ys) y; 
 	};
 	
+
+foldL1 = \h c xs -> 
+	case xs of {
+		NilL -> c;
+		Snoc ys y -> h (foldL1 h c ys) y; 
+	};
+	
 foldR1 = \c h xs -> 
 	case xs of {
 		NilR -> c;

@@ -42,6 +42,18 @@ class EqualitySpec {
            "appendL xs ys", 
            """foldL id (\f x a -> snoc (f a) x) ys xs""")
   
+  @Test def appendL3 =
+    testEq(in, 
+           "appendL xs ys", 
+           """foldL1 snoc xs ys""")
+
+  // free and bound f 
+  @Ignore 
+  @Test def bug =
+    testEq(in, 
+           "appendL xs ys", 
+           """foldL (foldL id) f xs ys""")
+  
   @Test def map =
     testEq(in, 
            """listR f xs""", 
@@ -116,6 +128,18 @@ class EqualitySpec {
     testEq(in, 
            """mult1 x y""", 
            """foldN Z (\n -> plus1 n y) x""")
+  
+  val in1 = "flists"
+  
+  @Test def rev1 =
+    testEq(in1, 
+           """rev xs""", 
+           """foldr Nil append xs""")
+  
+  @Test def rev2 =
+    testEq(in1, 
+           """rev1 xs Nil""", 
+           """foldl Nil prepend xs""")
   
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
