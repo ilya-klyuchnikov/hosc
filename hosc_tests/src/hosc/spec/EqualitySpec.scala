@@ -10,70 +10,98 @@ import hosc.{SuperCompiler0, CodeConstructor, Eq}
 
 class EqualitySpec {
   
+  val in = "lists"
+  
   @Test def append =
-    testEq("lists", 
+    testEq(in, 
            "appendR (appendR xs ys) zs", 
            "appendR xs (appendR ys zs)")
   
   @Test def map =
-    testEq("lists", 
+    testEq(in, 
            """listR f xs""", 
            """foldR NilR (\a x -> Cons (f a) x) xs""")
   
   @Test def append1 =
-    testEq("lists", 
+    testEq(in, 
            "appendR xs ys", 
            "foldR ys cons xs")
   
   @Test def append2 =
-    testEq("lists", 
+    testEq(in, 
            "appendR xs ys", 
            """foldR id (\x f y -> cons x (f y)) xs ys""")
   
   @Test def concat =
-    testEq("lists", 
+    testEq(in, 
            "concatR xs", 
            "foldR NilR catR xs")
   
   @Test def length1 =
-    testEq("lists", 
+    testEq(in, 
            """lengthR xs""", 
-           """foldR Z (\a -> plus (S Z)) xs""")
+           """foldR Z (\a n -> (S n)) xs""")
   
   @Test def length2 =
-    testEq("lists", 
+    testEq(in, 
            """lengthR xs""", 
            """(compose sum (listR (\x -> S Z))) xs""")
   
   @Test def convert =
-    testEq("lists", 
+    testEq(in, 
            """convertL2R xs""", 
            """convertL2R xs""")
   
   @Test def filter1 =
-    testEq("lists", 
+    testEq(in, 
            """filterR p xs""", 
            """(compose concatR (listR (cond p wrapR nilpR))) xs""")
   
   @Test def filter2 =
-    testEq("lists", 
+    testEq(in, 
            """filterR p xs""", 
            """(compose (foldR NilR catR) (listR (cond p wrapR nilpR))) xs""")
   
   @Test def filter3 =
-    testEq("lists", 
+    testEq(in, 
            """filterR p xs""", 
            """(compose (foldR NilR catR) (foldR NilR (\a x -> Cons ((cond p wrapR nilpR) a) x))) xs""")
   
   @Test def filter4 =
-    testEq("lists", 
+    testEq(in, 
            """filterR p xs""", 
            """foldR1 NilR (cond (compose p outl) (uncurry cons) outr) xs""")
   
   @Test def filter5 =
-    testEq("lists", 
+    testEq(in, 
            """filterR p xs""", 
            """foldR NilR (curry (cond (compose p outl) (uncurry cons) outr)) xs""")
+  
+  @Test def plus1 =
+    testEq(in, 
+           """plus x y""", 
+           """foldN x succ y""")
+  
+  @Test def plus2 =
+    testEq(in, 
+           """plus1 x y""", 
+           """foldN y succ x""")
+  
+  @Test def mult1 =
+    testEq(in, 
+           """mult x y""", 
+           """foldN Z (plus x) y""")
+  
+  @Test def mult2 =
+    testEq(in, 
+           """mult1 x y""", 
+           """foldN Z (plus y) x""")
+  
+  @Test def mult3 =
+    testEq(in, 
+           """mult1 x y""", 
+           """foldN Z (\n -> plus1 n y) x""")
+  
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
     

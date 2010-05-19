@@ -16,11 +16,35 @@ outr = \p -> case p of {
 	P a b -> b;
 };
 
+succ = \x -> S x;
+
 plus = \x y -> 
+	case y of {
+		Z -> x;
+		S y1 -> S (plus x y1);
+	};
+
+plus1 = \x y -> 
 	case x of {
 		Z -> y;
-		S x1 -> S (plus x1 y);
+		S x1 -> S (plus1 x1 y);
 	};
+
+	
+mult = \x y -> case y of {
+	Z -> Z;
+	S y1 -> plus x (mult x y1);
+};
+
+mult1 = \x y -> case x of {
+	Z -> Z;
+	S x1 -> plus1 (mult1 x1 y) y;
+};
+
+foldN = \c h x -> case x of {
+	Z -> c;
+	S x1 -> h (foldN c h x1);
+}; 
 
 compose = \f g x ->  f (g x);
 	
@@ -62,7 +86,7 @@ foldR1 = \c h xs ->
 -- curried version of ++
 catR = foldR id (\x f y -> cons x (f y));
 
-sum = foldR Z plus;
+sum = foldR Z plus1;
 lengthR = \xs -> 
 	case xs of {
 		NilR -> Z;
