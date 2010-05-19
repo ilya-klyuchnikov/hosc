@@ -11,7 +11,7 @@ import TermAlgebra._
 class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeVarsInLetrecs: Boolean) {
   private val vNames = "xyzuvwprst".toArray
   private val fNames = "fgh".toArray
-  private var fUsed = Set[String]() ++ (getAllVars(originalProgram.goal) map {v => v.name})
+  private var fUsed = Set[String]() ++ (getAllVars(tree.rootNode.expr) map {v => v.name})
   
   def generateProgram() = Program(originalProgram.ts, construct(tree.rootNode), Nil)
   
