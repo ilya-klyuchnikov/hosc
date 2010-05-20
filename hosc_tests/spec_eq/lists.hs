@@ -78,6 +78,12 @@ listR = \f xs ->
 		NilR -> NilR;
 		Cons x1 xs1 -> Cons (f x1) (listR f xs1);
 	};
+	
+listL = \f xs ->
+	case xs of {
+		NilL -> NilL;
+		Snoc xs1 x1 -> Snoc (listL f xs1) (f x1);
+	};
 
 foldR = \c h xs -> 
 	case xs of {
@@ -181,3 +187,14 @@ unzipR = pair (P (listR outl) (listR outr));
 unzipR1 = foldR nils conss;
 nils = P NilR NilR;
 conss = \p1 p2 -> P (Cons (outl p1) (outl p2)) (Cons (outr p1) (outr p2));
+
+initsL = foldL (Snoc NilL NilL) (\ys a -> case ys of {Snoc xs x -> Snoc ys (Snoc x a);});
+
+inits = \xs -> case xs of {
+	NilL -> Snoc NilL NilL;
+	Snoc ys y -> Snoc (inits ys) xs;
+};
+
+cross = \p1 p2 -> case p1 of {
+	P f g -> case p2 of {P x y -> P (f x) (g y);};  
+};

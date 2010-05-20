@@ -146,6 +146,27 @@ class EqualitySpec {
            """listR f (concatR xs)""", 
            """concatR (listR (listR f) xs)""")
   
+  @Test def inits =
+    testEq(in, 
+           """listL (listL f) (inits xs)""", 
+           """inits (listL f xs)""")
+  
+  @Ignore
+  @Test def inits1 =
+    testEq(in, 
+           """listL (listL f) (initsL xs)""", 
+           """initsL (listL f xs)""")
+  
+  @Test def zip =
+    testEq(in, 
+           """listR (cross (P f g)) (zipR xs ys) """, 
+           """uncurry zipR (cross (P (listR f) (listR g)) (P xs ys))""")
+  
+  @Test def zip_filter =
+    testEq(in, 
+           """filterR p xs""", 
+           """listR outl (filterR outr (uncurry zipR (pair (P id (listR p)) xs)))""")
+  
   
   val in1 = "flists"
   
