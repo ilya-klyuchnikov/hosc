@@ -162,3 +162,22 @@ uncurry = \f p -> case p of {
 };
 
 curry = \f b c -> f (P b c);
+
+zipR = \xs ys -> 
+	case xs of {
+		NilR -> NilR;
+		Cons x1 xs1 -> case ys of {
+			NilR -> NilR;
+			Cons y1 ys1 -> Cons (P x1 y1) (zipR xs1 ys1);
+		};
+	};
+
+pair = \p x -> case p of {
+	P f g -> P (f x) (g x);
+};
+
+unzipR = pair (P (listR outl) (listR outr));
+
+unzipR1 = foldR nils conss;
+nils = P NilR NilR;
+conss = \p1 p2 -> P (Cons (outl p1) (outl p2)) (Cons (outr p1) (outr p2));

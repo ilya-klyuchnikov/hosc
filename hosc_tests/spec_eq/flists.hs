@@ -41,3 +41,9 @@ app = \xs ys ->
 		Nil -> ys; 
 		Cons x1 xs1 -> Cons x1 (app xs1 ys); 
 	};
+	
+map = \f xs ->
+  case xs of {
+    Nil -> Nil;
+    Cons x1 xs1 -> Cons (f x1) (map f xs1);
+  };

@@ -129,6 +129,24 @@ class EqualitySpec {
            """mult1 x y""", 
            """foldN Z (\n -> plus1 n y) x""")
   
+  @Ignore
+  @Test def unzip1 =
+    testEq(in, 
+           """unzipR xs""", 
+           """unzipR1 xs""")
+  
+  @Ignore
+  @Test def unzip2 =
+    testEq(in, 
+           """xs""", 
+           """uncurry zipR (unzipR xs)""")
+  
+  @Test def map_concat =
+    testEq(in, 
+           """listR f (concatR xs)""", 
+           """concatR (listR (listR f) xs)""")
+  
+  
   val in1 = "flists"
   
   @Test def rev1 =
@@ -140,6 +158,24 @@ class EqualitySpec {
     testEq(in1, 
            """rev1 xs Nil""", 
            """foldl Nil prepend xs""")
+  
+  @Test def rev3 =
+    testEq(in1, 
+           """map f (rev1 (Cons a Nil) (Cons b Nil))""", 
+           """rev1 (map f (Cons a Nil)) (map f (Cons b Nil))""")
+  
+  @Test def rev4 =
+    testEq(in1, 
+           """map f (rev1 (Cons a Nil) ys)""", 
+           """rev1 (map f (Cons a Nil)) (map f ys)""")
+  
+  @Ignore
+  @Test def rev5 =
+    testEq(in1, 
+           """map f (rev1 xs ys)""", 
+           """rev1 (map f xs) (map f ys)""")
+  
+  
   
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
