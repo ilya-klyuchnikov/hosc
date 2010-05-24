@@ -3,6 +3,7 @@ package hosc.spec
 import org.junit.Test
 import org.junit.Assert._
 
+import hosc.Eq
 import hosc.Util._
 import hosc.{SuperCompilerApp => SCP}
 
