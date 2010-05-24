@@ -36,7 +36,7 @@ class SuperCompilerSpec {
   def checkSpec(test: String): Unit = {
     val testIn = "spec/" + test + ".in.hs"
     val testOut = "spec/dump/" + test + ".hs"
-    val testOutTree = "spec/dump/" + test + "svg.hs"
+    val testOutTree = "spec/dump/" + test + "svg"
     val specifiedOut = "spec/" + test + ".out.hs"
     
     SCP.main(Array("-si", testIn, "-t", testOutTree, "-p", testOut))
