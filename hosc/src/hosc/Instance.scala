@@ -23,7 +23,7 @@ object Instance {
         if (v1.global && v1 != e2) {
           false
         } else if (map.getOrElse(v1, e2) == e2) {
-          map + (v1 -> e2)
+          map += (v1 -> e2)
           true
         } else {
           false
