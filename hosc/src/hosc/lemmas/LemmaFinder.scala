@@ -9,6 +9,7 @@ import hosc.TicksAlgebra
 class LemmaFinder(val program: Program) {
   val scp = new SuperCompiler0(program)
   scp.renameVars = false
+  scp.useControl = false
   val gen = new ExpressionGenerator(program)
   
   def findEqExpressions(expr: Expression, localExprs: List[Expression]): List[Expression] = {
