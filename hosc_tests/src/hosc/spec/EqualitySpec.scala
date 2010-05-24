@@ -196,7 +196,49 @@ class EqualitySpec {
            """map f (rev1 xs ys)""", 
            """rev1 (map f xs) (map f ys)""")
   
+  /*
+   * MONADIC LAWS CHECKS
+   */
   
+  val min = "mlists"
+  // return a >>= k  ==  k a
+  @Test def m_law_1 =
+    testEq(min, 
+           """id (k a)""", 
+           """(join (return a) k)""")
+  
+  // m >>= return  ==  m
+  @Test def m_law_2 =
+    testEq(min, 
+           """join m return""", 
+           """id m""")
+  
+  // m >>= (\x -> k x >>= h)  ==  (m >>= k) >>= h
+  @Test def m_law_3 =
+    testEq(min, 
+           """join m (\x -> join (k x) h)""", 
+           """join (join m k) h""")
+  
+  // Since list is a functor it should satisfy following law:
+  // fmap f xs  ==  xs >>= return . f
+  @Test def m_law_4 =
+    testEq(min, 
+           """fmap f xs""", 
+           """join xs (compose return f)""")
+  
+  // Functor law:
+  // fmap id  ==  id
+  @Test def m_law_5 =
+    testEq(min, 
+           """fmap gid xs""", 
+           """id xs""")
+  
+  // Functor law:
+  // fmap (f . g)  ==  fmap f . fmap g
+  @Test def m_law_6 =
+    testEq(min, 
+           """fmap (compose f g) xs""", 
+           """compose (fmap f) (fmap g) xs""")
   
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
