@@ -270,6 +270,20 @@ class EqualitySpec {
            """mfix (compose (liftM h) f)""", 
            """liftM h (mfix (compose f h))""")
   
+  // mzero >>= f  =  mzero
+  @Test def m_law_11 =
+    testEq(min, 
+           """join mzero f""", 
+           """mzero""")
+  
+  // v >> mzero   =  mzero
+  // this is good example - it shows that
+  // this law is true for finite lists only!
+  @Test def m_law_12 =
+    testEq(min, 
+           """bind v mzero""", 
+           """mzero""")
+  
   // return a >>= k  ==  k a
   @Test def maybe_law_1 =
     testEq(maybe, 
@@ -332,6 +346,20 @@ class EqualitySpec {
     testEq(maybe, 
            """mfix (compose (liftM h) f)""", 
            """liftM h (mfix (compose f h))""")
+  
+  // mzero >>= f  =  mzero
+  @Test def maybe_law_11 =
+    testEq(maybe, 
+           """join mzero f""", 
+           """mzero""")
+  
+  // v >> mzero   =  mzero
+  // this is good example - it shows that
+  // this law is not true for undefined!
+  @Test def maybe_law_12 =
+    testEq(maybe, 
+           """bind v mzero""", 
+           """mzero""")
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
     val file = "spec_eq/" + input + ".hs"

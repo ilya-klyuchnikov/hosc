@@ -37,3 +37,7 @@ id = \m -> case m of {
 };
 
 gid = \x -> x;
+
+bind = \m k -> join m (\x -> k);
+
+mzero = Nothing;
