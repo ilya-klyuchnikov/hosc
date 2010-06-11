@@ -162,12 +162,18 @@ class EqualitySpec {
            """listR (cross (P f g)) (zipR xs ys) """, 
            """uncurry zipR (cross (P (listR f) (listR g)) (P xs ys))""")
   
+  // fails for now - it's OK
+  @Test def zip1 =
+    testEq(in, 
+           """listR (cross1 (P f g)) (zipR xs ys) """, 
+           """uncurry zipR (cross1 (P (listR f) (listR g)) (P xs ys))""")
+  
   @Test def zip_filter =
     testEq(in, 
            """filterR p xs""", 
            """listR outl (filterR outr (uncurry zipR (pair (P id (listR p)) xs)))""")
   
-  
+ 
   val in1 = "flists"
   
   @Test def rev1 =
@@ -195,11 +201,6 @@ class EqualitySpec {
     testEq(in1, 
            """map f (rev1 xs ys)""", 
            """rev1 (map f xs) (map f ys)""")
-  
-  /*
-   * MONADIC LAWS CHECKS
-   */
-  
   val min = "mlists"
   val maybe = "maybe_monad"
   // return a >>= k  ==  k a
@@ -360,6 +361,54 @@ class EqualitySpec {
     testEq(maybe, 
            """bind v mzero""", 
            """mzero""")
+  
+  val state = "state_monad"
+    // return a >>= k  ==  k a
+  @Test def state_law_1 =
+    testEq(state, 
+           """(k a) x""", 
+           """(join (return a) k) x""")
+  
+  // m >>= return  ==  m
+  @Test def state_law_2 =
+    testEq(state, 
+           """join m return""", 
+           """id m""")
+  
+  // m >>= (\x -> k x >>= h)  ==  (m >>= k) >>= h
+  @Test def state_law_3 =
+    testEq(state, 
+           """join m (\x -> join (k x) h)""", 
+           """join (join m k) h""")
+  
+  // Since list is a functor it should satisfy following law:
+  // fmap f xs  ==  xs >>= return . f
+  @Test def state_law_4 =
+    testEq(state, 
+           """fmap f xs""", 
+           """join xs (compose return f)""")
+  
+  // Functor law:
+  // fmap id  ==  id
+  @Test def state_law_5 =
+    testEq(state, 
+           """fmap gid xs""", 
+           """id xs""")
+  
+  // Functor law:
+  // fmap (f . g)  ==  fmap f . fmap g
+  @Test def state_law_6 =
+    testEq(state, 
+           """fmap (compose f g) xs""", 
+           """compose (fmap f) (fmap g) xs""")
+  
+  // mzero >>= f  =  mzero
+  @Test def state_law_11 =
+    testEq(state, 
+           """join mzero f""", 
+           """mzero""")
+  
+  
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
     val file = "spec_eq/" + input + ".hs"
@@ -368,7 +417,7 @@ class EqualitySpec {
     val input2 = termFromString(goal2, program)
     val p1 = sc(program, input1)
     val p2 = sc(program, input2)
-    println("===================")
+    //println("===================")
     println(goal1 + " == " + goal2)
     println(p1.toDocString)
     println(p2.toDocString)
