@@ -198,3 +198,5 @@ inits = \xs -> case xs of {
 cross = \p1 p2 -> case p1 of {
 	P f g -> case p2 of {P x y -> P (f x) (g y);};  
 };
+
+cross1 = \p -> case p of {P f g -> pair (P (compose f outl) (compose g outr));};

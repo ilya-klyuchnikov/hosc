@@ -67,11 +67,11 @@ liftM = \f m1 -> join m1 (\x1 -> return (f x1));
 
 mzero = Nil;
 
+bind = \m k -> join m (\x -> k);
+
 -- >>
 -- m >> k              = foldr ((++) . (\ _ -> k)) [] m
 --bind = \m k -> foldr (compose app (\x -> k)) Nil m;
-
-bind = \m k -> join m (\x -> k);
 
 {-
 Laws:
