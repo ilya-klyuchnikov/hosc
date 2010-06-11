@@ -44,6 +44,8 @@ object Instance {
           }
       case (Choice(e1, e2), Choice(e3, e4)) => 
         walk(e1, e3, binders) && walk(e2, e4, binders)
+      case (LetRecExpression((f, e11), e21), LetRecExpression((g, e12), e22)) =>
+        walk(e11, e12, (f, g) :: binders) && walk(e21, e22, (f, g) :: binders)
       case _ => false
     }
     if (walk(expr1, expr2, Nil)) {
