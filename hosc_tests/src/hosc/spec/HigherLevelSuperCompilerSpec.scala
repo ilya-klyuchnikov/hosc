@@ -24,7 +24,7 @@ class HigherLevelSuperCompilerSpec {
   def checkSpec(test: String): Unit = {
     val testIn = "spec_hl/" + test + ".in.hs"
     val testOut = "spec_hl/dump/" + test + ".hs"
-    val testOutTree = "spec_hl/dump/" + test + "svg"
+    val testOutTree = "spec_hl/dump/" + test + ".svg"
     val specifiedOut = "spec_hl/" + test + ".out.hs"
     
     HLSC.main(Array("-si", testIn, "-t", testOutTree, "-p", testOut))
