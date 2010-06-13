@@ -4,7 +4,30 @@ data Red a = Sum a a;
 data Context a = Hole (Red a) | C1 (Context a) (Term a) | C2 a (Context a);
 data Dec a = Val a | Ctx (Context a);
 
-normalize2 f t where
+-- interesting: sc without control - seems we need simplify there:
+{-
+==========HE
+case  (decompose t)  of { Ctx $9 -> ((normalize2 f) ((step f) $9)); Val $8 -> $8; }
+case 
+case  (decompose $19)  of {
+  Ctx $29 -> (Ctx (C1 $29 $20));
+  Val $30 -> case  (decompose $20)  of { Ctx $32 -> (Ctx (C2 $30 $32)); Val $31 -> (Ctx (Hole (Sum $30 $31))); };
+}
+ of {
+  Ctx $34 -> ((normalize2 f) ((step f) $34));
+  Val $33 -> $33;
+}
+-}
+
+normalize2 f t 
+
+{-
+normalize f t 
+
+with/without control and reverse generalizing (generalizing down node) seems non-terminating!
+-}
+
+where
 
 --contract :: (a -> a -> a) -> Red a -> a;
 contract = \f red -> case red of {
