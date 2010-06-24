@@ -1,0 +1,1 @@
+tail (Cons a b) => b;

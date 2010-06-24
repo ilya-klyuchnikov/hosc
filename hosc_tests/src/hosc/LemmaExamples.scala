@@ -4,8 +4,9 @@ import hosc.Util._
 
 object LemmaExamples {
   def main(args : Array[String]) : Unit = {
-    step("hl/even_doubleAcc3.hs", "hl/even_doubleAcc4.hs")
-    step("hl/rev2.hs", "hl/rev1.hs")
+    //step("hl/even_doubleAcc3.hs", "hl/even_doubleAcc4.hs")
+    //step("hl/rev2.hs", "hl/rev1.hs")
+    step("spec_fhl/lemma1_1.hs", "spec_fhl/lemma1_2.hs")
   }
   
   def step(f1: String, f2: String) : Unit = {
@@ -28,6 +29,7 @@ object LemmaExamples {
   def supercompile(file: String) = {
     val program = programFromFile(file)
     val sc = new SuperCompiler0(program)
+    sc.useControl = false
     val pt = sc.buildProcessTree(program.goal)
     val g = new CodeConstructor(program, pt, true)
     val p = g.generateProgram()

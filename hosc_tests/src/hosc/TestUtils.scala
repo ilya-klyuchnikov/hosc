@@ -43,8 +43,10 @@ object TestUtils {
     Validator.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
     Postprocessor.process(term, globals)
-    val ti = new TypeInferrer(program.ts)
-    //ti.tcTerm(term)
+    
+    val program1 = Program(program.ts, term, program.fs)
+    val ti = new TypeInferrer(program1.ts)
+    ti.inferType(LangUtils.hl0ToELC(program1))
     term
   }
 }

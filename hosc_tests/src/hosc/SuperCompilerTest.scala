@@ -141,4 +141,7 @@ class SuperCompilerTest {
    
     @Test def iter2 = 
     SCP.main(Array("-si", "sc/iter2.hs", "-t", "sc/out0/iter2.svg", "-p", "sc/out0/iter2.hs"))
+    
+  @Test def russel_bad = 
+    SCP.main(Array("-si", "sc/russel_bad.hs", "-t", "sc/out0/russel_bad.svg", "-p", "sc/out0/russel_bad.hs"))
 }
