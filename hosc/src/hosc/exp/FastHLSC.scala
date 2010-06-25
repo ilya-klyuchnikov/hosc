@@ -7,6 +7,8 @@ import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra
 import hosc.lemmas.LemmaFinder
+import hosc.TicksAlgebra
+import hosc.Instance
 
 // Fast Higher-Level Supercompiler
 // the source for lemmas is computation history.
