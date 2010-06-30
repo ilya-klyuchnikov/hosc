@@ -55,8 +55,7 @@ object Validator {
             case Some(tv) => err("useless type variable " + tv.name, tv)
             case None =>
           }
-        }
-        case ad: ArrowDefinition => valTypeUsage(ad.ac, true)  
+        } 
       }
     }      
     
