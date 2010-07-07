@@ -17,32 +17,16 @@ class LemmaFinder(val program: Program) {
     val expSize = TermAlgebra.size(expr)
     val exprTreeSize = ProcessTreeAlgebra.size(exprTree)
     val vars = TermAlgebra.getFreeVars(expr)
-    println(expr + "\n" + expSize + "\n" + exprTreeSize)
     for (n <- 1 to (expSize - 1)) {
-      println("trying size " + n)
-      println("generating...")
       val candidates = gen.generate(n, vars)
       val buf = new ArrayBuffer[Expression]()
-      println("testing...")
       for (candidate <- candidates) {
         val (candidateTree, candidateSced) = sc(candidate)
-        //val candidateTreeSize = ProcessTreeAlgebra.size(candidateTree)
-        //if (localExprs.forall(e => !Eq.equivalent(candidate, e))) {
           if (Eq.equivalent(exprSced, candidateSced)) {
-            print(candidate)
             if (TicksAlgebra.isImprovement(candidateSced, exprSced)) {
-              //println(candidate)
-              //println(candidateSced)
-              println(" <=")
-              //println(exprSced)
               buf += candidate
-            } else {
-              //println(candidateSced)
-              println(" !<=")
-              //println(exprSced)
             }
           }
-        //}
       }
       if (!buf.isEmpty) {
         return buf.toList
