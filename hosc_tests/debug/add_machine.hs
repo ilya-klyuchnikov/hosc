@@ -25,6 +25,14 @@ normalize2 f t
 normalize f t 
 
 with/without control and reverse generalizing (generalizing down node) seems non-terminating!
+
+The reason is that
+HE.
+((plug ((contract f) (redex (C2 $248 $249)))) $249)
+((plug ((contract f) (redex (C2 $248 $929)))) $922)
+MSG:
+let $940 = $929 $933 = $922 in  ((plug ((contract f) (redex (C2 $248 $940)))) $933)
+-- after it the whistle will blow again! - the second expression is not simplified!
 -}
 
 where
