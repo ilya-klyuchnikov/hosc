@@ -44,11 +44,10 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def typeConstrDefinition = p(("data" ~> uident) ~ (typeVariable*) ~ ("=" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
     TypeConstructorDefinition)
   
-  private def tp1: Parser[Type] = p(uident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")"))
+  private def tp1: Parser[Type] = p(uident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")) // arg
   private def tp2: Parser[Type] = p(typeVariable | uident ~ (tp1*) ^^ TypeConstructor)
   private def tp3: Parser[Type] = p(tp2 |  ("(" ~> `type` <~ ")"))
-  private def `type` = rep1sep(tp3, "->") ^^ {_.reduceRight{Arrow}}
-  private def arrow: Parser[Arrow] = p(tp2 ~ ("->" ~> `type`) ^^ Arrow) | ("(" ~> arrow <~ ")") 
+  private def `type` = rep1sep(tp3, "->") ^^ {_.reduceRight{Arrow}} 
   private def typeVariable = p(lident ^^ TypeVariable)  
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
   
