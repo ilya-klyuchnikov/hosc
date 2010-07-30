@@ -37,11 +37,13 @@ trait ASupercompiler {
             case None => None
           }
         }
+        /*
         case RedexNestedCase(CaseExpression(innerSel, innerBs), CaseExpression(_, outerBs)) => {
           val newBs = innerBs map {case Branch(pat, exp) => Branch(pat, freshBinders(CaseExpression(exp, outerBs)))}
           val result = context.replaceHole(freshBinders(CaseExpression(innerSel, newBs)))
           Some(result :: Nil)
         }
+        */
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
           Some(freshBinders(sel) :: 
             (bs map {b => freshBinders(replaceTerm(context.replaceHole(b.term), sel, Constructor(b.pattern.name, b.pattern.args)))}))

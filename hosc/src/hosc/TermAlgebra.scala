@@ -27,7 +27,7 @@ object TermAlgebra {
   // global control - of certain interest!
   case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
   // nested case - also very interesting
-  case class RedexNestedCase(innerCase: CaseExpression, outerCase: CaseExpression) extends Redex(outerCase)
+  //case class RedexNestedCase(innerCase: CaseExpression, outerCase: CaseExpression) extends Redex(outerCase)
   case class RedexChoice(choice: Choice) extends Redex(choice)
   
   // TODO: remove case -> make Context Object!
