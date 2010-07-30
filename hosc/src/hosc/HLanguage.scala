@@ -91,13 +91,6 @@ object HLanguage {
          nest(2, group (ED :/: binding._1.toDoc :: "=" :: binding._2.toDoc))
          :/: "in" :: nest(2, ED :/: expr.toDoc) :: ")" :: ED)
    }
-   case class Choice(e1: Expression, e2: Expression) extends Expression {
-     type termType = Expression
-     def \\(s: Map[Variable, Variable]) = Choice(e1\\s, e2\\s)
-     def /(s: Map[Variable, Expression]) = Choice(e1/s, e2/s)
-     override def toString = "choice{" + e1 + "; " + e2 + ";}"
-     def toDoc = group("choice{" :: nest(2, e1.toDoc :/: ";" :/: e2.toDoc :: ";" :: ED) :: "}" :: ED)
-   }
    
    case class Branch(pattern: Pattern, term: Expression) extends Positional {
      def \\(s: Map[Variable, Variable]) = Branch(pattern\\s, term\\s)

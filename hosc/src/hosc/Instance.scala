@@ -42,8 +42,6 @@ object Instance {
           List.forall2(bs1s, bs2s){(b1, b2) =>
             b1.pattern.name == b2.pattern.name && walk(b1.term, b2.term, (b1.pattern.args zip b2.pattern.args) ::: binders)
           }
-      case (Choice(e1, e2), Choice(e3, e4)) => 
-        walk(e1, e3, binders) && walk(e2, e4, binders)
       case (LetRecExpression((f, e11), e21), LetRecExpression((g, e12), e22)) =>
         walk(e11, e12, (f, g) :: binders) && walk(e21, e22, (f, g) :: binders)
       case _ => false

@@ -5,7 +5,7 @@ import GraphAnalysis._
 import HLanguage.{Application => Application0, Variable => Variable0, CaseExpression => CaseExpression0, 
   Branch => Branch0, Pattern => Pattern0, Function=>Function0,
   Constructor => Constructor0, LambdaAbstraction => LambdaAbstraction0, 
-  LetExpression => LetExpression0, LetRecExpression => LetRecExpression0, Expression => Expression0, Program => Program0, Choice => Choice0}
+  LetExpression => LetExpression0, LetRecExpression => LetRecExpression0, Expression => Expression0, Program => Program0}
 
 import scala.collection.mutable.ListBuffer
 
@@ -18,7 +18,6 @@ object LangUtils {
     case CaseExpression0(sel, bs) => 
       CaseExpression(hl0ToELC(sel), 
           bs map {b => Branch(Pattern(b.pattern.name, b.pattern.args map {v => Variable(v.name)}), hl0ToELC(b.term))})
-    case Choice0(e1, e2) => Choice(hl0ToELC(e1), hl0ToELC(e2))
     case LetExpression0(bs, lexpr) => 
       LetExpression(bs map {b => (Variable(b._1.name), hl0ToELC(b._2))}, hl0ToELC(lexpr))
     case LetRecExpression0(b, lexpr) => 
@@ -51,7 +50,6 @@ object LangUtils {
     case Application0(head, arg) => getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression0(sel, bs) => 
       getFreeVars(sel) ++ (Set[Variable0]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
-    case Choice0(e1, e2) => getFreeVars(e1) ++ getFreeVars(e2)
     case LetRecExpression0(bs, expr) => getFreeVars(expr) ++ getFreeVars(bs._2) - bs._1
     case LetExpression0(bs, expr) => 
       ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
@@ -89,7 +87,6 @@ object LangUtils {
       val canonizedSelector = canonize(sel)
       CaseExpression0(canonizedSelector, canonizedBranches)
     }
-    case Choice0(e1, e2) => Choice0(canonize(e1), canonize(e2))
     case l: LetExpression0 => throw new IllegalArgumentException()
     case l: LetRecExpression0 => throw new IllegalArgumentException()
   }

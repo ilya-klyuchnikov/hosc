@@ -50,12 +50,6 @@ class CodeConstructor(val originalProgram: Program, val tree: ProcessTree, freeV
         fold(node.children.head)
 
       // TODO: get rid off this extension (move to experimental branch)
-      case Context(RedexChoice(choice)) => node.children match {
-        case e1 :: e2 :: Nil => Choice(fold(e1), fold(e2))
-        case _ => throw new IllegalStateException("exprected exactly 2 child nodes here...")
-      }
-
-      // TODO: get rid off this extension (move to experimental branch)
       case Context(RedexCaseCon(c, CaseExpression(sel, Nil))) => {
         CaseExpression(sel, Nil)
       }

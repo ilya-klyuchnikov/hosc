@@ -130,9 +130,6 @@ class SuperCompilerTest {
    @Test def ltl5 = 
     SCP.main(Array("-si", "mc/ltl5.hs", "-t", "sc/out0/ltl5.svg", "-p", "sc/out0/ltl5.hs"))
    
-   @Test def kripke1 = 
-    SCP.main(Array("-si", "mc/kripke1.hs", "-t", "sc/out0/kripke1.svg", "-p", "sc/out0/kripke1.hs"))
-   
    @Test def iterate = 
     SCP.main(Array("-si", "sc/iterate.hs", "-t", "sc/out0/iterate.svg", "-p", "sc/out0/iterate.hs"))
    

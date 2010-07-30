@@ -24,7 +24,6 @@ object HE0 {
     case LambdaAbstraction(v, t) => he(term1, t)
     case a: Application => lineApp(a) exists (he(term1, _))
     case CaseExpression(sel, bs) => he(term1, sel) || (bs exists {b => he(term1, b.term)})
-    case Choice(e1, e2) => he(term1, e1) || he(term1, e2)
     case _ => false
   }
   
@@ -43,7 +42,6 @@ object HE0 {
       samePatterns && he(sel1, sel2) && 
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && he(bs._1.term, bs._2.term)))
     }
-    case (Choice(e1a, e2a), Choice(e1b, e2b)) => he(e1a, e1b) && he(e2a, e2b)
     case _ => false
   }
 }

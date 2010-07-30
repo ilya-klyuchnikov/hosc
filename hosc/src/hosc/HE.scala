@@ -22,7 +22,6 @@ object HE {
       case a: Application => lineApp(a) exists (he(term1, _, binders))
       case CaseExpression(sel, bs) => 
         he(term1, sel, binders) || (bs exists {b => he(term1, b.term, (b.pattern.args map {(null,_)}) ::: binders)})
-      case Choice(e1, e2) => he(term1, e1, binders) || he(term1, e2, binders)
       case _ => false
     }
   }
@@ -48,7 +47,6 @@ object HE {
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders)))
     }
-    case (Choice(e1a, e2a), Choice(e1b, e2b)) => he(e1a, e1b, binders) && he(e2a, e2b, binders)
     case _ => false
   }
 }
@@ -79,7 +77,6 @@ class HEWithSize(minSize: Int) {
       case a: Application => lineApp(a) exists (he(term1, _, binders))
       case CaseExpression(sel, bs) => 
         he(term1, sel, binders) || (bs exists {b => he(term1, b.term, (b.pattern.args map {(null,_)}) ::: binders)})
-      case Choice(e1, e2) => he(term1, e1, binders) || he(term1, e2, binders)
       case _ => false
     }
   }
@@ -104,7 +101,6 @@ class HEWithSize(minSize: Int) {
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && 
           he(bs._1.term, bs._2.term, (bs._1.pattern.args zip bs._2.pattern.args) ::: binders)))
     }
-    case (Choice(e1a, e2a), Choice(e1b, e2b)) => he(e1a, e1b, binders) && he(e2a, e2b, binders)
     case _ => false
   }
 }

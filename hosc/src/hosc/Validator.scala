@@ -96,7 +96,6 @@ object Validator {
     }
     case a: Application => {valTerm(boundedVars, a.head, p); valTerm(boundedVars, a.arg, p);}
     case c: CaseExpression => valCase(boundedVars, c, p)
-    case Choice(e1, e2) => {valTerm(boundedVars, e1, p); valTerm(boundedVars, e2, p);}
     case let: LetExpression => err("unexpected let", let)
     case letrec: LetRecExpression => err("unexpected letrec", letrec)
   }
@@ -154,10 +153,6 @@ object Validator {
       valTermWithFreeVars(boundedVars, a.arg, p);
     }
     case c: CaseExpression => valCaseWithFreeVars(boundedVars, c, p)
-    case Choice(e1, e2) => {
-      valTermWithFreeVars(boundedVars, e1, p)
-      valTermWithFreeVars(boundedVars, e2, p)
-    }
     case LetRecExpression((v, e), e0) => {
       valTermWithFreeVars(boundedVars, e, p);
       valTermWithFreeVars(boundedVars, e0, p)

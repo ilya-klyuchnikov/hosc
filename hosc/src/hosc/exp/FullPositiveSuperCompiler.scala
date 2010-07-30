@@ -40,8 +40,6 @@ class FullPositiveSuperCompiler(program: Program) extends SuperCompiler0(program
             case None => res = false
           }
         }
-        case RedexChoice(Choice(e1, e2)) => 
-          tree.addChildren(n, List(context.replaceHole(freshBinders(e1)),context.replaceHole(freshBinders(e2))))
         // the most interesting case!
         case RedexCaseVar(_, CaseExpression(sel, bs)) =>
           val es: List[Expression] = freshBinders(sel) :: 

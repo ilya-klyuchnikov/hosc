@@ -62,10 +62,6 @@ trait Driver {
           val childExprs = childForSel :: childrenForBranches
           tree.addChildren(node, childExprs)
         }
-        case RedexChoice(Choice(e1, e2)) => {
-          val childExprs = List(context.replaceHole(freshBinders(e1)),context.replaceHole(freshBinders(e2)))
-          tree.addChildren(node, childExprs)
-        }
       }
       case _ => throw new IllegalArgumentException("non reducible expression: " + expr)
     }

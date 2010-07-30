@@ -26,9 +26,6 @@ object TermAlgebra {
   case class RedexCall(f: Variable) extends NonTrivialRedex(f)
   // global control - of certain interest!
   case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
-  // nested case - also very interesting
-  //case class RedexNestedCase(innerCase: CaseExpression, outerCase: CaseExpression) extends Redex(outerCase)
-  case class RedexChoice(choice: Choice) extends Redex(choice)
   
   // TODO: remove case -> make Context Object!
   sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
@@ -67,7 +64,6 @@ object TermAlgebra {
     //case outer@CaseExpression(inner: CaseExpression, _) => ContextHole(RedexNestedCase(inner, outer))
     case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
     case a @ Application(h, _) => ContextApp(createContext(h), a)
-    case ch: Choice => ContextHole(RedexChoice(ch))
     case v: Variable => throw new IllegalArgumentException("cannot be decomposed as a context: " + v)
     case lam: LambdaAbstraction => throw new IllegalArgumentException("cannot be decomposed as a context: " + lam)
     case c: Constructor => throw new IllegalArgumentException("cannot be decomposed as a context: " + c)
@@ -90,7 +86,6 @@ object TermAlgebra {
     case CaseExpression(sel, bs) => 
       CaseExpression(applySubstitution(sel, s), 
           bs map {b => Branch(b.pattern, applySubstitution(b.term, s -- b.pattern.args))})
-    case Choice(e1, e2) => Choice(applySubstitution(e1, s), applySubstitution(e2, s))
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
@@ -102,7 +97,6 @@ object TermAlgebra {
     case Application(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
     case CaseExpression(sel, bs) => 
       getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
-    case Choice(e1, e2) => getBoundedVars(e1) ++ getBoundedVars(e2) 
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
@@ -120,10 +114,6 @@ object TermAlgebra {
     case LetRecExpression((f, e), e0) => {
       val eVars = getFreeVars(e) 
       eVars ++ (getFreeVars(e0) -- eVars) - f
-    }
-    case Choice(e1, e2) => {
-      val e1Vars = getFreeVars(e1)
-      e1Vars ++ (getFreeVars(e2) -- e1Vars)
     }
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
   }
@@ -174,8 +164,6 @@ object TermAlgebra {
         ((args1 zip args2) forall (args => eq1(args._1, args._2)))
       case (Application(h1, a1), Application(h2, a2)) => 
         eq1(h1, h2) && eq1(a1, a2)
-      case (Choice(e1a, e2a), Choice(e1b, e2b)) =>
-        eq1(e1a, e1b) && eq1(e2a, e2b)
       case (LambdaAbstraction(b1, v1), LambdaAbstraction(b2, v2)) =>
         eq1(b1, b2) && eq1(v1, v2)
       case (CaseExpression(sel1, Nil), CaseExpression(sel2, Nil)) =>
@@ -211,7 +199,6 @@ object TermAlgebra {
       LambdaAbstraction(freshV, applySubstitution(freshBinders(t), Map(v -> freshV)))
     }
     case CaseExpression(sel, bs) => CaseExpression(freshBinders(sel), bs map {freshBinders(_)})
-    case Choice(e1, e2) => Choice(freshBinders(e1), freshBinders(e2))
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
   
@@ -230,7 +217,6 @@ object TermAlgebra {
     case LambdaAbstraction(v, t) => LambdaAbstraction(v, replaceTerm(t, t1, t2))
     case CaseExpression(sel, bs) => 
       CaseExpression(replaceTerm(sel, t1, t2), bs map {b => Branch(b.pattern, replaceTerm(b.term, t1, t2))})
-    case Choice(e1, e2) => Choice(replaceTerm(e1, t1, t2), replaceTerm(e2, t1, t2))
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
@@ -256,7 +242,6 @@ object TermAlgebra {
        (getAllVars(expr) /: bs) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
     case LetRecExpression(bs, expr) =>
        (getAllVars(expr) /: (bs :: Nil)) {(vs, b) => vs ++ getAllVars(b._2) + b._1}
-    case Choice(e1, e2) => getAllVars(e1) ++ getAllVars(e2)
   }
   
   def size(expr: Expression): Int = expr match {
@@ -270,8 +255,6 @@ object TermAlgebra {
       size(e1) + size(e2)
     case CaseExpression(sel, bs) =>
       1 + size(sel) + sum(bs map {b => size(b.term)})
-    case Choice(e1, e2) =>
-      size(e1) + size(e2)
   }
   
   private def sum(ns: List[Int]): Int = {

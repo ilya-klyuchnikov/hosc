@@ -43,7 +43,6 @@ object LambdaLifting {
     case LambdaAbstraction(_, expr) => findLetRec(expr)
     case Application(head, arg) => findLetRec(head).orElse(findLetRec(arg))
     case CaseExpression(sel, branches) => branches.foldLeft(findLetRec(sel)){(r, branch) => r.orElse(findLetRec(branch.term))}
-    case Choice(e1, e2) => findLetRec(e1) orElse findLetRec(e2)
     case letrec@LetRecExpression((f, e1), e2) => {
       val e1FreeVars = TermAlgebra.getFreeVars(e1) - f
       if (e1FreeVars.isEmpty) 
@@ -65,7 +64,6 @@ object LambdaLifting {
       Application(injectArgument(head, f, v0), injectArgument(arg, f, v0))
     case CaseExpression(sel, branches) => 
       CaseExpression(injectArgument(sel, f, v0), branches map {b => Branch(b.pattern, injectArgument(b.term, f, v0))})
-    case Choice(e1, e2) => Choice(injectArgument(e1, f, v0), injectArgument(e2, f, v0))
     case LetRecExpression((f1, e1), e2) => 
       if (f1==f) {
         val nv = newVar()
@@ -89,7 +87,6 @@ object LambdaLifting {
     case CaseExpression(sel, bs) => 
       CaseExpression(extractGlobals(sel, p), 
           bs map {b => Branch(b.pattern, extractGlobals(b.term, p))})
-    case Choice(e1, e2) => Choice(extractGlobals(e1, p), extractGlobals(e2, p))
     case lr: LetRecExpression => letrecToHl(lr, p)
     case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }

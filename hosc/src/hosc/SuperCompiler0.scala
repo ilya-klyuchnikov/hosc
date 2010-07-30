@@ -159,7 +159,6 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
     case Context(RedexCaseCon(_, _)) => true
-    //case Context(RedexLamApp(lam, app)) => true
     case _ => false
   }
   

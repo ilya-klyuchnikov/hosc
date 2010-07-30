@@ -45,13 +45,6 @@ object MSG {
         t = applySubstitution(t, Map(v -> Constructor(n1, newVars)))
         l2 ++= addDSubs
       }
-      case (v, Choice(e1a, e2a), Choice(e1b, e2b)) => {
-        val nv1 = newVar()
-        val nv2 = newVar()
-        val addDSubs = List((nv1, e1a, e1b), (nv2, e2a, e2b))
-        t = applySubstitution(t, Map(v -> Choice(nv1, nv2)))
-        l2 ++= addDSubs
-      }
       case (v, la1@LambdaAbstraction(a1, t1), la2@LambdaAbstraction(a2, t2)) if HE.heByCoupling(la1, la2) || HE.heByCoupling(la2, la1) => {
         val arg = newVar() // binder!!
         val rs = newVar()

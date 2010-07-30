@@ -11,15 +11,6 @@ import hosc.{SuperCompilerApp => SCP0}
 import hosc.exp.{SuperCompilerApp1 => SCP1}
 
 class Experiments {
-  // synapse with choice
-  @Test def synapse =
-    SCP0.main(Array("-si", "exp/synapse.hs", "-t", "exp/out0/synapse.svg","-p", "exp/out0/synapse.hs"))
-  
-  @Test def nondet1 =
-    SCP0.main(Array("-si", "exp/nondet1.hs", "-t", "exp/out0/nondet1.svg","-p", "exp/out0/nondet1.hs"))
-  
-  @Test def nondet2 =
-    SCP0.main(Array("-si", "exp/nondet2.hs", "-t", "exp/out0/nondet2.svg","-p", "exp/out0/nondet2.hs"))
   
  @Ignore 
  @Test def eval1_0 =

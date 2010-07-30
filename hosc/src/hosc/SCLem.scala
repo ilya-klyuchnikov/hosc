@@ -28,7 +28,6 @@ class SCLem(program: Program, lemmas: List[Lemma]) extends SuperCompiler0(progra
     case LambdaAbstraction(v, t) => LambdaAbstraction(v, applyLemma(t, lemma))
     case CaseExpression(sel, bs) => 
       CaseExpression(applyLemma(sel, lemma), bs map {b => Branch(b.pattern, applyLemma(b.term, lemma))})
-    case Choice(e1, e2) => Choice(applyLemma(e1, lemma), applyLemma(e2, lemma))
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
