@@ -17,7 +17,7 @@ trait TreeOperations {
   }
   
   def abstractUp(t: ProcessTree, up: Node, down: Node): ProcessTree = {
-    val g = MSG.msg(up.expr, down.expr)
+    val g = MSG.msgExt(up.expr, down.expr)
     t.replace(up, LetExpression(g.sub1, g.term))
   }
   

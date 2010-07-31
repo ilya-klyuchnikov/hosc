@@ -10,7 +10,14 @@ object MSG {
   case class Generalization(term: Expression, sub1: List[Substitution], sub2: List[Substitution])
   case class Generalization2(term: Expression, dSub: List[DoubleSubstitution])
 
-  def msg(term1: Expression, term2: Expression): Generalization = {
+  def msgExt(term1: Expression, term2: Expression): Generalization = {
+    val Generalization2(gTerm, dSub) = simplify(generalizeCoupled(term1, term2))
+    val s1 = dSub.map { case (v, e1, e2) => (v, e1) }
+    val s2 = dSub.map { case (v, e1, e2) => (v, e2) }
+    Generalization(gTerm, s1, s2)
+  }
+  
+  private def msg(term1: Expression, term2: Expression): Generalization = {
     val Generalization2(gTerm, dSub) = simplify(generalize(term1, term2))
     val s1 = dSub.map { case (v, e1, e2) => (v, e1) }
     val s2 = dSub.map { case (v, e1, e2) => (v, e2) }

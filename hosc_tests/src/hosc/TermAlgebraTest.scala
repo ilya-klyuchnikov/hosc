@@ -223,7 +223,7 @@ class TermAlgebraTest {
   @Test def msg1(): Unit = {
     val program = programFromFile(inputFile)
     val term = termFromString("app x", program)
-    val msg_ = msg(term, term)
+    val msg_ = msgExt(term, term)
     println(msg_)
     assertTrue(equivalent(msg_.term, term))
   }
@@ -233,14 +233,14 @@ class TermAlgebraTest {
     val term1 = termFromString("app x", program)
     val term2 = termFromString("app y", program)
     val term = termFromString("app z", program)
-    val msg_ = msg(term1, term2)
+    val msg_ = msgExt(term1, term2)
     println(msg_)
     assertTrue(equivalent(msg_.term, term))
   }
   
   
   @Test def msg4(): Unit = {
-    val actualMsg = msg(Variable("a"), Variable("a"))
+    val actualMsg = msgExt(Variable("a"), Variable("a"))
     println(actualMsg)
     
     val f1 = Variable("f1");   f1.global = true
@@ -251,7 +251,7 @@ class TermAlgebraTest {
     val y = Variable("y");
     val e1 = A(f1, A(f2, x));
     val e2 = A(f3, A(f1, A(f4, A (f2, y))));
-    val msg1 = msg(e1, e2);
+    val msg1 = msgExt(e1, e2);
     println(msg1);
     //assertTrue(equivalent(actualMsg.term, term))
   }
@@ -276,7 +276,7 @@ class TermAlgebraTest {
     
     val term1 = termFromString(input1, program)
     val term2 = termFromString(input2, program)
-    val actualMsg = msg(term1, term2)
+    val actualMsg = msgExt(term1, term2)
     println(actualMsg)
   }
 }

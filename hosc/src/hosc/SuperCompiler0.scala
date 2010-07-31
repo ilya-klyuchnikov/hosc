@@ -251,7 +251,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
   def abstractUp(t: ProcessTree, up: Node, down: Node): Unit = {
     val upTerm = up.expr
     val downTerm = down.expr
-    val g = msg(upTerm, downTerm)
+    val g = msgExt(upTerm, downTerm)
     if (g.sub1.isEmpty){
       t.replace(up, g.term)
     } else {
