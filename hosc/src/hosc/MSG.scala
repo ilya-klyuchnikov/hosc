@@ -15,26 +15,26 @@ object MSG {
     val s1 = dSub.map { case (v, e1, e2) => (v, e1) }
     val s2 = dSub.map { case (v, e1, e2) => (v, e2) }
     Generalization(gTerm, s1, s2)
-  } 
-  
-  private def generalizeCoupled(e1: Expression, e2: Expression): MSG.Generalization2 =
+  }
+
+  private def generalizeCoupled(e1: Expression, e2: Expression): Generalization2 =
     if (!HE.heByCoupling(e1, e2)) {
 
       val v = newVar()
-      MSG.Generalization2(v, List((v, e1, e2)))
+      Generalization2(v, List((v, e1, e2)))
 
     } else {
 
       (e1, e2) match {
 
         case (Variable(n1), Variable(n2)) if n1 == n2 =>
-          MSG.Generalization2(e1, List())
+          Generalization2(e1, List())
 
         case (Constructor(n1, args1), Constructor(n2, args2)) if n1 == n2 => {
           val subR = (args1, args2).zipped.map { generalizeCoupled }
           val genArgs = subR map { _.term }
-          val sub = subR.foldRight(List[MSG.DoubleSubstitution]()) { _.dSub ++ _ }
-          MSG.Generalization2(Constructor(n1, genArgs), sub)
+          val sub = subR.foldRight(List[DoubleSubstitution]()) { _.dSub ++ _ }
+          Generalization2(Constructor(n1, genArgs), sub)
         }
 
         case (LambdaAbstraction(v1, body1), LambdaAbstraction(v2, body2)) => {
@@ -44,17 +44,17 @@ object MSG {
           val freshBody2 = applySubstitution(body2, Map(v2 -> freshVar))
           val genBody = generalizeCoupled(freshBody1, freshBody2)
 
-          MSG.Generalization2(LambdaAbstraction(freshVar, genBody.term), genBody.dSub)
+          Generalization2(LambdaAbstraction(freshVar, genBody.term), genBody.dSub)
         }
 
         case (Application(h1, arg1), Application(h2, arg2)) => {
-          val MSG.Generalization2(genHead, sub1) = generalizeCoupled(h1, h2)
-          val MSG.Generalization2(genArg, sub2) = generalizeCoupled(arg1, arg2)
-          MSG.Generalization2(Application(genHead, genArg), sub1 ++ sub2)
+          val Generalization2(genHead, sub1) = generalizeCoupled(h1, h2)
+          val Generalization2(genArg, sub2) = generalizeCoupled(arg1, arg2)
+          Generalization2(Application(genHead, genArg), sub1 ++ sub2)
         }
 
         case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
-          val MSG.Generalization2(genSel, sub) = generalizeCoupled(sel1, sel2)
+          val Generalization2(genSel, sub) = generalizeCoupled(sel1, sel2)
 
           // TODO: get rid of it later
           val bs1s = bs1 sort compareB
@@ -73,33 +73,33 @@ object MSG {
             }
 
           // generalized branches
-          val genBs: List[(Pattern, MSG.Generalization2)] =
+          val genBs: List[(Pattern, Generalization2)] =
             freshBs map { case (p, t1, t2) => (p, generalizeCoupled(t1, t2)) }
 
-          val genCase = CaseExpression(genSel, genBs map { case (p, MSG.Generalization2(t, _)) => Branch(p, t) })
+          val genCase = CaseExpression(genSel, genBs map { case (p, Generalization2(t, _)) => Branch(p, t) })
           val genSub = genBs.map { _._2 }.foldRight(sub) { _.dSub ++ _ }
 
-          MSG.Generalization2(genCase, genSub)
+          Generalization2(genCase, genSub)
         }
 
         case (t1, t2) => {
           val nv = newVar
-          MSG.Generalization2(nv, List((nv, t1, t2)))
+          Generalization2(nv, List((nv, t1, t2)))
         }
 
       }
 
     }
 
-  private def simplify(gen2: MSG.Generalization2): MSG.Generalization2 = {
+  private def simplify(gen2: Generalization2): Generalization2 = {
     gen2.dSub match {
       case Nil => gen2
       case (el@(v, e1, e2)) :: els => {
-        val MSG.Generalization2(simpledTerm, simpledSub) = simplify(MSG.Generalization2(gen2.term, els))
+        val Generalization2(simpledTerm, simpledSub) = simplify(Generalization2(gen2.term, els))
         val (same, other) = simpledSub partition { case (_, t1, t2) => e1 == t1 && e2 == t2 }
         val sub = Map(same map { case (v1, _, _) => (v1, v) }: _*)
         val term = applySubstitution(simpledTerm, sub)
-        MSG.Generalization2(term, el :: other)
+        Generalization2(term, el :: other)
       }
     }
   }
