@@ -17,7 +17,7 @@ object MSG {
     Generalization(gTerm, s1, s2)
   }
   
-  private def msg(term1: Expression, term2: Expression): Generalization = {
+  def msg(term1: Expression, term2: Expression): Generalization = {
     val Generalization2(gTerm, dSub) = simplify(generalize(term1, term2))
     val s1 = dSub.map { case (v, e1, e2) => (v, e1) }
     val s2 = dSub.map { case (v, e1, e2) => (v, e2) }
@@ -144,32 +144,37 @@ object MSG {
       val bs1s = bs1 sortWith compareB
       val bs2s = bs2 sortWith compareB
 
-      // fresh branches
-      val freshBs: List[(Pattern, Expression, Expression)] =
-        (bs1s, bs2s).zipped.map { (b1, b2) =>
-          val freshPatVars = b1.pattern.args map {_ => newVar}
-          val freshPat = Pattern(b1.pattern.name, freshPatVars)
-
-          val freshB1 = applySubstitution(b1.term, Map(b1.pattern.args zip freshPatVars: _*))
-          val freshB2 = applySubstitution(b2.term, Map(b2.pattern.args zip freshPatVars: _*))
-
-          (freshPat, freshB1, freshB2)
+      if (bs1s(0).pattern.name == bs2s(0).pattern.name) {
+        
+    	// fresh branches
+        val freshBs: List[(Pattern, Expression, Expression)] =
+          (bs1s, bs2s).zipped.map { (b1, b2) =>
+            val freshPatVars = b1.pattern.args map {_ => newVar}
+            val freshPat = Pattern(b1.pattern.name, freshPatVars)
+            val freshB1 = applySubstitution(b1.term, Map(b1.pattern.args zip freshPatVars: _*))
+            val freshB2 = applySubstitution(b2.term, Map(b2.pattern.args zip freshPatVars: _*))
+            (freshPat, freshB1, freshB2)
         }
 
-      // generalized branches
-      val genBs: List[(Pattern, Generalization2)] =
-        freshBs map { case (p, t1, t2) => (p, generalize(t1, t2)) }
+        // generalized branches
+        val genBs: List[(Pattern, Generalization2)] =
+          freshBs map { case (p, t1, t2) => (p, generalize(t1, t2)) }
 
-      val genCase = CaseExpression(genSel, genBs map { case (p, Generalization2(t, _)) => Branch(p, t) })
-      val genSub = genBs.map { _._2 }.foldRight(sub) { _.dSub ++ _ }
+        val genCase = CaseExpression(genSel, genBs map { case (p, Generalization2(t, _)) => Branch(p, t) })
+        val genSub = genBs.map { _._2 }.foldRight(sub) { _.dSub ++ _ }
       
-      val boundVars = (genBs map {case (p, g) => p.args}).flatten
+        val boundVars = (genBs map {case (p, g) => p.args}).flatten
       
-      if (isValidSub(boundVars, genSub)) {
-        Generalization2(genCase, genSub)
+        if (isValidSub(boundVars, genSub)) {
+          Generalization2(genCase, genSub)
+        } else {
+    	  trivialGen(e1, e2)
+        }
+      
       } else {
     	trivialGen(e1, e2)
       }
+
     }
 
     case _ =>
