@@ -183,7 +183,7 @@ object MSG {
   }
   
   private def trivialGen(e1: Expression, e2: Expression) = {
-	val nv = newVar
+	  val nv = newVar
     Generalization2(nv, List((nv, e1, e2)))
   }
 
