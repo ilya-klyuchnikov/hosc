@@ -1,6 +1,6 @@
 package hosc.re
 
-import hosc.TestUtils
+import hosc.TUtils
 import hosc.HLanguage._
 import hosc.LangUtils._
 import hosc.SuperCompiler0
@@ -8,7 +8,7 @@ import hosc.CodeConstructor
 import hosc.Eq
 
 object RegExpTester {
-  lazy val program = TestUtils.programResultFromFile("re/regexp2.hs").get
+  lazy val program = TUtils.programResultFromFile("re/regexp2.hs").get
  
   def superCompile(goal: Expression) = {
     val sc = new SuperCompiler0(program)
@@ -34,8 +34,8 @@ object RegExpTester {
     println(goal1Str)
     println(goal2Str)
     
-    val goal1 = TestUtils.termFromString(goal1Str, program)
-    val goal2 = TestUtils.termFromString(goal2Str, program)
+    val goal1 = TUtils.termFromString(goal1Str, program)
+    val goal2 = TUtils.termFromString(goal2Str, program)
     
     val sced1 = superCompile(goal1)
     val sced2 = superCompile(goal2)

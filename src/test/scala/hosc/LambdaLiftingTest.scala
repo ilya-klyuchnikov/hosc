@@ -5,7 +5,7 @@ import org.junit.Ignore
 import org.junit.Assert._
 
 import HLanguage._
-import TestUtils._
+import TUtils._
 
 class LambdaLiftingTest {
   val examplesDir = "examples/"

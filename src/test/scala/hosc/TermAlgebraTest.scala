@@ -7,7 +7,7 @@ import HLanguage.{Application => A, _}
 import TermAlgebra._
 import HE._
 import MSG._
-import TestUtils._
+import TUtils._
 import Util._
 
 class TermAlgebraTest {

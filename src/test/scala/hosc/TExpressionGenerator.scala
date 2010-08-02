@@ -5,7 +5,7 @@ import HLanguage._
 import LangUtils._
 import hosc.lemmas.ExpressionGenerator
 
-object TestExpressionGenerator {
+object TExpressionGenerator {
   def main(args : Array[String]) : Unit = {
     val start = System.currentTimeMillis
     val p = programFromFile("hl/or_even_odd.hs")

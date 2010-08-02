@@ -3,7 +3,7 @@ package hosc.re
 import org.junit.{Test, Assert}
 import org.junit.Assert._
 
-import hosc.TestUtils._
+import hosc.TUtils._
 import hosc.{SuperCompilerApp => SCP}
 import hosc.exp.{SuperCompilerApp1 => SCP1, HigherLevelSuperCompilerApp => HLSCP}
 import hosc.Interpreter

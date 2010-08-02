@@ -157,7 +157,7 @@ class HParsersTest {
             )
         )))
     val expected = Program(listT :: Nil, goal, revF :: appF :: Nil )
-    val programResult = TestUtils.programResultFromFile("examples/" + "parser/rev.hs")    
+    val programResult = TUtils.programResultFromFile("examples/" + "parser/rev.hs")
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -210,7 +210,7 @@ class HParsersTest {
   
   def assertValidationError(fileName: String, msg: String)  = {
     println(fileName)
-    val r = TestUtils.programResultFromFile("examples/" + fileName)  
+    val r = TUtils.programResultFromFile("examples/" + fileName)
     println(r)
     assertFalse(msg, r.successful)
     r match {
@@ -221,7 +221,7 @@ class HParsersTest {
   
   def assertSyntaxError(fileName: String, msg: String)  = {
     println(fileName)
-    val r = TestUtils.programResultFromFile(fileName)  
+    val r = TUtils.programResultFromFile(fileName)
     println(r)
     assertFalse(msg, r.successful)
     r match {
@@ -231,27 +231,27 @@ class HParsersTest {
   }
   
   def testSTerm(input: String, expected: Expression): Unit = {
-    val r = TestUtils.termResultFromString(input)
+    val r = TUtils.termResultFromString(input)
     println(r)
     assertTrue(r.successful)
     assertEquals(expected, r.get)
   }
   
   def testETerm(input: String): Unit = {
-    val r = TestUtils.termResultFromString(input)
+    val r = TUtils.termResultFromString(input)
     println(r)
     assertFalse(r.successful)
   }
   
   def testSType(input: String, expected: Type): Unit = {
-    val r = TestUtils.typeExprResultFromString(input)
+    val r = TUtils.typeExprResultFromString(input)
     println(r)
     assertTrue(r.successful)
     assertEquals(expected, r.get)
   }
   
   def testEType(input: String): Unit = {
-    val r = TestUtils.typeExprResultFromString(input)
+    val r = TUtils.typeExprResultFromString(input)
     println(r)
     assertFalse(r.successful)
   }

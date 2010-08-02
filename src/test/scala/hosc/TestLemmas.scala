@@ -5,7 +5,7 @@ import HLanguage._
 import LangUtils._
 import hosc.lemmas.LemmaGenerator
 
-object TestLemmas {
+object Lemmas {
   def main(args : Array[String]) : Unit = {
     val p = programFromFile("sc/lemmas.hs");
     val lg = LemmaGenerator(p)

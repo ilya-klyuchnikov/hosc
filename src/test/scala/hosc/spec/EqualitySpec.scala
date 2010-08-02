@@ -4,7 +4,7 @@ import org.junit.{Test, Ignore}
 import org.junit.Assert._
 
 import hosc.Util._
-import hosc.TestUtils._
+import hosc.TUtils._
 import hosc.HLanguage._
 import hosc.{SuperCompiler0, CodeConstructor, Eq, LambdaLifting, Postprocessor}
 

@@ -2,7 +2,7 @@ package hosc
 
 import org.junit.Test
 import org.junit.Assert._
-import TestUtils._
+import TUtils._
 
 class InterpreterTest {
 

@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.Assert._
 import HLanguage._
 
-object TestUtils {
+object TUtils {
   def termResultFromString(input: String) =
     HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     
