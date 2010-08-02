@@ -1,5 +1,5 @@
 .scala_dependencies
-bin/
+target/
 dump/
 out/
 out0/
