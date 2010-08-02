@@ -6,7 +6,7 @@ import hosc.Eq
 import hosc.sc.{SuperCompilerWithControlApp}
 
 class Equivalence {
-  
+  val examplesDir = "examples/"
   @Test def abs = testEq("eq/abs1.hs", "eq/abs2.hs")
   @Test def add = testEq("eq/add1.hs", "eq/add2.hs")
   @Test def app = testEq("eq/app1.hs", "eq/app2.hs")
@@ -28,8 +28,9 @@ class Equivalence {
   @Test def rep = testEq("eq/rep1.hs", "eq/rep2.hs") 
   
   def testEq(f1: String, f2: String): Unit = {
-    val p1 = SuperCompilerWithControlApp.superCompileFile(f1)
-    val p2 = SuperCompilerWithControlApp.superCompileFile(f2)
+	  
+    val p1 = SuperCompilerWithControlApp.superCompileFile(examplesDir + f1)
+    val p2 = SuperCompilerWithControlApp.superCompileFile(examplesDir + f2)
     Assert.assertTrue(Eq.equivalent(p1.goal, p2.goal))
   }
 }

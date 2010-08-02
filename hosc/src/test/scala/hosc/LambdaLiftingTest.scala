@@ -8,37 +8,42 @@ import HLanguage._
 import TestUtils._
 
 class LambdaLiftingTest {
-  @Test def letrec1(): Unit = {
-    val p = Util.rawProgramFromFile("lifting/letrec.hs")
+  val examplesDir = "examples/"
+
+  @Test
+  def letrec1(): Unit = {
+    val p = Util.rawProgramFromFile(examplesDir + "lifting/letrec.hs")
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
     println("\n")
-    
+
     val e = LambdaLifting.lift(p)
     println(e.toDocString)
   }
-  
-  @Test def letrec_rev(): Unit = {
-    val p = Util.rawProgramFromFile("lifting/letrec_rev.hs")
+
+  @Test
+  def letrec_rev(): Unit = {
+    val p = Util.rawProgramFromFile(examplesDir + "lifting/letrec_rev.hs")
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
-    
+
     println("\n")
-    
+
     val e = LambdaLifting.lift(p)
     println(e.toDocString)
   }
-  
-  @Test def letrec_2app(): Unit = {
-    val p = Util.rawProgramFromFile("lifting/letrec_2app.hs")
+
+  @Test
+  def letrec_2app(): Unit = {
+    val p = Util.rawProgramFromFile(examplesDir + "lifting/letrec_2app.hs")
     println(p.goal)
     val l = LambdaLifting.findLetRec(p.goal)
     println(l)
-    
+
     println("\n")
-    
+
     val e = LambdaLifting.lift(p)
     println(e.toDocString)
   }

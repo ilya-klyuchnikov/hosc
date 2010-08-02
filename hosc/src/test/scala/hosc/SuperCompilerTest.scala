@@ -11,134 +11,134 @@ import hosc.{SuperCompilerApp => SCP}
 class SuperCompilerTest {
   
   @Test def t01_loop = 
-    SCP.main(Array("-si", "sc/01_loop.hs", "-t", "sc/out0/01_loop.svg","-p", "sc/out0/01_loop.hs"))
+    SCP.main(Array("-si", "examples/sc/01_loop.hs", "-t", "examples/sc/out0/01_loop.svg","-p", "examples/sc/out0/01_loop.hs"))
   
   // producing bottom: TODO -> make special case for program generator 
   @Test def loop = 
-    SCP.main(Array("-si", "sc/loop.hs", "-t", "sc/out0/loop.svg", "-p", "sc/out0/loop.hs"))
+    SCP.main(Array("-si", "examples/sc/loop.hs", "-t", "examples/sc/out0/loop.svg", "-p", "examples/sc/out0/loop.hs"))
   
   @Test def eqnum_plus = 
-    SCP.main(Array("-si", "sc/eqnum_plus.hs", "-t", "sc/out0/eqnum_plus.svg", "-p", "sc/out0/eqnum_plus.hs"))
+    SCP.main(Array("-si", "examples/sc/eqnum_plus.hs", "-t", "examples/sc/out0/eqnum_plus.svg", "-p", "examples/sc/out0/eqnum_plus.hs"))
   
   @Test def eq = 
-    SCP.main(Array("-si", "sc/eq.hs", "-t", "sc/out0/eq.svg", "-p", "sc/out0/eq.hs"))
+    SCP.main(Array("-si", "examples/sc/eq.hs", "-t", "examples/sc/out0/eq.svg", "-p", "examples/sc/out0/eq.hs"))
   
   @Test def zip1 = 
-    SCP.main(Array("-si", "sc/zip1.hs", "-t", "sc/out0/zip1.svg", "-p", "sc/out0/zip1.hs"))
+    SCP.main(Array("-si", "examples/sc/zip1.hs", "-t", "examples/sc/out0/zip1.svg", "-p", "examples/sc/out0/zip1.hs"))
     
   @Test def zip2 = 
-    SCP.main(Array("-si", "sc/zip2.hs", "-t", "sc/out0/zip2.svg", "-p", "sc/out0/zip2.hs"))
+    SCP.main(Array("-si", "examples/sc/zip2.hs", "-t", "examples/sc/out0/zip2.svg", "-p", "examples/sc/out0/zip2.hs"))
   
   @Test def regexp(): Unit = 
-    SCP.main(Array("-si", "sc/regexp.hs", "-t", "sc/out0/regexp.svg", "-p", "sc/out0/regexp.hs"))
+    SCP.main(Array("-si", "examples/sc/regexp.hs", "-t", "examples/sc/out0/regexp.svg", "-p", "examples/sc/out0/regexp.hs"))
   
   @Test def synapse() = 
-    SCP.main(Array("-si", "sc/synapse.hs", "-t", "sc/out0/synapse.svg", "-p", "sc/out0/synapse.hs"))
+    SCP.main(Array("-si", "examples/sc/synapse.hs", "-t", "examples/sc/out0/synapse.svg", "-p", "examples/sc/out0/synapse.hs"))
   
   @Test def synapse1() = 
-    SCP.main(Array("-si", "sc/synapse1.hs",  "-t", "sc/out0/synapse1.svg", "-p", "sc/out0/synapse1.hs"))
+    SCP.main(Array("-si", "examples/sc/synapse1.hs",  "-t", "examples/sc/out0/synapse1.svg", "-p", "examples/sc/out0/synapse1.hs"))
   
   @Test def synapse2() = 
-    SCP.main(Array("-si", "sc/synapse2.hs", "-t", "sc/out0/synapse2.svg", "-p", "sc/out0/synapse2.hs"))
+    SCP.main(Array("-si", "examples/sc/synapse2.hs", "-t", "examples/sc/out0/synapse2.svg", "-p", "examples/sc/out0/synapse2.hs"))
   
   @Test def even() = 
-    SCP.main(Array("-si", "sc/even.hs", "-t", "sc/out0/even.svg", "-p", "sc/out0/even.hs"))
+    SCP.main(Array("-si", "examples/sc/even.hs", "-t", "examples/sc/out0/even.svg", "-p", "examples/sc/out0/even.hs"))
     
   @Test def even1() = 
-    SCP.main(Array("-si", "sc/even1.hs", "-t", "sc/out0/even1.svg", "-p", "sc/out0/even1.hs"))
+    SCP.main(Array("-si", "examples/sc/even1.hs", "-t", "examples/sc/out0/even1.svg", "-p", "examples/sc/out0/even1.hs"))
   
   @Test def even2() = 
-    SCP.main(Array("-si", "sc/even2.hs", "-t", "sc/out0/even2.svg", "-p", "sc/out0/even2.hs"))
+    SCP.main(Array("-si", "examples/sc/even2.hs", "-t", "examples/sc/out0/even2.svg", "-p", "examples/sc/out0/even2.hs"))
   
   @Test def evenSS() = 
-    SCP.main(Array("-si", "sc/evenSS.hs", "-t", "sc/out0/evenSS.svg", "-p", "sc/out0/evenSS.hs"))
+    SCP.main(Array("-si", "examples/sc/evenSS.hs", "-t", "examples/sc/out0/evenSS.svg", "-p", "examples/sc/out0/evenSS.hs"))
   
   // -----
   @Test def case_() = 
-    SCP.main(Array("-si", "sc/case.hs", "-t", "sc/out0/case.svg", "-p", "sc/out0/case.hs"))
+    SCP.main(Array("-si", "examples/sc/case.hs", "-t", "examples/sc/out0/case.svg", "-p", "examples/sc/out0/case.hs"))
   
   @Test def eqnum() = 
-    SCP.main(Array("-si", "sc/eqnum.hs", "-t", "sc/out0/eqnum.svg", "-p", "sc/out0/eqnum.hs"))
+    SCP.main(Array("-si", "examples/sc/eqnum.hs", "-t", "examples/sc/out0/eqnum.svg", "-p", "examples/sc/out0/eqnum.hs"))
   
   @Test def eqnumxx() = 
-    SCP.main(Array("-si", "sc/eqnumxx.hs", "-t", "sc/out0/eqnumxx.svg", "-p", "sc/out0/eqnumxx.hs"))
+    SCP.main(Array("-si", "examples/sc/eqnumxx.hs", "-t", "examples/sc/out0/eqnumxx.svg", "-p", "examples/sc/out0/eqnumxx.hs"))
   
   @Test def exp() = 
-    SCP.main(Array("-si", "sc/exp.hs", "-t", "sc/out0/exp.svg", "-p", "sc/out0/exp.hs"))
+    SCP.main(Array("-si", "examples/sc/exp.hs", "-t", "examples/sc/out0/exp.svg", "-p", "examples/sc/out0/exp.hs"))
   
   @Test def fib() = 
-    SCP.main(Array("-si", "sc/fib.hs", "-t", "sc/out0/fib.svg", "-p", "sc/out0/fib.hs"))
+    SCP.main(Array("-si", "examples/sc/fib.hs", "-t", "examples/sc/out0/fib.svg", "-p", "examples/sc/out0/fib.hs"))
  
   @Test def filter() = 
-    SCP.main(Array("-si", "sc/filter.hs", "-t", "sc/out0/filter.svg", "-p", "sc/out0/filter.hs"))
+    SCP.main(Array("-si", "examples/sc/filter.hs", "-t", "examples/sc/out0/filter.svg", "-p", "examples/sc/out0/filter.hs"))
   
   @Test def isort() = 
-    SCP.main(Array("-si", "sc/isort.hs", "-t", "sc/out0/isort.svg", "-p", "sc/out0/isort.hs"))
+    SCP.main(Array("-si", "examples/sc/isort.hs", "-t", "examples/sc/out0/isort.svg", "-p", "examples/sc/out0/isort.hs"))
   
   @Test def leq_add() = 
-    SCP.main(Array("-si", "sc/leq_add.hs", "-t", "sc/out0/leq_add.svg", "-p", "sc/out0/leq_add.hs"))
+    SCP.main(Array("-si", "examples/sc/leq_add.hs", "-t", "examples/sc/out0/leq_add.svg", "-p", "examples/sc/out0/leq_add.hs"))
   
   @Test def letrec_rev() = 
-    SCP.main(Array("-si", "sc/letrec_rev.hs", "-t", "sc/out0/letrec_rev.svg", "-p", "sc/out0/letrec_rev.hs"))
+    SCP.main(Array("-si", "examples/sc/letrec_rev.hs", "-t", "examples/sc/out0/letrec_rev.svg", "-p", "examples/sc/out0/letrec_rev.hs"))
   
   @Test def letrec() = 
-    SCP.main(Array("-si", "sc/letrec.hs", "-t", "sc/out0/letrec.svg", "-p", "sc/out0/letrec.hs"))  
+    SCP.main(Array("-si", "examples/sc/letrec.hs", "-t", "examples/sc/out0/letrec.svg", "-p", "examples/sc/out0/letrec.hs"))  
   
   @Test def min() = 
-    SCP.main(Array("-si", "sc/min.hs", "-t", "sc/out0/min.svg", "-p", "sc/out0/min.hs"))
+    SCP.main(Array("-si", "examples/sc/min.hs", "-t", "examples/sc/out0/min.svg", "-p", "examples/sc/out0/min.hs"))
   
   @Test def takenm() = 
-    SCP.main(Array("-si", "sc/takenm.hs", "-t", "sc/out0/takenm.svg", "-p", "sc/out0/takenm.hs"))
+    SCP.main(Array("-si", "examples/sc/takenm.hs", "-t", "examples/sc/out0/takenm.svg", "-p", "examples/sc/out0/takenm.hs"))
   
   @Test def war() = 
-    SCP.main(Array("-si", "sc/var.hs", "-t", "sc/out0/var.svg", "-p", "sc/out0/var.hs"))
+    SCP.main(Array("-si", "examples/sc/var.hs", "-t", "examples/sc/out0/var.svg", "-p", "examples/sc/out0/var.hs"))
   
    @Test def church() = 
-    SCP.main(Array("-si", "sc/church.hs", "-t", "sc/out0/church.svg", "-p", "sc/out0/church.hs"))
+    SCP.main(Array("-si", "examples/sc/church.hs", "-t", "examples/sc/out0/church.svg", "-p", "examples/sc/out0/church.hs"))
    
    @Test def fix() = 
-    SCP.main(Array("-si", "sc/fix.hs", "-t", "sc/out0/fix.svg", "-p", "sc/out0/fix.hs"))
+    SCP.main(Array("-si", "examples/sc/fix.hs", "-t", "examples/sc/out0/fix.svg", "-p", "examples/sc/out0/fix.hs"))
    
    @Test def drec() = 
-    SCP.main(Array("-si", "sc/drec.hs", "-t", "sc/out0/drec.svg", "-p", "sc/out0/drec.hs"))
+    SCP.main(Array("-si", "examples/sc/drec.hs", "-t", "examples/sc/out0/drec.svg", "-p", "examples/sc/out0/drec.hs"))
    
    @Test def enc() = 
-    SCP.main(Array("-si", "sc/encoding.hs", "-t", "sc/out0/enc.svg", "-p", "sc/out0/enc.hs"))
+    SCP.main(Array("-si", "examples/sc/encoding.hs", "-t", "examples/sc/out0/enc.svg", "-p", "examples/sc/out0/enc.hs"))
    
    @Test def sf() = 
-    SCP.main(Array("-si", "sc/sf.hs", "-t", "sc/out0/sf.svg", "-p", "sc/out0/sf.hs"))
+    SCP.main(Array("-si", "examples/sc/sf.hs", "-t", "examples/sc/out0/sf.svg", "-p", "examples/sc/out0/sf.hs"))
    
    @Test def rev() = 
-    SCP.main(Array("-si", "sc/rev.hs", "-t", "sc/out0/rev.svg", "-p", "sc/out0/rev.hs"))
+    SCP.main(Array("-si", "examples/sc/rev.hs", "-t", "examples/sc/out0/rev.svg", "-p", "examples/sc/out0/rev.hs"))
    
    @Test def synapse0() = 
-    SCP.main(Array("-si", "sc/synapse0.hs",  "-t", "sc/out0/synapse0.svg", "-p", "sc/out0/synapse0.hs"))
+    SCP.main(Array("-si", "examples/sc/synapse0.hs",  "-t", "examples/sc/out0/synapse0.svg", "-p", "examples/sc/out0/synapse0.hs"))
    
    @Test def fix_con = 
-    SCP.main(Array("-si", "sc/fix_con.hs", "-t", "sc/out0/fix_con.svg", "-p", "sc/out0/fix_con.hs"))
+    SCP.main(Array("-si", "examples/sc/fix_con.hs", "-t", "examples/sc/out0/fix_con.svg", "-p", "examples/sc/out0/fix_con.hs"))
    
    @Test def ltl1 = 
-    SCP.main(Array("-si", "mc/ltl1.hs", "-t", "sc/out0/ltl1.svg", "-p", "sc/out0/ltl1.hs"))
+    SCP.main(Array("-si", "examples/mc/ltl1.hs", "-t", "examples/sc/out0/ltl1.svg", "-p", "examples/sc/out0/ltl1.hs"))
    
    @Ignore
    @Test def ltl2 = 
-    SCP.main(Array("-si", "mc/ltl2.hs", "-t", "sc/out0/ltl2.svg", "-p", "sc/out0/ltl2.hs"))
+    SCP.main(Array("-si", "examples/mc/ltl2.hs", "-t", "examples/sc/out0/ltl2.svg", "-p", "examples/sc/out0/ltl2.hs"))
    
    @Test def ltl4 = 
-    SCP.main(Array("-si", "mc/ltl4.hs", "-t", "sc/out0/ltl4.svg", "-p", "sc/out0/ltl4.hs"))
+    SCP.main(Array("-si", "examples/mc/ltl4.hs", "-t", "examples/sc/out0/ltl4.svg", "-p", "examples/sc/out0/ltl4.hs"))
    
    @Test def ltl5 = 
-    SCP.main(Array("-si", "mc/ltl5.hs", "-t", "sc/out0/ltl5.svg", "-p", "sc/out0/ltl5.hs"))
+    SCP.main(Array("-si", "examples/mc/ltl5.hs", "-t", "examples/sc/out0/ltl5.svg", "-p", "examples/sc/out0/ltl5.hs"))
    
    @Test def iterate = 
-    SCP.main(Array("-si", "sc/iterate.hs", "-t", "sc/out0/iterate.svg", "-p", "sc/out0/iterate.hs"))
+    SCP.main(Array("-si", "examples/sc/iterate.hs", "-t", "examples/sc/out0/iterate.svg", "-p", "examples/sc/out0/iterate.hs"))
    
    @Test def fixDouble = 
-    SCP.main(Array("-si", "sc/fixDouble.hs", "-t", "sc/out0/fixDouble.svg", "-p", "sc/out0/fixDouble.hs"))
+    SCP.main(Array("-si", "examples/sc/fixDouble.hs", "-t", "examples/sc/out0/fixDouble.svg", "-p", "examples/sc/out0/fixDouble.hs"))
    
     @Test def iter2 = 
-    SCP.main(Array("-si", "sc/iter2.hs", "-t", "sc/out0/iter2.svg", "-p", "sc/out0/iter2.hs"))
+    SCP.main(Array("-si", "examples/sc/iter2.hs", "-t", "examples/sc/out0/iter2.svg", "-p", "examples/sc/out0/iter2.hs"))
     
   @Test def russel_bad = 
-    SCP.main(Array("-si", "sc/russel_bad.hs", "-t", "sc/out0/russel_bad.svg", "-p", "sc/out0/russel_bad.hs"))
+    SCP.main(Array("-si", "examples/sc/russel_bad.hs", "-t", "examples/sc/out0/russel_bad.svg", "-p", "examples/sc/out0/russel_bad.hs"))
 }

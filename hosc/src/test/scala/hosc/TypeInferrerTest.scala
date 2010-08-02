@@ -33,7 +33,7 @@ class TypeInferrerTest {
     testTypeError("types/fixErr.hs")
   
   @Test def drec() =
-    println(Util.inferGoalType("sc/encoding.hs"))
+    println(Util.inferGoalType("examples/" + "sc/encoding.hs"))
   
   @Test def evalErr() =
     testTypeError("types/evalErr.hs")
@@ -42,7 +42,7 @@ class TypeInferrerTest {
      testTyping("types/eval.hs", "Exp -> Val")
   
   def testTyping(fileName: String, typeString: String) = {
-    val actualType = Util.inferGoalType(fileName)
+    val actualType = Util.inferGoalType("examples/" + fileName)
     val expectedType = HParsers.parseType(new CharArrayReader(typeString.toCharArray)).get
     println("actual:")
     println(actualType)

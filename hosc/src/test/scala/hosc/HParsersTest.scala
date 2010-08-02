@@ -157,7 +157,7 @@ class HParsersTest {
             )
         )))
     val expected = Program(listT :: Nil, goal, revF :: appF :: Nil )
-    val programResult = TestUtils.programResultFromFile("parser/rev.hs")    
+    val programResult = TestUtils.programResultFromFile("examples/" + "parser/rev.hs")    
     println(programResult)
     assertTrue(programResult.successful)
     val program = programResult.get
@@ -201,16 +201,16 @@ class HParsersTest {
   }
   
   @Test def caseError(): Unit = {
-    assertSyntaxError("parser/case.hs", "missing ; should be reported")
+    assertSyntaxError("examples/" + "parser/case.hs", "missing ; should be reported")
   }
   
   @Test def parserErrors(): Unit = {
-    assertSyntaxError("parser/syntax_err.hs", "")
+    assertSyntaxError("examples/" + "parser/syntax_err.hs", "")
   }
   
   def assertValidationError(fileName: String, msg: String)  = {
     println(fileName)
-    val r = TestUtils.programResultFromFile(fileName)  
+    val r = TestUtils.programResultFromFile("examples/" + fileName)  
     println(r)
     assertFalse(msg, r.successful)
     r match {

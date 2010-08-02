@@ -1,6 +1,5 @@
 package hosc
 
-import hosc.{SuperCompilerApp => SCP0, SCLemApp}
 import hosc.exp.{SuperCompilerApp1 => SCP1, SuperCompilerApp2 => SCP2}
 
 object LTL {

@@ -411,7 +411,7 @@ class EqualitySpec {
   
 
   def testEq(input: String, goal1: String, goal2: String): Unit = {
-    val file = "spec_eq/" + input + ".hs"
+    val file = "examples/" + "spec_eq/" + input + ".hs"
     val program = programFromFile(file)
     val input1 = termFromString(goal1, program)
     val input2 = termFromString(goal2, program)

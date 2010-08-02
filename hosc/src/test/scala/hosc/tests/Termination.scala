@@ -44,8 +44,10 @@ class Termination {
   def synapse = 
     run("hll/synapse.hs")
   
+  val examplesDir = "examples/"  
+    
   def run(file: String): Unit = {
-    SuperCompilerApp.superCompileFile(file)
-    SuperCompilerWithControlApp.superCompileFile(file)
+    SuperCompilerApp.superCompileFile(examplesDir + file)
+    SuperCompilerWithControlApp.superCompileFile(examplesDir + file)
   }
 }
