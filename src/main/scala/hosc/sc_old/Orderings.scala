@@ -1,4 +1,4 @@
-package hosc.sc
+package hosc.sc_old
 
 import hosc.{HE, Instance, TermAlgebra}
 import hosc.ProcessTree.Node

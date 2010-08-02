@@ -3,7 +3,7 @@ package hosc.tests
 import org.junit.{Test, Assert}
 
 import hosc.Eq
-import hosc.sc.{SuperCompilerWithControlApp}
+import hosc.sc_old.{SuperCompilerWithControlApp}
 
 class Equivalence {
   val examplesDir = "examples/"
