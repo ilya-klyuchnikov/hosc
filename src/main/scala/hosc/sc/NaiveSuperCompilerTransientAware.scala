@@ -10,8 +10,8 @@ import hosc.EmbeddingNaiveBinary
 class NaiveSuperCompilerTransientAware(program: Program) extends NaiveSuperCompiler(program) {
 
   override def relevant(node: Node) = decompose(node.expr) match {
-	  
-	// transient nodes
+
+    // transient nodes
     case Context(RedexLamApp(lam, app)) => false
     case Context(RedexCall(_)) => false
     case Context(RedexCaseCon(_, _)) => false
