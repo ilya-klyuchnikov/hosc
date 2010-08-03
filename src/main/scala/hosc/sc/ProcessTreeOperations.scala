@@ -5,11 +5,7 @@ import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra._
 
-// the basic driver
-// it doesn't support propagation of missing pattern
-// upward the process tree - just replaces 
-// con<case C of {...}> => case C of {} 
-trait Driver {
+trait ProcessTreeOperations {
   def program: Program
 
   def driveNode(tree: ProcessTree, node: Node): ProcessTree = node.expr match {
