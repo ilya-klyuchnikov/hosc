@@ -117,6 +117,10 @@ trait ProcessTreeOperations {
         tree.addChildren(node, v :: branchChildren)
     }
     
+    case LambdaAbstraction(v, t) => {
+    	tree.addChildren(node, List(t))
+    }
+    
     case CaseExpression(sel, bs) => {
     	val v = newVar
     	tree.replace(node, LetExpression(List((v, sel)), CaseExpression(v, bs)))

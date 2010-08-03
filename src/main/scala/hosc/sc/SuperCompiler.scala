@@ -27,6 +27,8 @@ trait SuperCompiler extends ProcessTreeOperations {
     while (!p.isClosed) {
       val beta = p.leafs.find(!_.isProcessed).get
       p = step(p, beta)
+      //println(p)
+      //println("----")
     }
     p
   }

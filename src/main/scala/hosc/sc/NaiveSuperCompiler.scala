@@ -14,13 +14,10 @@ import hosc.EmbeddingNaiveBinary
  *
  */
 class NaiveSuperCompiler(val program: Program) extends SuperCompiler {
-
-  def transient(node: Node) = decompose(node.expr) match {
-    case Context(RedexCall(_)) => true
-    case Context(RedexLamApp(lam, app)) => true
-    case Context(RedexCaseCon(_, _)) => true
-    case o: Observable => true
-    case _ => false
+	
+  def relevant(node: Node) = decompose(node.expr) match {
+    case Context(RedexLamApp(lam, app)) => false
+    case _ => true
   }
 
   def findRenaming(relevantAncs: List[Node], beta: ProcessTree.Node) =
@@ -30,10 +27,10 @@ class NaiveSuperCompiler(val program: Program) extends SuperCompiler {
     findEmbedding(relevantAncs, beta) filter { alpha => Instance.instanceOf(alpha.expr, beta.expr) }
 
   def findEmbedding(relevantAncs: List[Node], beta: ProcessTree.Node) =
-    if (transient(beta)) {
-      None
-    } else {
+    if (relevant(beta)) {
       relevantAncs find { alpha => EmbeddingNaiveBinary.he(alpha.expr, beta.expr) }
+    } else {
+      None
     }
 
   def processRenaming(tree: ProcessTree, up: Node, down: Node) =
@@ -49,7 +46,7 @@ class NaiveSuperCompiler(val program: Program) extends SuperCompiler {
     driveNode(tree, node)
 
   def relevantAncestors(beta: Node): List[Node] =
-    beta.ancestors filter { !isLetNode(_) } filter { !transient(_) }
+    beta.ancestors filter { !isLetNode(_) } filter { relevant }
 
   def isLetNode(n: Node): Boolean = n.expr match {
     case LetExpression(_, _) => true
