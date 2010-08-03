@@ -409,7 +409,8 @@ class EqualitySpec {
            """compose (fmap f) (fmap g) xs""")
   
   // mzero >>= f  =  mzero
-  @Test def state_law_11 =
+  @Test(timeout=5000) 
+  def state_law_11 =
     testEq(state, 
            """join mzero f""", 
            """mzero""")

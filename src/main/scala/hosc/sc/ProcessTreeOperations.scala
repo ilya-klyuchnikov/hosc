@@ -92,22 +92,29 @@ trait ProcessTreeOperations {
     } 
   }
 
-  def abstractUpOrBinarySplitDown(tree: ProcessTree, nodeToGeneralize: Node, companionNode: Node): ProcessTree = {
-    MSG.msgExt(nodeToGeneralize.expr, companionNode.expr) match {
-      case Generalization(Variable(_), _, _) => null
-      case Generalization(genExpr, sub1, _) => tree.replace(nodeToGeneralize, LetExpression(sub1, genExpr))
+  def abstractUpOrBinarySplitDown(tree: ProcessTree, up: Node, down: Node): ProcessTree = {
+    MSG.msg(up.expr, down.expr) match {
+      case Generalization(Variable(_), _, _) => splitBinary(tree, down)
+      case Generalization(genExpr, sub1, _) => tree.replace(up, LetExpression(sub1, genExpr))
     }
   }
 
-  def splitNaive(tree: ProcessTree, node: Node): ProcessTree = node.expr match {
+  def splitBinary(tree: ProcessTree, node: Node): ProcessTree = node.expr match {
 
     case Application(e1, e2) => {
       val (v1, v2) = (newVar, newVar)
       tree.replace(node, LetExpression(List((v1, e1), (v2, e2)), Application(v1, v2)))
     }
     
-    case CaseExpression(Variable(_), bs) => {
-    	throw new IllegalArgumentException("not splittable expression: " + node.expr)
+    case Constructor(name, args) => {
+    	val newArgs = args map {_ => newVar}
+    	tree.replace(node, LetExpression(newArgs zip args, Constructor(name, newArgs)))
+    }
+    
+    // here we drive without positive information propagation to ensure termination
+    case CaseExpression(v@Variable(_), bs) => {
+        val branchChildren = bs map { b => freshBinders(b.term)}
+        tree.addChildren(node, v :: branchChildren)
     }
     
     case CaseExpression(sel, bs) => {
