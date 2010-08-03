@@ -1,4 +1,4 @@
-package hosc.spec
+package hosc.spec.hl
 
 import hosc.exp.FastHLSCApp
 

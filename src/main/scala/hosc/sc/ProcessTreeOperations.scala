@@ -4,6 +4,8 @@ import hosc.HLanguage._
 import hosc.ProcessTree
 import hosc.ProcessTree._
 import hosc.TermAlgebra._
+import hosc.{ Instance, MSG }
+import hosc.MSG.Generalization
 
 trait ProcessTreeOperations {
   def program: Program
@@ -67,4 +69,54 @@ trait ProcessTreeOperations {
     }
   }
 
+  def fold(tree: ProcessTree, funNode: Node, repNode: Node): ProcessTree = {
+    repNode.repeatedOf = funNode
+    tree
+  }
+
+  // TODO: switch to msg?
+  def prepareForFold(tree: ProcessTree, node: Node, subNode: Node): ProcessTree = {
+    val configuration = node.expr
+    val subConfiguration = subNode.expr
+    val sub = Instance.findSubst(configuration, subConfiguration)
+    val keyMap = Map(sub.keys.toList map { k => (k, newVar()) }: _*)
+    val eg = configuration / keyMap
+    val sub2 = (sub map { case (k, v) => (keyMap(k), v) }).toList
+    tree.replace(subNode, LetExpression(sub2, eg))
+  }
+  
+  def abstractUp(tree: ProcessTree, up: Node, down: Node): ProcessTree = {
+	 MSG.msgExt(up.expr, down.expr) match {
+      case Generalization(Variable(_), _, _) => throw new IllegalArgumentException("Unexpected exprs: " + up.expr + " " + down.expr) 
+      case Generalization(genExpr, sub1, _) => tree.replace(up, LetExpression(sub1, genExpr))
+    } 
+  }
+
+  def abstractUpOrBinarySplitDown(tree: ProcessTree, nodeToGeneralize: Node, companionNode: Node): ProcessTree = {
+    MSG.msgExt(nodeToGeneralize.expr, companionNode.expr) match {
+      case Generalization(Variable(_), _, _) => null
+      case Generalization(genExpr, sub1, _) => tree.replace(nodeToGeneralize, LetExpression(sub1, genExpr))
+    }
+  }
+
+  def splitNaive(tree: ProcessTree, node: Node): ProcessTree = node.expr match {
+
+    case Application(e1, e2) => {
+      val (v1, v2) = (newVar, newVar)
+      tree.replace(node, LetExpression(List((v1, e1), (v2, e2)), Application(v1, v2)))
+    }
+    
+    case CaseExpression(Variable(_), bs) => {
+    	throw new IllegalArgumentException("not splittable expression: " + node.expr)
+    }
+    
+    case CaseExpression(sel, bs) => {
+    	val v = newVar
+    	tree.replace(node, LetExpression(List((v, sel)), CaseExpression(v, bs)))
+    }
+
+    case expr => {
+      throw new IllegalArgumentException("not splittable expression: " + expr)
+    }
+  }
 }

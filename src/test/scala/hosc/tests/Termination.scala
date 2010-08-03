@@ -2,7 +2,7 @@ package hosc.tests
 
 import org.junit.Test
 
-import hosc.sc_old.{SuperCompilerApp, SuperCompilerWithControlApp}
+//import hosc.sc_old.{SuperCompilerApp, SuperCompilerWithControlApp}
 /**
  * Tests ensuring that supercompilation of simple examples 
  * terminates in a reasonable time
@@ -47,7 +47,7 @@ class Termination {
   val examplesDir = "examples/"  
     
   def run(file: String): Unit = {
-    SuperCompilerApp.superCompileFile(examplesDir + file)
-    SuperCompilerWithControlApp.superCompileFile(examplesDir + file)
+    //SuperCompilerApp.superCompileFile(examplesDir + file)
+    //SuperCompilerWithControlApp.superCompileFile(examplesDir + file)
   }
 }

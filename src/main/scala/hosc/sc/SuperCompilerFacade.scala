@@ -1,11 +1,11 @@
-package hosc.sc_old
+package hosc.sc
 
 import hosc.CodeConstructor
 import hosc.HLanguage._
 import hosc.Util
 
-trait SCFacade {
-  def createSuperCompiler(program: Program): SuperCompilerAlgorithm
+trait SuperCompilerFacade {
+  def createSuperCompiler(program: Program): SuperCompiler
   
   def superCompile(program: Program): Program = {
     val sc = createSuperCompiler(program)
@@ -31,12 +31,4 @@ trait SCFacade {
     fw.flush
     fw.close
   }
-}
-
-object SuperCompilerApp extends SCFacade {
-  def createSuperCompiler(program: Program) = new SuperCompiler(program)
-}
-
-object SuperCompilerWithControlApp extends SCFacade {
-  def createSuperCompiler(program: Program) = new SuperCompilerWithControl(program)
 }

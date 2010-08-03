@@ -21,8 +21,4 @@ trait TreeOperations {
     t.replace(up, LetExpression(g.sub1, g.term))
   }
   
-  def fold(tree: ProcessTree, funNode: Node, recNode:Node): ProcessTree = {
-    recNode.repeatedOf = funNode
-    tree
-  }
 }

@@ -1,4 +1,4 @@
-package hosc.spec
+package hosc.spec.hl
 
 import org.junit.Test
 import org.junit.Assert._
