@@ -13,3 +13,13 @@ class EquivalenceNaiveWithCoupling extends Equivalence {
     Assert.assertTrue(Eq.equivalent(p1.goal, p2.goal))
   }
 }
+
+class EquivalenceNaiveWithControl extends Equivalence {
+  import hosc.sc.{ HOSC15, NaiveSuperCompilerWithControl }
+  override def testEq(f1: String, f2: String): Unit = {
+    val sc = NaiveSuperCompilerWithControl
+    val p1 = sc.superCompileFile(examplesDir + f1)
+    val p2 = sc.superCompileFile(examplesDir + f2)
+    Assert.assertTrue(Eq.equivalent(p1.goal, p2.goal))
+  }
+}

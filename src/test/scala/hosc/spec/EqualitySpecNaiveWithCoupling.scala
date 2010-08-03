@@ -13,3 +13,14 @@ class EqualitySpecNaiveWithCoupling extends EqualitySpec {
     p
   }
 }
+
+class EqualitySpecNaiveWithControl extends EqualitySpec {
+  import hosc.sc.NaiveSuperCompilerWithControl
+  override def sc(program: Program, goal: Expression) = {
+    val sc0 = new NaiveSuperCompilerWithControl(program)
+    val pt = sc0.buildProcessTree(goal)
+    val g = new CodeConstructor(program, pt, true)
+    val p = g.generateProgram()
+    p
+  }
+}
