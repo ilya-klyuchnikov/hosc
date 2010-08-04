@@ -1,0 +1,13 @@
+<svg:svg width="1022" height="630" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="940" height="30" y="0" x="41"></svg:rect><svg:text y="15" x="511">(\f -&gt; (((\y -&gt; case (y) of {F g -&gt; g;}) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x))))) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x))))))</svg:text><svg:line x2="511" y2="100" x1="511" y1="30"></svg:line><svg:rect width="892" height="30" y="100" x="65"></svg:rect><svg:text y="115" x="511">(((\y -&gt; case (y) of {F g -&gt; g;}) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x))))) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x)))))</svg:text><svg:line x2="511" y2="200" x1="511" y1="130"></svg:line><svg:rect width="886" height="30" y="200" x="68"></svg:rect><svg:text y="215" x="511">(case ((F (\p1 -&gt; (f (((\z2 -&gt; case (z2) of {F s1 -&gt; s1;}) p1) p1))))) of {F w1 -&gt; w1;} (F (\r -&gt; (f (((\z -&gt; case (z) of {F t1 -&gt; t1;}) r) r)))))</svg:text><svg:line x2="511" y2="300" x1="511" y1="230"></svg:line><svg:rect width="706" height="30" y="300" x="158"></svg:rect><svg:text y="315" x="511">((\x1 -&gt; (f (((\w -&gt; case (w) of {F v -&gt; v;}) x1) x1))) (F (\t -&gt; (f (((\v1 -&gt; case (v1) of {F y2 -&gt; y2;}) t) t)))))</svg:text><svg:line x2="511" y2="400" x1="511" y1="330"></svg:line><svg:rect width="982" height="30" y="400" x="20"></svg:rect><svg:text y="415" x="511">(f (((\y1 -&gt; case (y1) of {F z1 -&gt; z1;}) (F (\s -&gt; (f (((\u -&gt; case (u) of {F x2 -&gt; x2;}) s) s))))) (F (\r1 -&gt; (f (((\p -&gt; case (p) of {F u1 -&gt; u1;}) r1) r1))))))</svg:text><svg:line x2="511" y2="500" x1="511" y1="430"></svg:line><svg:rect width="946" height="30" y="500" x="38"></svg:rect><svg:text y="515" x="511">let 
+ in (((\y -&gt; case (y) of {F g -&gt; g;}) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x))))) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x)))))</svg:text><svg:line x2="511" y2="600" x1="511" y1="530"></svg:line><svg:rect width="892" height="30" y="600" x="65"></svg:rect><svg:text y="615" x="511">(((\y -&gt; case (y) of {F g -&gt; g;}) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x))))) (F (\x -&gt; (f (((\y -&gt; case (y) of {F g -&gt; g;}) x) x)))))</svg:text>
+    <svg:path d="M 65, 615 C 0, 615 0, 115 65, 115" style="stroke:black;"></svg:path>
+    </svg:svg>

@@ -1,0 +1,12 @@
+<svg:svg width="142" height="230" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="16" height="30" y="0" x="63"></svg:rect><svg:text y="15" x="71">f</svg:text><svg:line x2="71" y2="100" x1="71" y1="30"></svg:line><svg:rect width="100" height="30" y="100" x="21"></svg:rect><svg:text y="115" x="71">(Cons (True) f)</svg:text><svg:line x2="43" y2="200" x1="71" y1="130"></svg:line><svg:rect width="46" height="30" y="200" x="20"></svg:rect><svg:text y="215" x="43">(True)</svg:text><svg:line x2="114" y2="200" x1="71" y1="130"></svg:line><svg:rect width="16" height="30" y="200" x="106"></svg:rect><svg:text y="215" x="114">f</svg:text>
+    <svg:path d="M 122, 215 C 142, 215 142, 15 79, 15" style="stroke:black;"></svg:path>
+    </svg:svg>

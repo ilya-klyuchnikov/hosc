@@ -1,0 +1,12 @@
+<svg:svg width="152" height="230" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="40" height="30" y="0" x="56"></svg:rect><svg:text y="15" x="76">(f x)</svg:text><svg:line x2="76" y2="100" x1="76" y1="30"></svg:line><svg:rect width="112" height="30" y="100" x="20"></svg:rect><svg:text y="115" x="76">((\y -&gt; (f y)) x)</svg:text><svg:line x2="76" y2="200" x1="76" y1="130"></svg:line><svg:rect width="40" height="30" y="200" x="56"></svg:rect><svg:text y="215" x="76">(f x)</svg:text>
+    <svg:path d="M 56, 215 C 0, 215 0, 15 56, 15" style="stroke:black;"></svg:path>
+    </svg:svg>

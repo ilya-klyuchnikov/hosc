@@ -27,5 +27,6 @@ class NaiveSuperCompilerWithControl(program: Program) extends NaiveSuperCompiler
 }
 
 object NaiveSuperCompilerWithControl extends SuperCompilerFacade {
+  val name = "NaiveSuperCompilerWithControl"
   def createSuperCompiler(program: Program) = new NaiveSuperCompilerWithControl(program)
 }

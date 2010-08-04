@@ -1,0 +1,14 @@
+<svg:svg width="856" height="630" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="700" height="30" y="0" x="78"></svg:rect><svg:text y="15" x="428">((\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) (MkU (\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) (Z)))</svg:text><svg:line x2="428" y2="100" x1="428" y1="30"></svg:line><svg:rect width="742" height="30" y="100" x="57"></svg:rect><svg:text y="115" x="428">let z1=(Z)
+ in case ((MkU (\u1 -&gt; case (u1) of {MkU s y -&gt; (s (MkU s (S y)));}) z1)) of {MkU y1 v -&gt; (y1 (MkU y1 (S v)));}</svg:text><svg:line x2="394" y2="200" x1="428" y1="130"></svg:line><svg:rect width="652" height="30" y="200" x="68"></svg:rect><svg:text y="215" x="394">case ((MkU (\u1 -&gt; case (u1) of {MkU s y -&gt; (s (MkU s (S y)));}) z1)) of {MkU y1 v -&gt; (y1 (MkU y1 (S v)));}</svg:text><svg:line x2="394" y2="300" x1="394" y1="230"></svg:line><svg:rect width="742" height="30" y="300" x="23"></svg:rect><svg:text y="315" x="394">((\t -&gt; case (t) of {MkU w x1 -&gt; (w (MkU w (S x1)));}) (MkU (\z -&gt; case (z) of {MkU x v1 -&gt; (x (MkU x (S v1)));}) (S z1)))</svg:text><svg:line x2="394" y2="400" x1="394" y1="330"></svg:line><svg:rect width="748" height="30" y="400" x="20"></svg:rect><svg:text y="415" x="394">let r=(S z1)
+ in case ((MkU (\u1 -&gt; case (u1) of {MkU s y -&gt; (s (MkU s (S y)));}) r)) of {MkU y1 v -&gt; (y1 (MkU y1 (S v)));}</svg:text><svg:line x2="351" y2="500" x1="394" y1="430"></svg:line><svg:rect width="646" height="30" y="500" x="28"></svg:rect><svg:text y="515" x="351">case ((MkU (\u1 -&gt; case (u1) of {MkU s y -&gt; (s (MkU s (S y)));}) r)) of {MkU y1 v -&gt; (y1 (MkU y1 (S v)));}</svg:text><svg:line x2="737" y2="500" x1="394" y1="430"></svg:line><svg:rect width="46" height="30" y="500" x="714"></svg:rect><svg:text y="515" x="737">(S z1)</svg:text><svg:line x2="737" y2="600" x1="737" y1="530"></svg:line><svg:rect width="22" height="30" y="600" x="726"></svg:rect><svg:text y="615" x="737">z1</svg:text><svg:line x2="822" y2="200" x1="428" y1="130"></svg:line><svg:rect width="28" height="30" y="200" x="808"></svg:rect><svg:text y="215" x="822">(Z)</svg:text>
+    <svg:path d="M 28, 515 C 0, 515 0, 215 68, 215" style="stroke:black;"></svg:path>
+    </svg:svg>

@@ -5,6 +5,7 @@ import hosc.HLanguage._
 import hosc.Util
 
 trait SuperCompilerFacade {
+  def name: String
   def createSuperCompiler(program: Program): SuperCompiler
   
   def superCompile(program: Program): Program = {

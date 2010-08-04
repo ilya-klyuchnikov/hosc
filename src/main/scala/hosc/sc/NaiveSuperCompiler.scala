@@ -14,7 +14,7 @@ import hosc.EmbeddingNaiveBinary
  *
  */
 class NaiveSuperCompiler(val program: Program) extends SuperCompiler {
-	
+
   def relevant(node: Node) = decompose(node.expr) match {
     case Context(RedexLamApp(lam, app)) => false
     case _ => true
@@ -55,5 +55,6 @@ class NaiveSuperCompiler(val program: Program) extends SuperCompiler {
 }
 
 object NaiveSuperCompiler extends SuperCompilerFacade {
+  val name = "NaiveSuperCompiler"
   def createSuperCompiler(program: Program) = new NaiveSuperCompiler(program)
 }

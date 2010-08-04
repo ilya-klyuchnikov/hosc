@@ -19,21 +19,22 @@ class NaiveSuperCompilerTransientAware(program: Program) extends NaiveSuperCompi
     case o: Observable => false
     case _ => true
   }
-  
+
   var steps = 0
-  
+
   // since this supercompiler may non-terminate we explicitly 
   // limit the number of steps
   override def step(tree: ProcessTree, beta: ProcessTree.Node) = {
-	  steps += 1
-	  if (steps > 1000) {
-	 	  throw new Exception("1000 steps")
-	  }
-	  super.step(tree, beta)
+    steps += 1
+    if (steps > 1000) {
+      throw new Exception("1000 steps")
+    }
+    super.step(tree, beta)
   }
 
 }
 
 object NaiveSuperCompilerTransientAware extends SuperCompilerFacade {
+  val name = "NaiveSuperCompilerTransientAware"
   def createSuperCompiler(program: Program) = new NaiveSuperCompilerTransientAware(program)
 }

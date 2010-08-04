@@ -1,0 +1,12 @@
+<svg:svg width="546" height="730" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="64" height="30" y="0" x="241"></svg:rect><svg:text y="15" x="273">((h a) b)</svg:text><svg:line x2="273" y2="100" x1="273" y1="30"></svg:line><svg:rect width="406" height="30" y="100" x="70"></svg:rect><svg:text y="115" x="273">(((\x1 -&gt; (\y -&gt; case (x1) of {Z  -&gt; y; S u -&gt; ((h u) y);})) a) b)</svg:text><svg:line x2="273" y2="200" x1="273" y1="130"></svg:line><svg:rect width="322" height="30" y="200" x="112"></svg:rect><svg:text y="215" x="273">((\s -&gt; case (a) of {Z  -&gt; s; S p -&gt; ((h p) s);}) b)</svg:text><svg:line x2="273" y2="300" x1="273" y1="230"></svg:line><svg:rect width="250" height="30" y="300" x="148"></svg:rect><svg:text y="315" x="273">case (a) of {Z  -&gt; b; S x -&gt; ((h x) b);}</svg:text><svg:line x2="28" y2="400" x1="273" y1="330"></svg:line><svg:rect width="16" height="30" y="400" x="20"></svg:rect><svg:text y="415" x="28">a</svg:text><svg:line x2="84" y2="400" x1="273" y1="330"></svg:line><svg:rect width="16" height="30" y="400" x="76"></svg:rect><svg:text y="415" x="84">b</svg:text><svg:line x2="329" y2="400" x1="273" y1="330"></svg:line><svg:rect width="64" height="30" y="400" x="297"></svg:rect><svg:text y="415" x="329">((h x) b)</svg:text><svg:line x2="329" y2="500" x1="329" y1="430"></svg:line><svg:rect width="394" height="30" y="500" x="132"></svg:rect><svg:text y="515" x="329">(((\t -&gt; (\r -&gt; case (t) of {Z  -&gt; r; S v -&gt; ((h v) r);})) x) b)</svg:text><svg:line x2="329" y2="600" x1="329" y1="530"></svg:line><svg:rect width="322" height="30" y="600" x="168"></svg:rect><svg:text y="615" x="329">((\z -&gt; case (x) of {Z  -&gt; z; S w -&gt; ((h w) z);}) b)</svg:text><svg:line x2="329" y2="700" x1="329" y1="630"></svg:line><svg:rect width="262" height="30" y="700" x="198"></svg:rect><svg:text y="715" x="329">case (x) of {Z  -&gt; b; S y1 -&gt; ((h y1) b);}</svg:text>
+    <svg:path d="M 460, 715 C 546, 715 546, 315 398, 315" style="stroke:black;"></svg:path>
+    </svg:svg>

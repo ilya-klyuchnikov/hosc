@@ -19,5 +19,6 @@ class NaiveSuperCompilerWithCoupling(program: Program) extends NaiveSuperCompile
 }
 
 object NaiveSuperCompilerWithCoupling extends SuperCompilerFacade {
+  val name = "NaiveSuperCompilerWithCoupling"
   def createSuperCompiler(program: Program) = new NaiveSuperCompilerWithCoupling(program)
 }

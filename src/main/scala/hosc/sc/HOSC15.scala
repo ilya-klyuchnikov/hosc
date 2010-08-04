@@ -99,5 +99,6 @@ class HOSC15(val program: Program) extends SuperCompiler {
 }
 
 object HOSC15 extends SuperCompilerFacade {
+  val name = "HOSC15"
   def createSuperCompiler(program: Program) = new HOSC15(program)
 }

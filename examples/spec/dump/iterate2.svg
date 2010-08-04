@@ -1,0 +1,13 @@
+<svg:svg width="386" height="630" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="124" height="30" y="0" x="131"></svg:rect><svg:text y="15" x="193">((iterate f) (f x))</svg:text><svg:line x2="193" y2="100" x1="193" y1="30"></svg:line><svg:rect width="346" height="30" y="100" x="20"></svg:rect><svg:text y="115" x="193">(((\y -&gt; (\v -&gt; (Cons v ((iterate y) (y v))))) f) (f x))</svg:text><svg:line x2="193" y2="200" x1="193" y1="130"></svg:line><svg:rect width="274" height="30" y="200" x="56"></svg:rect><svg:text y="215" x="193">((\u -&gt; (Cons u ((iterate f) (f u)))) (f x))</svg:text><svg:line x2="193" y2="300" x1="193" y1="230"></svg:line><svg:rect width="226" height="30" y="300" x="80"></svg:rect><svg:text y="315" x="193">(Cons (f x) ((iterate f) (f (f x))))</svg:text><svg:line x2="63" y2="400" x1="193" y1="330"></svg:line><svg:rect width="40" height="30" y="400" x="43"></svg:rect><svg:text y="415" x="63">(f x)</svg:text><svg:line x2="63" y2="500" x1="63" y1="430"></svg:line><svg:rect width="16" height="30" y="500" x="55"></svg:rect><svg:text y="515" x="63">x</svg:text><svg:line x2="233" y2="400" x1="193" y1="330"></svg:line><svg:rect width="220" height="30" y="400" x="123"></svg:rect><svg:text y="415" x="233">let z=(f x)
+ in ((iterate f) (f z))</svg:text><svg:line x2="193" y2="500" x1="233" y1="430"></svg:line><svg:rect width="124" height="30" y="500" x="131"></svg:rect><svg:text y="515" x="193">((iterate f) (f z))</svg:text><svg:line x2="315" y2="500" x1="233" y1="430"></svg:line><svg:rect width="40" height="30" y="500" x="295"></svg:rect><svg:text y="515" x="315">(f x)</svg:text><svg:line x2="315" y2="600" x1="315" y1="530"></svg:line><svg:rect width="16" height="30" y="600" x="307"></svg:rect><svg:text y="615" x="315">x</svg:text>
+    <svg:path d="M 131, 515 C 0, 515 0, 15 131, 15" style="stroke:black;"></svg:path>
+    </svg:svg>

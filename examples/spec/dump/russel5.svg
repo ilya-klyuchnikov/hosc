@@ -1,0 +1,13 @@
+<svg:svg width="824" height="430" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="688" height="30" y="0" x="68"></svg:rect><svg:text y="15" x="412">((\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) (MkU (\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) x))</svg:text><svg:line x2="412" y2="100" x1="412" y1="30"></svg:line><svg:rect width="616" height="30" y="100" x="104"></svg:rect><svg:text y="115" x="412">case ((MkU (\v -&gt; case (v) of {MkU r w -&gt; (r (MkU r (S w)));}) x)) of {MkU y s -&gt; (y (MkU y (S s)));}</svg:text><svg:line x2="412" y2="200" x1="412" y1="130"></svg:line><svg:rect width="784" height="30" y="200" x="20"></svg:rect><svg:text y="215" x="412">let z=(S x)
+ in ((\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) (MkU (\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) z))</svg:text><svg:line x2="372" y2="300" x1="412" y1="230"></svg:line><svg:rect width="688" height="30" y="300" x="28"></svg:rect><svg:text y="315" x="372">((\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) (MkU (\u -&gt; case (u) of {MkU p n -&gt; (p (MkU p (S n)));}) z))</svg:text><svg:line x2="776" y2="300" x1="412" y1="230"></svg:line><svg:rect width="40" height="30" y="300" x="756"></svg:rect><svg:text y="315" x="776">(S x)</svg:text><svg:line x2="776" y2="400" x1="776" y1="330"></svg:line><svg:rect width="16" height="30" y="400" x="768"></svg:rect><svg:text y="415" x="776">x</svg:text>
+    <svg:path d="M 28, 315 C 0, 315 0, 15 68, 15" style="stroke:black;"></svg:path>
+    </svg:svg>

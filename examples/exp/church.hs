@@ -1,9 +1,7 @@
 data Nat = Z | S Nat;
 data Boolean = False | True;
 
---eq (add x y) (unchurch(churchAdd (church x) (church y))) 
-
-eq (add (unchurch x) (unchurch y)) (unchurch (churchAdd x y))
+eq (add x y) (unchurch(churchAdd (church x) (church y)))
 
 where
 

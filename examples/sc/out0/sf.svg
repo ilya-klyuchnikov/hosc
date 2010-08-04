@@ -1,0 +1,14 @@
+<svg:svg width="418" height="730" xmlns:svg="http://www.w3.org/2000/svg">
+    <svg:defs>
+    <svg:style type="text/css">
+    
+    rect {fill: none;stroke: black; stroke-width: 1;}
+    text {text-anchor: middle; font-family: monospace; font-size: 10px;}
+    line {stroke: black; stroke-width: 1}
+    path {fill:none; stroke-width:1;stroke-dasharray: 4,4;}</svg:style>
+    </svg:defs>
+    <svg:rect width="184" height="30" y="0" x="117"></svg:rect><svg:text y="15" x="209">let z=id
+ in ((sf id) (id z))</svg:text><svg:line x2="157" y2="100" x1="209" y1="30"></svg:line><svg:rect width="106" height="30" y="100" x="104"></svg:rect><svg:text y="115" x="157">((sf id) (id z))</svg:text><svg:line x2="157" y2="200" x1="157" y1="130"></svg:line><svg:rect width="274" height="30" y="200" x="20"></svg:rect><svg:text y="215" x="157">(((\y -&gt; (\u -&gt; ((sf y) (y u)))) id) (id z))</svg:text><svg:line x2="157" y2="300" x1="157" y1="230"></svg:line><svg:rect width="208" height="30" y="300" x="53"></svg:rect><svg:text y="315" x="157">((\v -&gt; ((sf id) (id v))) (id z))</svg:text><svg:line x2="157" y2="400" x1="157" y1="330"></svg:line><svg:rect width="208" height="30" y="400" x="53"></svg:rect><svg:text y="415" x="157">let w=(id z)
+ in ((sf id) (id w))</svg:text><svg:line x2="93" y2="500" x1="157" y1="430"></svg:line><svg:rect width="106" height="30" y="500" x="40"></svg:rect><svg:text y="515" x="93">((sf id) (id w))</svg:text><svg:line x2="230" y2="500" x1="157" y1="430"></svg:line><svg:rect width="46" height="30" y="500" x="207"></svg:rect><svg:text y="515" x="230">(id z)</svg:text><svg:line x2="230" y2="600" x1="230" y1="530"></svg:line><svg:rect width="88" height="30" y="600" x="186"></svg:rect><svg:text y="615" x="230">((\p -&gt; p) z)</svg:text><svg:line x2="230" y2="700" x1="230" y1="630"></svg:line><svg:rect width="16" height="30" y="700" x="222"></svg:rect><svg:text y="715" x="230">z</svg:text><svg:line x2="366" y2="100" x1="209" y1="30"></svg:line><svg:rect width="22" height="30" y="100" x="355"></svg:rect><svg:text y="115" x="366">id</svg:text><svg:line x2="366" y2="200" x1="366" y1="130"></svg:line><svg:rect width="64" height="30" y="200" x="334"></svg:rect><svg:text y="215" x="366">(\x -&gt; x)</svg:text><svg:line x2="366" y2="300" x1="366" y1="230"></svg:line><svg:rect width="16" height="30" y="300" x="358"></svg:rect><svg:text y="315" x="366">x</svg:text>
+    <svg:path d="M 40, 515 C 0, 515 0, 115 104, 115" style="stroke:black;"></svg:path>
+    </svg:svg>
