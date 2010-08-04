@@ -1,4 +1,4 @@
--- all except naive are good
+-- bad: naive
 
 data Nat = Z | S Nat;
 data Boolean = False | True;

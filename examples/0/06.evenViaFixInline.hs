@@ -1,4 +1,4 @@
-
+-- good: HOSC, transient
 
 data Nat = Z | S Nat;
 data Boolean = False | True;

@@ -1,8 +1,4 @@
-{--
-"Good" residual program should return True only.
-
-All except naive is good.
---}
+-- bad: naive
 
 data Nat = Z | S Nat;
 data Boolean = False | True;

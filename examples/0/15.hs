@@ -1,3 +1,5 @@
+-- good: HOSC
+
 data List a = Nil | Cons a (List a);
 
 map f (iterate f x) where

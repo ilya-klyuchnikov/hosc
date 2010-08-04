@@ -15,7 +15,7 @@ map = \f xs ->
         };
     
 zip = \p -> case p of {
-P xs ys ->
+   P xs ys ->
         case xs of {
                 Nil -> Nil;
                 Cons x1 xs1 -> 

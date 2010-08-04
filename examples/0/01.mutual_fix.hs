@@ -1,4 +1,4 @@
--- All except HOSC produces bad results!
+-- good: HOSC
 
 data Input = A Input | B Input;
 data Pair a b = P a b;

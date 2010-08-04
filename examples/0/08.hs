@@ -1,3 +1,5 @@
+-- bad: naive
+
 data List a = Nil | Cons a (List a);
 data Nat = Z | S Nat;
 
