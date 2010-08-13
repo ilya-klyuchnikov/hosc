@@ -1,11 +1,10 @@
 -- good: HOSC, NaiveWithCC
 
-data Bool = True | False;
 data Nat = Z | S Nat;
 
-fix (\x -> natS x)
+fix (\x -> s x)
 
 where
 
 fix = \f -> f (fix f);
-natS = \n -> S n;
+s = \n -> S n;
