@@ -4,6 +4,7 @@ object Examples {
   val supercompilers: List[SuperCompilerFacade] = List(
     HOSC15,
     NaiveSuperCompiler,
+    NaiveSuperCompilerWithCoupling,
     NaiveSuperCompilerWithControl,
     NaiveSuperCompilerWithControlAndCoupling,
     NaiveSuperCompilerTransientAware)
