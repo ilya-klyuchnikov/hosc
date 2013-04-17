@@ -8,7 +8,7 @@ import hosc.CodeConstructor
 import hosc.Eq
 
 object RegExpTester {
-  lazy val program = TUtils.programResultFromFile("re/regexp2.hs").get
+  lazy val program = TUtils.programResultFromFile("examples/re/regexp2.hs").get
  
   def superCompile(goal: Expression) = {
     val sc = new SuperCompiler0(program)
@@ -76,20 +76,24 @@ object RegExpTester {
   def main(args: Array[String]): Unit = {
     //println(testEq("a", "b", 0, false))
     checkRegexps("(rep a)", "(rep (rep a))")
-   
+
+
     checkRegexps("(or nil (rep a))", "(rep a)")
-    
+
+
     // 6 (a*b)*a* == a*(ba*)*
     checkRegexps("(concat (rep (concat (rep a) b)) (rep a))", 
                  "(concat (rep a) (rep (concat b (rep a))))")
-    
+
     // 7 (a+b)* == (a*b*)*
     checkRegexps("(rep (or a b))", 
                  "(rep (concat (rep a) (rep b)))")
-    
+
+
+    // slow
     // 9 (a|b) (a*b*)* = (a*b*)*(a|b)
-    checkRegexps("(concat (or a b) (rep (concat (rep a) (rep b))))", 
-                 "(concat (rep (concat (rep a) (rep b))) (or a b))")
-    
+    //checkRegexps("(concat (or a b) (rep (concat (rep a) (rep b))))",
+    //             "(concat (rep (concat (rep a) (rep b))) (or a b))")
+
   }
 }

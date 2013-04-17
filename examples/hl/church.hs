@@ -2,7 +2,7 @@
 data Nat = Z | S Nat;
 data Boolean = False | True;
 
---eq (add (unchurch x) (unchurch y)) (unchurch (churchAdd y x))
+eq (add (unchurch x) (unchurch y)) (unchurch (churchAdd y x))
 
 --eq (unchurch (churchAdd x x)) (add (unchurch x) (unchurch x))
 

@@ -5,19 +5,34 @@ import hosc.exp.{FullPositiveSuperCompilerApp => FPSC}
 
 object HigherLevelExamples {
   def main(args : Array[String]) : Unit = {
-    //HLSC.main(Array("-si", "hl/or_even_odd.hs", "-t", "hl/out/or_even_odd.svg","-p", "hl/out/or_even_odd.hs"))
-    //HLSC.main(Array("-si", "hl/even_doubleAcc.hs", "-t", "hl/out/even_doubleAcc.svg","-p", "hl/out/even_doubleAcc.hs"))
-    //HLSC.main(Array("-si", "hl/and_even_odd.hs", "-t", "hl/out/and_even_odd.svg","-p", "hl/out/and_even_odd.hs"))
-    //HLSC.main(Array("-si", "hl/even_plus_xx.hs", "-t", "hl/out/even_plus_xx.svg","-p", "hl/out/even_plus_xx.hs"))
-    //HLSC.main(Array("-si", "hl/add_x_x.hs", "-t", "hl/out/add_x_x.svg","-p", "hl/out/add_x_x.hs"))
-    //HLSC.main(Array("-si", "hl/eqnum.hs", "-t", "hl/out/eqnum.svg","-p", "hl/out/eqnum.hs"))
-    
-    //HLSC.main(Array("-si", "hl/app_rev.hs", "-t", "hl/out/app_rev.svg","-p", "hl/out/app_rev.hs"))
-    //FPSC.main(Array("-si", "hl/church.hs", "-t", "hl/out/church.svg","-p", "hl/out/church.hs"))
-    //HLSC.main(Array("-si", "hl/tree_flatten.hs", "-t", "hl/out/tree_flatten.svg","-p", "hl/out/tree_flatten.hs"))
-    //HLSC.main(Array("-si", "hl/eq_tree_leaves.hs", "-t", "hl/out/eq_tree_leaves.svg","-p", "hl/out/eq_tree_leaves.hs"))
-    //HLSC.main(Array("-si", "hl/eq_tree.hs", "-t", "hl/out/eq_tree.svg","-p", "hl/out/eq_tree.hs"))
-    //HLSC.main(Array("-si", "hl/rev_map.hs", "-t", "hl/out/rev_map.svg","-p", "hl/out/rev_map.hs"))
+    // 6 sec
+    HLSC.main(Array("-si", "examples/hl/or_even_odd.hs", "-t", "out/hl/or_even_odd.svg","-p", "out/hl/or_even_odd.hs"))
+    // 92 sec
+    //HLSC.main(Array("-si", "examples/hl/even_doubleAcc.hs", "-t", "out/hl/even_doubleAcc.svg","-p", "out/hl/even_doubleAcc.hs"))
+    // 8 sec
+    HLSC.main(Array("-si", "examples/hl/and_even_odd.hs", "-t", "out/hl/and_even_odd.svg","-p", "out/hl/and_even_odd.hs"))
+    // 4 sec
+    HLSC.main(Array("-si", "examples/hl/even_plus_xx.hs", "-t", "out/hl/even_plus_xx.svg","-p", "out/hl/even_plus_xx.hs"))
+    // 5 sec
+    HLSC.main(Array("-si", "examples/hl/add_x_x.hs", "-t", "out/hl/add_x_x.svg","-p", "out/hl/add_x_x.hs"))
+    // 142 sec
+    //HLSC.main(Array("-si", "examples/hl/eqnum.hs", "-t", "out/hl/eqnum.svg","-p", "out/hl/eqnum.hs"))
+
+    // very slow - do not run
+    //HLSC.main(Array("-si", "examples/hl/app_rev.hs", "-t", "out/hl/app_rev.svg","-p", "out/hl/app_rev.hs"))
+
+    // fast
+    FPSC.main(Array("-si", "examples/hl/church.hs", "-t", "out/hl/church.svg","-p", "out/hl/church.hs"))
+
+    // very slow
+    //HLSC.main(Array("-si", "examples/hl/tree_flatten.hs", "-t", "out/hl/tree_flatten.svg", "-p", "out/hl/tree_flatten.hs"))
+
+    // very slow
+    //HLSC.main(Array("-si", "examples/hl/eq_tree_leaves.hs", "-t", "out/hl/eq_tree_leaves.svg","-p", "out/hl/eq_tree_leaves.hs"))
+    // very slow
+    //HLSC.main(Array("-si", "examples/hl/eq_tree.hs", "-t", "out/hl/eq_tree.svg","-p", "out/hl/eq_tree.hs"))
+    // fast
+    HLSC.main(Array("-si", "examples/hl/rev_map.hs", "-t", "out/hl/rev_map.svg","-p", "out/hl/rev_map.hs"))
 
   }
 }

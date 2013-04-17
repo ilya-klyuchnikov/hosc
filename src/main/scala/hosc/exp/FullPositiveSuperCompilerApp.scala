@@ -47,6 +47,7 @@ object FullPositiveSuperCompilerApp {
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){
+      svgFile.getParentFile.mkdirs()
       svgFile.createNewFile()
     } 
     scala.xml.XML.save(outFileName, svg)

@@ -1,4 +1,6 @@
 .scala_dependencies
+.idea/
+.idea_modules/
 target/
 dump/
 out/
