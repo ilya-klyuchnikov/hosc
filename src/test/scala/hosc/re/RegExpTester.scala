@@ -72,7 +72,8 @@ object RegExpTester {
     println(eq)
     eq
   }
-  
+
+  // ~ 1min
   def main(args: Array[String]): Unit = {
     //println(testEq("a", "b", 0, false))
     checkRegexps("(rep a)", "(rep (rep a))")

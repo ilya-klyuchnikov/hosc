@@ -6,7 +6,7 @@ object LemmaExamples {
   def main(args : Array[String]) : Unit = {
     //step("hl/even_doubleAcc3.hs", "hl/even_doubleAcc4.hs")
     //step("hl/rev2.hs", "hl/rev1.hs")
-    step("spec_fhl/lemma1_1.hs", "spec_fhl/lemma1_2.hs")
+    step("examples/spec_fhl/lemma1_1.hs", "examples/spec_fhl/lemma1_2.hs")
   }
   
   def step(f1: String, f2: String) : Unit = {

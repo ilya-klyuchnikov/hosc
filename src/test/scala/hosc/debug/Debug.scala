@@ -15,6 +15,6 @@ object Debug {
 	//SCP.main(Array("-si", "debug/explode2.hs", "-t", "debug/explode2.svg","-p", "debug/explode2.out.hs"))
     //SCP.main(Array("-si", "debug/explode3.hs", "-t", "debug/explode3.svg","-p", "debug/explode3.out.hs"))
     //SCP.main(Array("-si", "debug/explode4.hs", "-t", "debug/explode4.svg","-p", "debug/explode4.out.hs"))
-	SCP.main(Array("-si", "debug/add_machine.hs", "-t", "debug/am.svg","-p", "debug/am.out.hs"))
+	  SCP.main(Array("-si", "examples/debug/add_machine.hs", "-t", "out/debug/am.svg","-p", "out/debug/am.out.hs"))
   }
 }

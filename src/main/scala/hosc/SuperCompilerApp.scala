@@ -45,6 +45,7 @@ object SuperCompilerApp {
     
     val svgFile = new java.io.File(outFileName)
     if (!svgFile.exists){
+      svgFile.getParentFile.mkdirs()
       svgFile.createNewFile()
     } 
     scala.xml.XML.save(outFileName, svg)
@@ -54,6 +55,7 @@ object SuperCompilerApp {
     val doc = p.toDoc
     val slFile = new java.io.File(outProgramFileName)
     if (!slFile.exists){
+      slFile.getParentFile.mkdirs()
       slFile.createNewFile()
     }
     val fw = new FileWriter(slFile);

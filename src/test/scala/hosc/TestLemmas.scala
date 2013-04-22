@@ -6,8 +6,9 @@ import LangUtils._
 import hosc.lemmas.LemmaGenerator
 
 object Lemmas {
+  // ~ 40sec
   def main(args : Array[String]) : Unit = {
-    val p = programFromFile("sc/lemmas.hs");
+    val p = programFromFile("examples/sc/lemmas.hs");
     val lg = LemmaGenerator(p)
     val vrbs = List("f") map {Variable(_)}
     lg.genAllExprs(4, vrbs)
