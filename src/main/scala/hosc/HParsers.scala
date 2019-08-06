@@ -96,8 +96,8 @@ class HLexical extends StdLexical with HTokens {
 
   protected def processLIdent(name: String) = if (reserved contains name) Keyword(name) else LIdentifier(name)
   protected def processUIdent(name: String) = if (reserved contains name) Keyword(name) else UIdentifier(name)
-  def upperCaseLetter = elem("upper-case-letter", _.isUpperCase)
-  def lowerCaseLetter = elem("lower-case-letter", _.isLowerCase)
+  def upperCaseLetter = elem("upper-case-letter", _.isUpper)
+  def lowerCaseLetter = elem("lower-case-letter", _.isLower)
 
     // see `whitespace in `Scanners'
   override def whitespace: Parser[Any] = rep(
