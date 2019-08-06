@@ -12,8 +12,8 @@ case class GeneralizedExpression(exp: Expression, subst: Map[Variable, Expressio
  */
 object AdvancedExpressionGenerator {
 	def generate(exp: Expression) = subGenerate(exp, Set(), Map())
- 
-	private def subGenerate(expr: Expression, boundVars: Set[Variable], subst: Map[Variable, Expression]): List[GeneralizedExpression] = 
+
+	private def subGenerate(expr: Expression, boundVars: Set[Variable], subst: Map[Variable, Expression]): List[GeneralizedExpression] =
     expr match {
 	  case v: Variable => {
 	    if (boundVars(v)) {
@@ -34,7 +34,7 @@ object AdvancedExpressionGenerator {
         }
         val start: List[List[GeneralizedExpression]] = List(Nil)
         val argsGen = args.map{subGenerate(_, boundVars, subst)}
-        val argsLists = argsGen.foldRight(start){(xxx, res) => List.flatten(xxx map {a => res map {a :: _}})}
+        val argsLists = argsGen.foldRight(start){(xxx, res) => (xxx map {a => res map {a :: _}}).flatten}
         val res1 = argsLists map { args =>
           val resSubst = args.foldRight(subst){(genExpr, s) => s ++ genExpr.subst}
           val consArgs = args.map{_.exp}
@@ -63,7 +63,7 @@ object AdvancedExpressionGenerator {
           val branches = (bs zip branchList) map {case (b, ge) => Branch(b.pattern, ge.exp)}
           selGs map {selG => GeneralizedExpression(CaseExpression(selG.exp, branches), mSubst ++ selG.subst)}
         }
-        val res2 = List.flatten(res1)
+        val res2 = res1.flatten
         if (me != null) {
           me :: res2
         } else {
