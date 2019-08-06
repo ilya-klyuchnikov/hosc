@@ -6,24 +6,24 @@ import HLanguage._
 import HParsers._
 
 object Validator {
-  case class ValidatorError(error: HError) extends Exception(error.toString) {}
+  case class ValidatorError(error: Error) extends Exception(error.toString) {}
   def validate(s: Success[Program]): ParseResult[Program] =  {
     val p = s.get
     var typeNames = Set[String]()
     var dataConNames = Set[String]()
     var fNames = Set[String]()
     val fNamesInDefs = Set.empty[String] ++ (p.fs map (_.name))
-    
+
     def valTD(td: TypeDefinition) = {
       var tvs = Set.empty[TypeVariable]
       var tvsUsed = Set.empty[TypeVariable]
-      
+
       def valTypeUsage(t: Type, allowFreeVars: Boolean): Unit = t match {
         case tv: TypeVariable => {
           if (!allowFreeVars && !(tvs contains tv)) err("undefined var " + tv.name, tv)
           tvsUsed += tv
         }
-        case Arrow(t1, t2) => valTypeUsage(t1, allowFreeVars); valTypeUsage(t2, allowFreeVars); 
+        case Arrow(t1, t2) => valTypeUsage(t1, allowFreeVars); valTypeUsage(t2, allowFreeVars);
         case tc @ TypeConstructor(n, args) => {
           p.getTypeConstructorDefinition(n) match {
             case Some(td) => {
@@ -34,16 +34,16 @@ object Validator {
           }
         }
       }
-      
+
       def valDC(dc: DataConstructor) = {
         if (dataConNames contains dc.name) err("duplicate data constructor definition " + dc.name, dc)
         dataConNames += dc.name
         for (a <- dc.args) valTypeUsage(a, false)
       }
-      
+
       if (typeNames contains td.name) err("duplicate type name " + td.name, td)
       typeNames += td.name
-      
+
       td match {
         case tcd: TypeConstructorDefinition => {
           for (v <- tcd.args) {
@@ -55,16 +55,16 @@ object Validator {
             case Some(tv) => err("useless type variable " + tv.name, tv)
             case None =>
           }
-        } 
+        }
       }
-    }      
-    
+    }
+
     def valFD(f: Function) = {
       if (fNames contains f.name) err("duplicate function " + f.name, f)
       valTerm(fNamesInDefs, f.body, p)
     }
-    
-    try {     
+
+    try {
       for(td <- p.ts) valTD(td)
       for(f <- p.fs) valFD(f)
       valTermWithFreeVars(fNamesInDefs, p.goal, p)
@@ -73,13 +73,13 @@ object Validator {
       case ValidatorError(he) => he
     }
   }
-  
+
   private def err(msg: String, pos: Positional) = {
-    throw ValidatorError(error(msg, pos))
+    throw ValidatorError(error(msg))
   }
-  
+
   def valTerm(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
-    case v: Variable => 
+    case v: Variable =>
       if (!(boundedVars contains v.name)) err("unbounded variable " + v.name, v)
     case c: Constructor => {
       p.getDataConstructor(c.name) match {
@@ -99,7 +99,7 @@ object Validator {
     case let: LetExpression => err("unexpected let", let)
     case letrec: LetRecExpression => err("unexpected letrec", letrec)
   }
-  
+
   private def valCase(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
     valTerm(boundedVars, c.selector, p)
     if (c.branches.isEmpty) {
@@ -132,9 +132,9 @@ object Validator {
       }
     }
   }
-  
+
   def valTermWithFreeVars(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
-    case v: Variable => 
+    case v: Variable =>
     case c: Constructor => {
       p.getDataConstructor(c.name) match {
         case Some(dc) => {
@@ -149,7 +149,7 @@ object Validator {
       valTermWithFreeVars(boundedVars + l.v.name, l.t, p)
     }
     case a: Application => {
-      valTermWithFreeVars(boundedVars, a.head, p); 
+      valTermWithFreeVars(boundedVars, a.head, p);
       valTermWithFreeVars(boundedVars, a.arg, p);
     }
     case c: CaseExpression => valCaseWithFreeVars(boundedVars, c, p)
@@ -159,7 +159,7 @@ object Validator {
     }
     case let: LetExpression => err("unexpected let-expression", let)
   }
-  
+
   private def valCaseWithFreeVars(boundedVars: Set[String], c: CaseExpression, p: Program): Unit = {
     valTermWithFreeVars(boundedVars, c.selector, p);
     if (c.branches.isEmpty) {
@@ -193,5 +193,5 @@ object Validator {
       }
     }
   }
-  
+
 }

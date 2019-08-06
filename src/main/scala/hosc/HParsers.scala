@@ -71,15 +71,6 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
     }
     LambdaAbstraction(vs.head, desugarLambda_(vs.tail))
   }
-
-  /* customized error: validation error */
-  case class HError(override val msg: String, val pos: Positional) extends Error(msg, null) {
-    override def toString = "[" + pos.pos +"] error: " + msg + "\n\n" + pos.pos.longString
-  }
-
-  def error(msg: String, pos: Positional) = {
-    lastNoSuccess = null; val e = HError(msg, pos);  lastNoSuccess = null; e
-  }
 }
 
 trait HTokens extends StdTokens {
