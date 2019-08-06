@@ -35,7 +35,7 @@ case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
   def value(tv: TypeVariable) = map(tv)
   def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv(map + {(tv, ts)})
   def install(tvs: List[(TypeVariable, TypeScheme)]) = TypeEnv(map ++ tvs)
-  def nonGenericVars = map.values.toList flatMap {_.nonGenericVars} removeDuplicates
+  def nonGenericVars = map.values.toList flatMap {_.nonGenericVars} distinct
   def sub(s: Subst) = TypeEnv(map transform {(k, v) => v.sub(s)})
 }
 
