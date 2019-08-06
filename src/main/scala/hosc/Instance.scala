@@ -7,7 +7,7 @@ object Instance {
   def findSubst(expr1: Expression, expr2: Expression): Map[Variable, Expression] = {
     val map = scala.collection.mutable.Map[Variable, Expression]()
     def walk(e1: Expression, e2: Expression, binders: List[(Variable, Variable)]): Boolean = (e1, e2) match {
-      case (v1: Variable, _) => { 
+      case (v1: Variable, _) => {
         // 1. e1 is bound => e1 == e2
         val bs = binders find {case (b1, b2) => b1 == v1}
         bs match {
@@ -36,8 +36,8 @@ object Instance {
       case (LambdaAbstraction(v1, b1), LambdaAbstraction(v2, b2)) =>
         walk(b1, b2, (v1, v2) :: binders)
       case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) if bs1.size == bs2.size =>
-        val bs1s = bs1 sort TermAlgebra.compareB
-        val bs2s = bs2 sort TermAlgebra.compareB
+        val bs1s = bs1 sortWith TermAlgebra.compareB
+        val bs2s = bs2 sortWith TermAlgebra.compareB
         walk(sel1, sel2, binders) &&
           List.forall2(bs1s, bs2s){(b1, b2) =>
             b1.pattern.name == b2.pattern.name && walk(b1.term, b2.term, (b1.pattern.args zip b2.pattern.args) ::: binders)
@@ -47,11 +47,11 @@ object Instance {
       case _ => false
     }
     if (walk(expr1, expr2, Nil)) {
-      Map(map.toList:_*).filter{case (k, v) => k != v} 
+      Map(map.toList:_*).filter{case (k, v) => k != v}
     } else {
       null
     }
   }
-  
+
   def instanceOf(e1: Expression, e2: Expression) = findSubst(e1, e2) != null
 }

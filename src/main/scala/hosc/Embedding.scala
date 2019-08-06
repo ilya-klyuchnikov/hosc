@@ -36,8 +36,8 @@ object EmbeddingNaiveBinary extends Embedding {
       he(head1, head2) && he(arg1, arg2)
 
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
-      val bs1_ = bs1 sort compareB
-      val bs2_ = bs2 sort compareB
+      val bs1_ = bs1 sortWith compareB
+      val bs2_ = bs2 sortWith compareB
       val samePatterns = (bs1_ map (_.pattern.name)) == (bs2_ map (_.pattern.name))
       samePatterns && he(sel1, sel2) &&
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && he(bs._1.term, bs._2.term)))

@@ -11,7 +11,7 @@ object HE0 {
   def strictHe(term1: Expression, term2: Expression) = heByDiving(term1, term2)
 
   def he(term1: Expression, term2: Expression): Boolean =
-    heByCoupling(term1, term2) || heByDiving(term1, term2) 
+    heByCoupling(term1, term2) || heByDiving(term1, term2)
 
   private def heByDiving(term1: Expression, term2: Expression): Boolean = term2 match {
     case Constructor(_, args) => args exists (he(term1, _))
@@ -32,8 +32,8 @@ object HE0 {
       line1.length == line2.length && ((line1 zip line2) forall (args => he(args._1, args._2)))
     }
     case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) => {
-      val bs1_ = bs1 sort compareB
-      val bs2_ = bs2 sort compareB
+      val bs1_ = bs1 sortWith compareB
+      val bs2_ = bs2 sortWith compareB
       val samePatterns = (bs1_ map (_.pattern.name)) == (bs2_ map (_.pattern.name))
       samePatterns && he(sel1, sel2) &&
         ((bs1_ zip bs2_) forall (bs => bs._1.pattern.name == bs._2.pattern.name && he(bs._1.term, bs._2.term)))
