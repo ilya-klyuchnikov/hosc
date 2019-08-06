@@ -97,7 +97,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   // in expression generator
   private def checkContext(te: TypeEnv, expr: Expression): TypeEnv = expr match {
     case LetExpression(bs, e0) => {
-      val (fs, bodies) = List.unzip(bs)
+      val (fs, bodies) = bs.unzip
       val f_types = fs map {x => TypeVariable(x.name)}
       val (sub1, type1s) = check(te, bodies)
       // check []
@@ -105,7 +105,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       checkContext(te1, e0)
     }
     case LetRecExpression(bs, e0) => {
-      val (fs, bodies) = List.unzip(bs)
+      val (fs, bodies) = bs.unzip
       val funTypes = fs map {x => TypeVariable(x.name)}
       val schemes = fs map {x => TypeScheme(Nil, newTyvar)}
       val te1 = TypeEnv(te.map ++ (funTypes zip schemes))
@@ -146,7 +146,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       (sub2, TypeConstructor(conDef.name, typeParams map (sub2 compose freshSub)))
     }
     case LetExpression(bs, expr) => {
-      val (fs, bodies) = List.unzip(bs)
+      val (fs, bodies) = bs.unzip
       val f_types = fs map {x => TypeVariable(x.name)}
       val (sub1, type1s) = check(te, bodies)
       val te1 = extend(te.sub(sub1), f_types, type1s)
@@ -154,7 +154,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       (sub1 compose sub2, type2)
     }
     case LetRecExpression(bs, expr) => {
-      val (fs, bodies) = List.unzip(bs)
+      val (fs, bodies) = bs.unzip
       val funTypes = fs map {x => TypeVariable(x.name)}
 
       // Hindley-Milner: letrecs are monomorphic in their own bodies
