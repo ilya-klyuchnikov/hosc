@@ -13,21 +13,21 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
   var info = false
   var useControl = true
   var renameVars = true
-  
+
   def buildProcessTree(e: Expression): ProcessTree = {
     val p = ProcessTree(e)
     if (debug) {
       println(program.toDocString)
     }
     while (!p.isClosed) {
-      if (debug) { 
+      if (debug) {
         println(p)
         println("==========")
       }
       val beta = p.leafs.find(!_.isProcessed).get
       step(p, beta)
     }
-    val res = 
+    val res =
     if (renameVars) {
       renameVars(p)
     } else {
@@ -38,14 +38,14 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     }
     res
   }
-  
+
   def step(p: ProcessTree, beta: Node): Unit = {
       val bExpr = beta.expr
       beta.expr match {
         case LetExpression(_, _) => drive(p, beta)
         case bTerm => {
           beta.ancestors find equivalenceTest(beta) match {
-            case Some(alpha) => { 
+            case Some(alpha) => {
               beta.repeatedOf = alpha
               if (info) {
               		println("==========RENAMING")
@@ -65,9 +65,9 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
                     println("==========")
                   }
                   abstractDown(p, alpha, beta)
-                  
+
                 }
-                case None => { 
+                case None => {
                   beta.ancestors find heByCouplingTest(beta) match {
                     case Some(alpha) => {
                       if (info) {
@@ -87,37 +87,37 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
             }
           }
         }
-      }    
+      }
   }
-  
+
   private def instanceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => eligibleForInstance(bNode.expr) && Instance.instanceOf(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
-  
+
   private def equivalenceTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => eligibleForFold(bNode.expr) && equivalent(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
-  
+
   protected def heByCouplingTest(bNode: Node)(aNode: Node): Boolean = aNode.expr match {
     case LetExpression(_, _) => false
     case aTerm => eligibleForWhistle(bNode.expr) && sameRedex(aNode.expr, bNode.expr) && HE.heByCoupling(aTerm, bNode.expr) && checkControl(aNode, bNode)
   }
-  
+
   // non-trivial expression
   def canBeEnhanced_?(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
     //case ObservableVarApp(_, _) => true
     //case Context(RedexNestedCase(_, _)) => true
-    
+
     case Context(RedexLamApp(lam, app)) => {
       val sizeBefore = TermAlgebra.size(app)
       val sizeAfter = TermAlgebra.size(TermAlgebra.applySubstitution(lam.t, Map(lam.v -> app.arg)))
       sizeBefore <= sizeAfter
     }
-    
+
     /*
     case Context(RedexCaseCon(c, ce)) => {
       ce.branches.find(_.pattern.name == c.name) match {
@@ -133,20 +133,20 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
      */
     case _ => false
   }
-  
+
   def eligibleForFold(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
-    case Context(RedexCaseVar(_, _)) => true 
+    case Context(RedexCaseVar(_, _)) => true
     case Context(RedexLamApp(lam, app)) => true
     case Context(RedexCaseCon(_, _)) => true
     case _ => false
   }
-  
+
   def sameRedex(t1: Expression, t2: Expression): Boolean = (decompose(t1), decompose(t2)) match {
     case (Context(redex1), Context(redex2)) => redex1.getClass == redex2.getClass
     case _ => false
   }
-  
+
   def eligibleForInstance(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
@@ -154,14 +154,14 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     case Context(RedexCaseCon(_, _)) => true
     case _ => false
   }
-  
+
   def eligibleForWhistle(t: Expression) = decompose(t) match {
     case Context(RedexCall(_)) => true
     case Context(RedexCaseVar(_, _)) => true
     case Context(RedexCaseCon(_, _)) => true
     case _ => false
   }
-  
+
   protected def checkControl(aNode: Node, bNode: Node): Boolean = {
     if (!useControl) {
       return true
@@ -177,14 +177,14 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
       false
     }
   }
-  
+
   def drive(t: ProcessTree, n: Node): Unit = {
     driveExp(n.expr) match {
       case Some(es) => t.addChildren(n, es)
       case None => processMissingMatch(t, n)
     }
   }
-  
+
   def processMissingMatch(t: ProcessTree, n: Node): Unit = {
     if (debug) {
     	println("propagating match error...")
@@ -192,10 +192,10 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     }
     val Context(RedexCaseCon(_, CaseExpression(sel, _))) = decompose(n.expr)
     val newExp = CaseExpression(sel, Nil)
-    t.replace(n, newExp) 
+    t.replace(n, newExp)
     return
-    val ancs = n.ancestors 
-    
+    val ancs = n.ancestors
+
     (ancs takeWhile reducable) find isGlobal match {
       case Some(globalNode) => {
         // finding corresponding globalNode
@@ -204,7 +204,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
         val missingChildNode = globalNode.children.find{(n:: ancs).contains(_)}.get
         // finding branch with 'missing' pattern
         val (missingBranch, _) = bs.zip(globalNode.children.tail).find{case (b, childNode) => childNode == missingChildNode}.get
-        val newBs = bs remove {_ == missingBranch}
+        val newBs = bs filterNot {_ == missingBranch}
         val newCaseExp = CaseExpression(sel, newBs)
         val newExpr = con.replaceHole(newCaseExp)
         //println("was:")
@@ -214,14 +214,14 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
         t.replace(globalNode, newExpr)
       }
       case None => {
-        // no proparagition to top is possible 
+        // no proparagition to top is possible
         // removing all patterns from the current node - it becomes complete one
         val CaseExpression(sel, _) = n.expr
         t.replace(n, CaseExpression(sel, Nil))
       }
     }
   }
-  
+
   def reducable(n: Node) = n.expr match {
     case le: LetExpression => false
     case c: Constructor => false
@@ -229,7 +229,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     case lambda: LambdaAbstraction => false
     case _ => true
   }
-  
+
   def isGlobal(n: Node): Boolean = n.expr match {
     case LetExpression(_, _) => false
     case e => decompose(e) match {
@@ -237,7 +237,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
       case _ => false
     }
   }
-  
+
   def abstractDown(t: ProcessTree, up: Node, down: Node): Unit = {
     val a = up.expr
     val b = down.expr
@@ -247,7 +247,7 @@ class SuperCompiler0(val program: Program) extends ASupercompiler with ProcessTr
     val sub1 = (sub map {case (k, v) => (keyMap(k), v)}).toList
     t.replace(down, LetExpression(sub1, eg))
   }
-  
+
   def abstractUp(t: ProcessTree, up: Node, down: Node): Unit = {
     val upTerm = up.expr
     val downTerm = down.expr

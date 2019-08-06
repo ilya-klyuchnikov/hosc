@@ -153,7 +153,7 @@ object GraphAnalysis {
       case Nil => Nil;
       case _ => {
         val ind = findIndependentComponent(components)
-        val others = components remove {_ == ind}
+        val others = components filterNot {_ == ind}
         ind :: topologicalSort(others, g)
       }
     }
