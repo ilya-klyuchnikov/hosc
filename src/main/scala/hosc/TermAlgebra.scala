@@ -104,7 +104,7 @@ object TermAlgebra {
   def getFreeVars(t: Expression): List[Variable] = t match {
     case v: Variable => if (v.global) List() else List(v)
     case Constructor(_, args) => (List[Variable]() /: args) {(vs, exp) =>  vs ++ (getFreeVars(exp) -- vs)}
-    case LambdaAbstraction(x, term) => getFreeVars(term) - x
+    case LambdaAbstraction(x, term) => getFreeVars(term).filterNot(_ == x)
     case Application(head, arg) => {
       val headVars = getFreeVars(head)
       headVars ++ (getFreeVars(arg) -- headVars)
