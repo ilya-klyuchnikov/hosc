@@ -17,7 +17,7 @@ object Eq {
           case _ => false
         }
       case (Constructor(name1, args1), Constructor(name2, args2)) =>
-        name1 == name2 && List.forall2(args1, args2)(eq1(_, _, bv1, bv2))
+        name1 == name2 && (args1, args2).zipped.forall(eq1(_, _, bv1, bv2))
       case (Application(h1, a1), Application(h2, a2)) =>
         eq1(h1, h2, bv1, bv2) && eq1(a1, a2, bv1, bv2)
       case (LambdaAbstraction(v1, b1), LambdaAbstraction(v2, b2)) =>
@@ -27,8 +27,8 @@ object Eq {
         val bs2s = bs2 sortWith compareB1
         bs1s(0).pattern.name == bs2s(0).pattern.name &&
           eq1(sel1, sel2, bv1, bv2) &&
-            List.forall2(bs1s, bs2s){
-              (b1, b2) => List.forall2(b1.pattern.args, b2.pattern.args)((x, y) => eq1(x, y, bv1 + x, bv2 + y)) &&
+            (bs1s, bs2s).zipped.forall {
+              (b1, b2) => (b1.pattern.args, b2.pattern.args).zipped.forall((x, y) => eq1(x, y, bv1 + x, bv2 + y)) &&
                 eq1(b1.term, b2.term, bv1 ++ b1.pattern.args, bv2 ++ b2.pattern.args)
             }
       }

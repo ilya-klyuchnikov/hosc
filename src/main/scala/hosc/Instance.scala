@@ -30,7 +30,7 @@ object Instance {
         }
       }
       case (Constructor(n1, args1), Constructor(n2, args2)) if n1 == n2 =>
-        List.forall2(args1, args2)(walk(_, _,binders))
+        (args1, args2).zipped.forall(walk(_, _,binders))
       case (Application(h1, a1), Application(h2, a2)) =>
         walk(h1, h2, binders) && walk(a1, a2, binders)
       case (LambdaAbstraction(v1, b1), LambdaAbstraction(v2, b2)) =>
@@ -39,7 +39,7 @@ object Instance {
         val bs1s = bs1 sortWith TermAlgebra.compareB
         val bs2s = bs2 sortWith TermAlgebra.compareB
         walk(sel1, sel2, binders) &&
-          List.forall2(bs1s, bs2s){(b1, b2) =>
+          (bs1s, bs2s).zipped.forall{(b1, b2) =>
             b1.pattern.name == b2.pattern.name && walk(b1.term, b2.term, (b1.pattern.args zip b2.pattern.args) ::: binders)
           }
       case (LetRecExpression((f, e11), e21), LetRecExpression((g, e12), e22)) =>
