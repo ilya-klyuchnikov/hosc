@@ -22,14 +22,16 @@ object TermAlgebra {
   case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
   case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
 
-  abstract case class NonTrivialRedex(term: Expression) extends Redex(term)
+  abstract class NonTrivialRedex(term: Expression) extends Redex(term)
   case class RedexCall(f: Variable) extends NonTrivialRedex(f)
   // global control - of certain interest!
   case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
 
-  // TODO: remove case -> make Context Object!
-  sealed abstract case class Context(val redex: Redex) extends ExpressionDecomposition {
+  sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
     def replaceHole(t: Expression): Expression
+  }
+  object Context {
+    def unapply(ctx: Context): Option[Redex] = Some(ctx.redex)
   }
   // <>
   case class ContextHole(override val redex: Redex) extends Context(redex) {
