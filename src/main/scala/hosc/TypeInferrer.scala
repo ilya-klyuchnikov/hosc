@@ -25,7 +25,7 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
     else new Subst(Map(x -> t)) compose this
 }
 
-case class TypeScheme(genericVars: List[TypeVariable], t: Type) {
+case class TypeScheme(private val genericVars: List[TypeVariable], t: Type) {
   def newInstance: Type =
     new Subst(Map(genericVars.map((_, newTyvar())):_*))(t)
   def nonGenericVars: List[TypeVariable] =
@@ -109,8 +109,10 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       val (fs, bodies) = bs.unzip
       val fTypes = fs map {x => TypeVariable(x.name)}
 
+      // check bodies
       val (sub1, type1s) = check(te, bodies)
       val te1 = extend(te.sub(sub1), fTypes, type1s)
+
       val (sub2, type2) = check(te1, expr)
       (sub1 compose sub2, type2)
     case LetRecExpression(bs, expr) =>
@@ -120,18 +122,17 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       // Hindley-Milner: letrecs are monomorphic in their own bodies
       val schemes = fs map {_ => TypeScheme(Nil, newTyvar())}
 
-      // step 1a: check bodies in extended environment
-      val te1 = TypeEnv(te.map ++ (fTypes zip schemes))
-      val (sub1, type1s) = check(te1, bodies)
-      // step 1b:
+      // step 1a: check RHSs in extended environment
+      val te1a = TypeEnv(te.map ++ (fTypes zip schemes))
+      val (sub1, type1s) = check(te1a, bodies)
+      // step 1b: the types of RHSs should be unified with the types of LHSs
       val l_types = schemes map {_.sub(sub1).t}
-      val sub2 = mgu(l_types zip type1s, sub1)
+      val sub1b = mgu(l_types zip type1s, sub1)
+      val te1b = extend(te.sub(sub1b), fTypes, l_types map sub1b)
 
       // step 2: check 'in' expression
-      val te2 = extend(te.sub(sub2), fTypes, l_types map sub2)
-      val (sub3, type3) = check(te2, expr)
-
-      (sub2 compose sub3, type3)
+      val (sub3, type3) = check(te1b, expr)
+      (sub1b compose sub3, type3)
     case CaseExpression(selector, branches) =>
       val (sub1, type1s) = checkB(te, branches)
       val tv = newTyvar()
