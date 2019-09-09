@@ -37,11 +37,6 @@ object EnrichedLambdaCalculus {
      def toDoc = group( group("case " :/: selector.toDoc :/: " of {" :: ED) :: 
        nest(2, branches.foldRight(ED){(b, y) => ED :/: b.toDoc :: y}) :/: "}" :: ED)
    }
-   case class Choice(e1: Expression, e2: Expression) extends Expression {
-     type termType = Expression
-     override def toString = "choice{" + e1 + "; " + e2 + ";}"
-     def toDoc = group("choice{" :: nest(2, e1.toDoc :/: ";" :/: e2.toDoc :: ";" :: ED) :: "}" :: ED)
-   }
    case class LetExpression(bs: List[(Variable, Expression)], expr: Expression) extends Expression {
      override def toString = "let " + (bs map {p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr 
      def toDoc = group("let" :: 

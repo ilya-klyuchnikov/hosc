@@ -39,7 +39,6 @@ object TypeAlgebra {
       freeVars(head) ++ freeVars(arg)
     case CaseExpression(sel, bs) => 
       freeVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (freeVars(b.term) -- b.pattern.args)}
-    case Choice(e1, e2) => freeVars(e1) ++ freeVars(e2)
     case LetRecExpression(bs, expr) => 
       ((freeVars(expr) /: bs) {(vs, b) => vs ++ freeVars(b._2)}) -- (bs map {_._1})
     case LetExpression(bs, expr) => 
