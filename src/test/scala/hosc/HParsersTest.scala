@@ -210,13 +210,12 @@ class HParsersTest {
 
   def assertValidationError(fileName: String, msg: String)  = {
     println(fileName)
-    val r = TUtils.programResultFromFile("examples/" + fileName)
-    println(r)
-    assertFalse(msg, r.successful)
-    // r match {
-    //   case x : HParsers.HError => ()
-    //   case _ => fail("validation error is expected: " + msg)
-    // }
+    try {
+      TUtils.programResultFromFile("examples/" + fileName)
+      assertFalse(msg, true)
+    } catch {
+      case _: Throwable =>
+    }
   }
 
   def assertSyntaxError(fileName: String, msg: String)  = {
