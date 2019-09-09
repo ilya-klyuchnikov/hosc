@@ -18,7 +18,7 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
     case TypeConstructor(k, ts) => TypeConstructor(k, ts map this)
   }
 
-  def extend(x: TypeVariable, t: Type) =
+  def extend(x: TypeVariable, t: Type): Subst =
     if (x == t) this
     else if (tyvars(t) contains x)
       throw TypeError("recursive binding: " + x + " = " + t)
@@ -26,17 +26,21 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
 }
 
 case class TypeScheme(genericVars: List[TypeVariable], t: Type) {
-  def newInstance = (new Subst(Map(genericVars map {(_, newTyvar)}:_*))) (t)
-  def nonGenericVars = tyvars(t).filterNot(genericVars.contains)
+  def newInstance: Type = (new Subst(Map(genericVars map {(_, newTyvar())}:_*))) (t)
+  def nonGenericVars: List[TypeVariable] = tyvars(t).filterNot(genericVars.contains)
   def sub(sub: Subst) = TypeScheme(genericVars, (sub exclude genericVars) (t))
 }
 
 case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
-  def value(tv: TypeVariable) = map(tv)
-  def install(tv: TypeVariable, ts: TypeScheme) = TypeEnv(map + {(tv, ts)})
-  def install(tvs: List[(TypeVariable, TypeScheme)]) = TypeEnv(map ++ tvs)
-  def nonGenericVars = map.values.toList flatMap {_.nonGenericVars} distinct
-  def sub(s: Subst) = TypeEnv(map transform {(k, v) => v.sub(s)})
+  def value(tv: TypeVariable): TypeScheme =
+    map(tv)
+  def install(tv: TypeVariable, ts: TypeScheme) =
+    TypeEnv(map + {(tv, ts)})
+  def install(tvs: List[(TypeVariable, TypeScheme)]) =
+    TypeEnv(map ++ tvs)
+  def nonGenericVars: List[TypeVariable] =
+    map.values.toList.flatMap(_.nonGenericVars).distinct
+  def sub(s: Subst) = TypeEnv(map transform {(_, v) => v.sub(s)})
 }
 
 object TypeInferrer {
@@ -46,19 +50,19 @@ object TypeInferrer {
       s
     case (a:TypeVariable, _) if s(a) == a =>
       s.extend(a, s(u))
-    case (a:TypeVariable, _) =>
+    case (_:TypeVariable, _) =>
       mgu(s(t), s(u), s)
-    case (_, a:TypeVariable) =>
+    case (_, _:TypeVariable) =>
       mgu(u, t, s)
     case (Arrow(t1, t2), Arrow(u1, u2)) =>
       mgu(t1, u1, mgu(t2, u2, s))
     case (TypeConstructor(k1, ts), TypeConstructor(k2, us)) if (k1 == k2) =>
      mgu(ts zip us, s)
     case _ =>
-      throw new TypeError("cannot unify " + s(t) + " with " + s(u))
+      throw TypeError("cannot unify " + s(t) + " with " + s(u))
   }
 
-  private def mgu(ts: List[Pair[Type, Type]], s: Subst): Subst = {
+  private def mgu(ts: List[(Type, Type)], s: Subst): Subst = {
     (s /: ts) {case (s1, (t1, t2)) => mgu(t1, t2, s1)}
   }
 
@@ -70,7 +74,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   private val typeConstructorDefs = Map(typeDefs flatMap {td => td.cons map {_.name -> td} }:_*)
 
   def inferType(e: Expression): Type = {
-    val v2scheme = {v: Variable => TypeVariable(v.name) -> TypeScheme(Nil, newTyvar)}
+    val v2scheme = {v: Variable => TypeVariable(v.name) -> TypeScheme(Nil, newTyvar())}
     val te = TypeEnv(Map(freeVars(e).toList map v2scheme :_*))
     check(te, e)._2
   }
@@ -78,43 +82,40 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   private def check(te: TypeEnv, expr: Expression): (Subst, Type) = expr match {
     case Variable(name) =>
       (new Subst(), te.value(TypeVariable(name)).newInstance)
-    case Application(h, a) => {
+    case Application(h, a) =>
       val (sub1, List(type_h, type_a)) = check(te, List(h, a))
-      val genVar = newTyvar
+      val genVar = newTyvar()
       val sub2 = mgu(type_h, Arrow(type_a, genVar), sub1)
       (sub2, sub2(genVar))
-    }
     case LambdaAbstraction(v, body) => {
-      val genVar = newTyvar
+      val genVar = newTyvar()
       // Hindley-Milner: argument is monomorphic!
       val vScheme = TypeScheme(Nil, genVar)
       val extendedEnv = te.install(TypeVariable(v.name), vScheme)
       val (sub, type_body) = check(extendedEnv, body)
       (sub, Arrow(sub(genVar), type_body))
     }
-    case Constructor(name, args) => {
+    case Constructor(name, args) =>
       val (sub1, type1s) = check(te, args)
       val conDef = typeConstructorDefs(name)
       val typeParams = conDef.args
-      val freshSub = new Subst(Map(typeParams map {(_, newTyvar)}:_*))
+      val freshSub = new Subst(Map(typeParams map {(_, newTyvar())}:_*))
       val freshDataConArgs = dataConstructors(name).args map freshSub
       val sub2 = mgu(freshDataConArgs zip type1s, sub1)
       (sub2, TypeConstructor(conDef.name, typeParams map (sub2 compose freshSub)))
-    }
-    case LetExpression(bs, expr) => {
+    case LetExpression(bs, expr) =>
       val (fs, bodies) = bs.unzip
       val f_types = fs map {x => TypeVariable(x.name)}
       val (sub1, type1s) = check(te, bodies)
       val te1 = extend(te.sub(sub1), f_types, type1s)
       val (sub2, type2) = check(te1, expr)
       (sub1 compose sub2, type2)
-    }
-    case LetRecExpression(bs, expr) => {
+    case LetRecExpression(bs, expr) =>
       val (fs, bodies) = bs.unzip
       val funTypes = fs map {x => TypeVariable(x.name)}
 
       // Hindley-Milner: letrecs are monomorphic in their own bodies
-      val schemes = fs map {x => TypeScheme(Nil, newTyvar)}
+      val schemes = fs map {_ => TypeScheme(Nil, newTyvar())}
 
       // step 1a: check bodies in extended environment
       val te1 = TypeEnv(te.map ++ (funTypes zip schemes))
@@ -128,40 +129,36 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       val (sub3, type3) = check(te2, expr)
 
       (sub2 compose sub3, type3)
-    }
-    case CaseExpression(selector, branches) => {
+    case CaseExpression(selector, branches) =>
       val (sub1, type1s) = checkB(te, branches)
-      val tv = newTyvar
+      val tv = newTyvar()
       val sub2 = mgu(type1s map {(tv, _)}, sub1)
       val (sub3, type3) = check(te.sub(sub2), selector)
       val Arrow(selType, branchBodyType) = sub2(tv)
       val sub = mgu(selType, type3, sub3 compose sub2)
       (sub, sub(branchBodyType))
-    }
   }
 
   private def check(te: TypeEnv, expressions: List[Expression]): (Subst, List[Type]) = expressions match {
     case Nil => (new Subst(), Nil)
-    case e :: es => {
+    case e :: es =>
       val (sub1, type1) = check(te, e)
       val (sub2, type2s) = check(te sub sub1, es)
       (sub2 compose sub1, sub2(type1) :: type2s)
-    }
   }
 
   private def checkB(te: TypeEnv, expressions: List[Branch]): (Subst, List[Type]) = expressions match {
-    case Nil => (new Subst(), List(Arrow(newTyvar, newTyvar)))
-    case e :: es => {
+    case Nil => (new Subst(), List(Arrow(newTyvar(), newTyvar())))
+    case e :: es =>
       val (sub1, type1) = checkB(te, e)
       val (sub2, type2s) = checkB(te sub sub1, es)
       (sub2 compose sub1, sub2(type1) :: type2s)
-    }
   }
 
   private def checkB(te: TypeEnv, b: Branch): (Subst, Type) = {
     val TypeConstructorDefinition(tName, tParams, _) = typeConstructorDefs(b.pattern.name)
 
-    val freshSub = new Subst(Map(tParams map {(_, newTyvar)}:_*))
+    val freshSub = new Subst(Map(tParams map {(_, newTyvar())}:_*))
     val freshDataConArgs = dataConstructors(b.pattern.name).args map freshSub
     val tVars =  b.pattern.args map {_.name} map TypeVariable
     val schemes = freshDataConArgs map {TypeScheme(Nil, _)}
@@ -179,7 +176,7 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
 
   private def createTypeScheme(nonGenericVars: List[TypeVariable], t: Type): TypeScheme = {
     val genericVars = tyvars(t).filterNot(nonGenericVars.contains)
-    val map = Map(genericVars map {(_, newTyvar)}:_*)
+    val map = Map(genericVars map {(_, newTyvar())}:_*)
     TypeScheme(map.values.toList, new Subst(map)(t))
   }
 
