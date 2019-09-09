@@ -75,8 +75,9 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
   private val typeConstructorDefs = Map(typeDefs flatMap {td => td.cons map {_.name -> td} }:_*)
 
   def inferType(e: Expression): Type = {
-    val v2scheme = {v: Variable => TypeVariable(v.name) -> TypeScheme(Nil, newTyvar())}
-    val te = TypeEnv(Map(freeVars(e).toList map v2scheme :_*))
+    val eVars = freeVars(e).toList
+    val schemes = eVars.map(v => TypeVariable(v.name) -> TypeScheme(Nil, newTyvar()))
+    val te = TypeEnv(Map(schemes :_*))
     check(te, e)._2
   }
 
@@ -84,18 +85,18 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
     case Variable(name) =>
       (new Subst(), te.value(TypeVariable(name)).newInstance)
     case Application(h, a) =>
-      val (sub1, List(type_h, type_a)) = check(te, List(h, a))
       val genVar = newTyvar()
+      val (sub1, List(type_h, type_a)) = check(te, List(h, a))
       val sub2 = mgu(type_h, Arrow(type_a, genVar), sub1)
+
       (sub2, sub2(genVar))
-    case LambdaAbstraction(v, body) => {
+    case LambdaAbstraction(v, body) =>
       val genVar = newTyvar()
       // Hindley-Milner: argument is monomorphic!
       val vScheme = TypeScheme(Nil, genVar)
       val extendedEnv = te.install(TypeVariable(v.name), vScheme)
       val (sub, type_body) = check(extendedEnv, body)
       (sub, Arrow(sub(genVar), type_body))
-    }
     case Constructor(name, args) =>
       val (sub1, type1s) = check(te, args)
       val conDef = typeConstructorDefs(name)
