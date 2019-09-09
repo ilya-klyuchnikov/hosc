@@ -155,31 +155,14 @@ object HLanguage {
    }
 }
 
-sealed abstract class Type
-case class TypeVariable(name: String) extends Type {
-  override def toString: String =
-    name
-}
-case class TypeConstructor(name: String, typeParameters: List[Type]) extends Type {
-  override def toString: String = typeParameters match {
-    case Nil => name
-    case _   => "(" + name + " " + typeParameters.mkString(" ") + ")";
-  }
-}
-case class Arrow(t1: Type, t2: Type) extends Type {
-  override def toString: String =
-    "(" + t1 + "->" + t2 + ")"
-}
+sealed trait Type
+case class TypeVariable(name: String) extends Type
+case class TypeConstructor(name: String, typeParameters: List[Type]) extends Type
+case class Arrow(t1: Type, t2: Type) extends Type
  
-abstract sealed class TypeDefinition {
+sealed trait TypeDefinition {
   def name: String
 }
 case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
-  extends TypeDefinition {
-  override def toString: String =
-    "data " + name + " " + args.mkString(" ") + " = " + cons.mkString(" | ") + ";"
-}
-case class DataConstructor(name: String, args: List[Type]) {
-  override def toString: String =
-    name + " " + args.mkString(" ")
-}
+  extends TypeDefinition
+case class DataConstructor(name: String, args: List[Type])
