@@ -19,23 +19,7 @@ object Util {
       throw new IllegalArgumentException(pr.toString)
     }
   }
-  
-  def programWithLemmas(pf: String, lf: String): (Program, List[Lemma]) = {
-    val program = programFromFile(pf)
-    val lemmas = lemmasFromFile(program, lf)
-    (program, lemmas)
-  }
-  
-  def lemmasFromFile(program: Program, fileName: String): List[Lemma] = {
-    val in = new FileReader(new File(fileName));
-    val pr = HParsers.parseLemmasForProgram(program, StreamReader(in))
-    if (pr.successful) {
-      pr.get
-    } else {
-      throw new IllegalArgumentException(pr.toString)
-    }
-  }
-  
+
   def programFromString(input: String): Program = {
     val pr = HParsers.parseProgram(new CharArrayReader(input.toCharArray))
     if (pr.successful) {
