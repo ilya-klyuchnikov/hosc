@@ -1,7 +1,7 @@
 package hosc
 
 object EnrichedLambdaCalculus {
-   sealed abstract class Expression
+   sealed trait Expression
    case class Variable(name: String) extends Expression {
      override def toString: String = name
    } 
