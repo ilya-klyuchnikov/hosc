@@ -154,15 +154,3 @@ object HLanguage {
      }
    }
 }
-
-sealed trait Type
-case class TypeVariable(name: String) extends Type
-case class TypeConstructor(name: String, typeParameters: List[Type]) extends Type
-case class Arrow(t1: Type, t2: Type) extends Type
- 
-sealed trait TypeDefinition {
-  def name: String
-}
-case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
-  extends TypeDefinition
-case class DataConstructor(name: String, args: List[Type])
