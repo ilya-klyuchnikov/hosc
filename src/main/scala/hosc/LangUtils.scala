@@ -64,11 +64,6 @@ object LangUtils {
     expr.toDoc.format(120, writer)
     writer.toString
   }
-  def format(expr: Expression): String = {
-    val writer = new java.io.StringWriter()
-    expr.toDoc.format(120, writer)
-    writer.toString
-  }
 
   def canonize(tt: Expression0):Expression0 = tt match {
     case v: Variable0 => v
