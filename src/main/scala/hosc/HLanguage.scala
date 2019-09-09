@@ -153,7 +153,6 @@ object HLanguage {
        writer1.toString
      }
    }
-   case class Lemma(from: Expression, to: Expression)
 }
 
 sealed abstract class Type extends Positional

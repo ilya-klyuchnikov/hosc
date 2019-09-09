@@ -34,7 +34,6 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
                        {case v ~ l ~ e => LetRecExpression((v, l), e)} | ("(" ~> letrec <~ ")")
   private def branch = p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)
   private def pattern = p(uident ~ (variable*) ^^ Pattern)
-  private def lemma = (term1 <~ "=>") ~ (term1 <~ ";") ^^ Lemma
 
   def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))
 
@@ -49,8 +48,6 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
 
   def parseType(r: Reader[Char]) = strong(`type`) (new lexical.Scanner(r))
-  def parseLemmasForProgram(p: Program, r: Reader[Char]) =
-    (lemma*)(new lexical.Scanner(r)) map {Postprocessor.postprocessLemmasForProgram(_, p)}
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program)(new lexical.Scanner(r))))
 
   def validate(pr: ParseResult[Program]): ParseResult[Program] = pr match {
@@ -170,10 +167,5 @@ object Postprocessor {
     case CaseExpression(s, bs) => process(s, globals); for (b <- bs) process(b.term, globals)
     case LetRecExpression((v, e), e0) => {v.global = true; process(e, globals + v); process(e0, globals + v)}
     case l:LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
-  }
-  def postprocessLemmasForProgram(ls: List[Lemma], program: Program) = {
-    val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
-    ls map {case Lemma(from, to) => process(from, globals); process(to, globals);}
-    ls
   }
 }
