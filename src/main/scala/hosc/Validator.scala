@@ -20,39 +20,39 @@ object Validator {
 
       def valTypeUsage(t: Type, allowFreeVars: Boolean): Unit = t match {
         case tv: TypeVariable => {
-          if (!allowFreeVars && !(tvs contains tv)) err("undefined var " + tv.name, tv)
+          if (!allowFreeVars && !(tvs contains tv)) err("undefined var " + tv.name)
           tvsUsed += tv
         }
         case Arrow(t1, t2) => valTypeUsage(t1, allowFreeVars); valTypeUsage(t2, allowFreeVars);
         case tc @ TypeConstructor(n, args) => {
           p.getTypeConstructorDefinition(n) match {
             case Some(td) => {
-              if (td.args.length != args.length) err("wrong numbers of argument for type " + n, tc)
+              if (td.args.length != args.length) err("wrong numbers of argument for type " + n)
               for (a <- args) valTypeUsage(a, allowFreeVars)
             }
-            case None => err("unknown type " + n, tc)
+            case None => err("unknown type " + n)
           }
         }
       }
 
       def valDC(dc: DataConstructor) = {
-        if (dataConNames contains dc.name) err("duplicate data constructor definition " + dc.name, dc)
+        if (dataConNames contains dc.name) err("duplicate data constructor definition " + dc.name)
         dataConNames += dc.name
         for (a <- dc.args) valTypeUsage(a, false)
       }
 
-      if (typeNames contains td.name) err("duplicate type name " + td.name, td)
+      if (typeNames contains td.name) err("duplicate type name " + td.name)
       typeNames += td.name
 
       td match {
         case tcd: TypeConstructorDefinition => {
           for (v <- tcd.args) {
-            if (tvs contains v) err("duplicate type variable " + v.name, v)
+            if (tvs contains v) err("duplicate type variable " + v.name)
             tvs += v
           }
           for (dc <- tcd.cons) valDC(dc)
           tcd.args find {!tvsUsed.contains(_)} match {
-            case Some(tv) => err("useless type variable " + tv.name, tv)
+            case Some(tv) => err("useless type variable " + tv.name)
             case None =>
           }
         }
@@ -75,6 +75,10 @@ object Validator {
   }
 
   private def err(msg: String, pos: Positional) = {
+    throw ValidatorError(error(msg))
+  }
+
+  private def err(msg: String) = {
     throw ValidatorError(error(msg))
   }
 

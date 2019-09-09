@@ -155,7 +155,7 @@ object HLanguage {
    }
 }
 
-sealed abstract class Type extends Positional
+sealed abstract class Type
 case class TypeVariable(name: String) extends Type {
   override def toString: String =
     name
@@ -167,12 +167,11 @@ case class TypeConstructor(name: String, typeParameters: List[Type]) extends Typ
   }
 }
 case class Arrow(t1: Type, t2: Type) extends Type {
-  pos = t1.pos
   override def toString: String =
     "(" + t1 + "->" + t2 + ")"
 }
  
-abstract sealed class TypeDefinition extends Positional {
+abstract sealed class TypeDefinition {
   def name: String
 }
 case class TypeConstructorDefinition(name: String, args: List[TypeVariable], cons: List[DataConstructor])
@@ -180,7 +179,7 @@ case class TypeConstructorDefinition(name: String, args: List[TypeVariable], con
   override def toString: String =
     "data " + name + " " + args.mkString(" ") + " = " + cons.mkString(" | ") + ";"
 }
-case class DataConstructor(name: String, args: List[Type]) extends Positional {
+case class DataConstructor(name: String, args: List[Type]) {
   override def toString: String =
     name + " " + args.mkString(" ")
 }

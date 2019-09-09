@@ -37,15 +37,15 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
 
   def parseTerm(r: Reader[Char]) = strong(term) (new lexical.Scanner(r))
 
-  def typeDefinition: Parser[TypeDefinition] = p(typeConstrDefinition)
-  private def typeConstrDefinition = p(("data" ~> uident) ~ (typeVariable*) ~ ("=" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
+  def typeDefinition: Parser[TypeDefinition] = typeConstrDefinition
+  private def typeConstrDefinition = (("data" ~> uident) ~ (typeVariable*) ~ ("=" ~> rep1sep(dataConstructor, "|") <~ ";") ^^
     TypeConstructorDefinition)
 
-  private def tp1: Parser[Type] = p(uident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")) // arg
-  private def tp3: Parser[Type] = p(p(typeVariable | uident ~ (tp1*) ^^ TypeConstructor) |  ("(" ~> `type` <~ ")"))
+  private def tp1: Parser[Type] = (uident ^^ {i => TypeConstructor(i, Nil)} | typeVariable | ("(" ~> `type` <~")")) // arg
+  private def tp3: Parser[Type] = (typeVariable | uident ~ (tp1*) ^^ TypeConstructor) |  ("(" ~> `type` <~ ")")
   private def `type` = rep1sep(tp3, "->") ^^ {_.reduceRight{Arrow}}
-  private def typeVariable = p(lident ^^ TypeVariable)
-  private def dataConstructor = p(uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
+  private def typeVariable = lident ^^ TypeVariable
+  private def dataConstructor = (uident ~ (tp1*) ^^ {case n ~ a => DataConstructor(n, a)})
 
   def parseType(r: Reader[Char]) = strong(`type`) (new lexical.Scanner(r))
   def parseProgram(r: Reader[Char]) = postprocess(validate(strong(program)(new lexical.Scanner(r))))
