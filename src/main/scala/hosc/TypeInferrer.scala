@@ -107,27 +107,28 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       (sub2, TypeConstructor(conDef.name, typeParams map (sub2 compose freshSub)))
     case LetExpression(bs, expr) =>
       val (fs, bodies) = bs.unzip
-      val f_types = fs map {x => TypeVariable(x.name)}
+      val fTypes = fs map {x => TypeVariable(x.name)}
+
       val (sub1, type1s) = check(te, bodies)
-      val te1 = extend(te.sub(sub1), f_types, type1s)
+      val te1 = extend(te.sub(sub1), fTypes, type1s)
       val (sub2, type2) = check(te1, expr)
       (sub1 compose sub2, type2)
     case LetRecExpression(bs, expr) =>
       val (fs, bodies) = bs.unzip
-      val funTypes = fs map {x => TypeVariable(x.name)}
+      val fTypes = fs map {x => TypeVariable(x.name)}
 
       // Hindley-Milner: letrecs are monomorphic in their own bodies
       val schemes = fs map {_ => TypeScheme(Nil, newTyvar())}
 
       // step 1a: check bodies in extended environment
-      val te1 = TypeEnv(te.map ++ (funTypes zip schemes))
+      val te1 = TypeEnv(te.map ++ (fTypes zip schemes))
       val (sub1, type1s) = check(te1, bodies)
       // step 1b:
       val l_types = schemes map {_.sub(sub1).t}
       val sub2 = mgu(l_types zip type1s, sub1)
 
       // step 2: check 'in' expression
-      val te2 = extend(te.sub(sub2), funTypes, l_types map sub2)
+      val te2 = extend(te.sub(sub2), fTypes, l_types map sub2)
       val (sub3, type3) = check(te2, expr)
 
       (sub2 compose sub3, type3)
