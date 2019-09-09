@@ -131,8 +131,8 @@ class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
       val te1b = extend(te.sub(sub1b), fTypes, l_types map sub1b)
 
       // step 2: check 'in' expression
-      val (sub3, type3) = check(te1b, expr)
-      (sub1b compose sub3, type3)
+      val (sub2, type2) = check(te1b, expr)
+      (sub1b compose sub2, type2)
     case CaseExpression(selector, branches) =>
       val (sub1, type1s) = checkB(te, branches)
       val tv = newTyvar()
