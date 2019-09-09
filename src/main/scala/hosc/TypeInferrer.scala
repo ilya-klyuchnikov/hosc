@@ -26,9 +26,12 @@ class Subst(val map: Map[TypeVariable, Type]) extends (Type => Type) {
 }
 
 case class TypeScheme(genericVars: List[TypeVariable], t: Type) {
-  def newInstance: Type = (new Subst(Map(genericVars map {(_, newTyvar())}:_*))) (t)
-  def nonGenericVars: List[TypeVariable] = tyvars(t).filterNot(genericVars.contains)
-  def sub(sub: Subst) = TypeScheme(genericVars, (sub exclude genericVars) (t))
+  def newInstance: Type =
+    new Subst(Map(genericVars.map((_, newTyvar())):_*))(t)
+  def nonGenericVars: List[TypeVariable] =
+    tyvars(t).filterNot(genericVars.contains)
+  def sub(sub: Subst): TypeScheme =
+    TypeScheme(genericVars, (sub exclude genericVars) (t))
 }
 
 case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
@@ -62,10 +65,8 @@ object TypeInferrer {
       throw TypeError("cannot unify " + s(t) + " with " + s(u))
   }
 
-  private def mgu(ts: List[(Type, Type)], s: Subst): Subst = {
-    (s /: ts) {case (s1, (t1, t2)) => mgu(t1, t2, s1)}
-  }
-
+  private def mgu(ts: List[(Type, Type)], s: Subst): Subst =
+    ts.foldLeft(s){case (s1, (t1, t2)) => mgu(t1, t2, s1)}
 }
 
 class TypeInferrer(typeDefs: List[TypeConstructorDefinition]) {
