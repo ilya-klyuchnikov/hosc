@@ -210,18 +210,6 @@ object TermAlgebra {
         applySubstitution(freshBinders(b.term), Map[Variable, Expression]() ++ (args zip newVars)))
   }
 
-  // replace all occurrences of t1 in term by t2
-  def replaceTerm(term: Expression, t1: Expression, t2: Expression): Expression = if (Eq.equivalent(term, t1)) t2 else term match {
-    case v: Variable => v
-    case Constructor(n, args) => Constructor(n, args map {a => replaceTerm(a, t1, t2)})
-    case Application(e1, e2) => Application(replaceTerm(e1, t1, t2), replaceTerm(e2, t1, t2))
-    case LambdaAbstraction(v, t) => LambdaAbstraction(v, replaceTerm(t, t1, t2))
-    case CaseExpression(sel, bs) =>
-      CaseExpression(replaceTerm(sel, t1, t2), bs map {b => Branch(b.pattern, replaceTerm(b.term, t1, t2))})
-    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
-    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
-  }
-
   def extractAppArgs(term: Expression): List[Expression] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
