@@ -64,26 +64,6 @@ object TermAlgebra {
     constructLambda_(vs)
   }
 
-  def freshBinders(term: Expression): Expression = term match {
-    case v: Variable => v
-    case LetExpression(bs, expr) => LetExpression(bs map {case (k, v) => (k, freshBinders(v))}, freshBinders(expr))
-    case Constructor(name, args) => Constructor(name, args map (freshBinders(_)))
-    case Application(e1, e2) => Application(freshBinders(e1), freshBinders(e2))
-    case LambdaAbstraction(v, t) => {
-      val freshV = newVar()
-      LambdaAbstraction(freshV, applySubstitution(freshBinders(t), Map(v -> freshV)))
-    }
-    case CaseExpression(sel, bs) => CaseExpression(freshBinders(sel), bs map {freshBinders(_)})
-    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
-  }
-
-  def freshBinders(b: Branch): Branch = {
-    val args = b.pattern.args
-    val newVars = args map {x => newVar()}
-    Branch(Pattern(b.pattern.name, newVars),
-        applySubstitution(freshBinders(b.term), Map[Variable, Expression]() ++ (args zip newVars)))
-  }
-
   def extractAppArgs(term: Expression): List[Expression] = term match {
     case Application(h, a) => extractAppArgs(h) ::: List(a)
     case _ => Nil
