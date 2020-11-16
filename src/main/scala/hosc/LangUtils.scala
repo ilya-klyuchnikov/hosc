@@ -55,34 +55,7 @@ object LangUtils {
       ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
   }
 
-  def hl0ToELC(p: Program0): Expression = {
-    val r = normalize(p)
-    r
-  }
-
-  def canonize(tt: Expression0):Expression0 = tt match {
-    case v: Variable0 => v
-    case c@Constructor0(name, args) => {
-      Constructor0(name, args map canonize)
-    }
-    case la@LambdaAbstraction0(x, term) => {
-      LambdaAbstraction0(x, canonize(term))
-    }
-    case a@Application0(head, arg) => {
-      Application0(canonize(head), canonize(arg))
-    }
-    case ce@CaseExpression0(sel, bs) => {
-      val sortedBranches = bs sortWith TermAlgebra.compareB
-      val canonizedBranches = sortedBranches map {b => Branch0(b.pattern, canonize(b.term))}
-      val canonizedSelector = canonize(sel)
-      CaseExpression0(canonizedSelector, canonizedBranches)
-    }
-    case l: LetExpression0 => throw new IllegalArgumentException()
-    case l: LetRecExpression0 => throw new IllegalArgumentException()
-  }
-
-  def canonize(p: Program0): Program0 = {
-    Program0(p.ts, canonize(p.goal), p.fs map {f => Function0(f.name, canonize(f.body))})
-  }
+  def hl0ToELC(p: Program0): Expression =
+    normalize(p)
 
 }
