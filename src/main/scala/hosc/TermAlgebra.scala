@@ -1,7 +1,6 @@
 package hosc
 
 import HLanguage._
-import MSG._
 
 object TermAlgebra {
   var i = 0
