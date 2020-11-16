@@ -4,15 +4,9 @@ import HLanguage._
 
 object TermAlgebra {
   var i = 0
-  def newVar() = {
+  def newVar(): Variable = {
     i += 1
     Variable("$" + i)
-  }
-
-  def getCoreLocalVar(app: Application): Variable = app.head match {
-    case v: Variable if (!v.global)=> v
-    case a: Application => getCoreLocalVar(a)
-    case _ => null
   }
 
   def applySubstitution(term: Expression, s: Map[Variable, Expression]): Expression = term match {
@@ -24,17 +18,6 @@ object TermAlgebra {
     case CaseExpression(sel, bs) =>
       CaseExpression(applySubstitution(sel, s),
           bs map {b => Branch(b.pattern, applySubstitution(b.term, s -- b.pattern.args))})
-    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
-    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
-  }
-
-  private def getBoundedVars(t: Expression): Set[Variable] = t match {
-    case v: Variable => Set()
-    case Constructor(_, args) => (Set[Variable]() /: args) {(vs, term) => vs ++ getBoundedVars(term)}
-    case LambdaAbstraction(x, term) => getBoundedVars(term) + x
-    case Application(head, arg) => getBoundedVars(head) ++ getBoundedVars(arg)
-    case CaseExpression(sel, bs) =>
-      getBoundedVars(sel) ++ (Set[Variable]() /: bs) {(vs, b) => vs ++ (getBoundedVars(b.term) ++ b.pattern.args)}
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
     case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
   }
@@ -79,52 +62,6 @@ object TermAlgebra {
       case v :: vv => LambdaAbstraction(v, constructLambda_(vv))
     }
     constructLambda_(vs)
-  }
-
-  // TODO: maybe move to de Brujin indices
-  // During unfolding we always rename functions
-  // in a way that bound vars (in lambda absractions and case expressions) are refreshed.
-  // This method assumes that binders always have different names.
-  def equivalent(term1: Expression, term2: Expression): Boolean = {
-    val map1to2 = scala.collection.mutable.Map[Variable, Variable]()
-    val map2to1 = scala.collection.mutable.Map[Variable, Variable]()
-    def eq1(t1: Expression, t2: Expression): Boolean = (t1, t2) match {
-      case (v1: Variable, v2: Variable) if v1.global == true && v2.global == true =>
-        v1.name == v2.name
-      case (v1: Variable, v2: Variable) if v1.global == false && v2.global == false =>
-      (map1to2.get(v1), map2to1.get(v2)) match {
-        case (Some(v3), Some(v4)) =>
-          v2 == v3 && v1 == v4
-        case (None, None) => map1to2(v1) = v2; map2to1(v2) = v1; true
-        case _ => false
-      }
-      case (Constructor(name1, args1), Constructor(name2, args2)) if name1 == name2 =>
-        ((args1 zip args2) forall (args => eq1(args._1, args._2)))
-      case (Application(h1, a1), Application(h2, a2)) =>
-        eq1(h1, h2) && eq1(a1, a2)
-      case (LambdaAbstraction(b1, v1), LambdaAbstraction(b2, v2)) =>
-        eq1(b1, b2) && eq1(v1, v2)
-      case (CaseExpression(sel1, Nil), CaseExpression(sel2, Nil)) =>
-        eq1(sel1, sel2)
-      case (CaseExpression(sel1, bs1), CaseExpression(sel2, bs2)) if bs1.size == bs2.size => {
-        val bs1s = bs1 sortWith compareB
-        val bs2s = bs2 sortWith compareB
-        if (bs1s.head.pattern.name == bs2s.head.pattern.name){
-          eq1(sel1, sel2) && ((bs1s zip bs2s) forall {
-            b => (b._1.pattern.name == b._2.pattern.name) &&
-              ((b._1.pattern.args zip b._2.pattern.args) forall (args => eq1(args._1, args._2))) &&
-              eq1(b._1.term, b._2.term)
-          })
-        } else {
-          false
-        }
-      }
-      case (LetRecExpression((f1, b1), in1), LetRecExpression((f2, b2), in2)) =>
-        eq1(f1, f2) && eq1(b1, b2) && eq1(in1, in2)
-      case _ =>
-        false
-    }
-    eq1(term1, term2)
   }
 
   def freshBinders(term: Expression): Expression = term match {
