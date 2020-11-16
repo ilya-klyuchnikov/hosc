@@ -9,69 +9,6 @@ object TermAlgebra {
     Variable("$" + i)
   }
 
-  sealed abstract class ExpressionDecomposition
-
-  sealed abstract class Observable(val term: Expression) extends ExpressionDecomposition
-  case class ObservableVar(v: Variable) extends Observable(v)
-  case class ObservableVarApp(v: Variable, app: Application) extends Observable(app)
-  case class ObservableCon(c: Constructor) extends Observable(c)
-  case class ObservableLam(l: LambdaAbstraction) extends Observable(l)
-
-  sealed abstract class Redex(term : Expression)
-  case class RedexLamApp(lam: LambdaAbstraction, app: Application) extends Redex(app)
-  case class RedexCaseCon(c: Constructor, ce: CaseExpression) extends Redex(ce)
-
-  abstract class NonTrivialRedex(term: Expression) extends Redex(term)
-  case class RedexCall(f: Variable) extends NonTrivialRedex(f)
-  // global control - of certain interest!
-  case class RedexCaseVar(v: Expression, ce: CaseExpression) extends NonTrivialRedex(ce)
-
-  sealed abstract class Context(val redex: Redex) extends ExpressionDecomposition {
-    def replaceHole(t: Expression): Expression
-  }
-  object Context {
-    def unapply(ctx: Context): Option[Redex] = Some(ctx.redex)
-  }
-  // <>
-  case class ContextHole(override val redex: Redex) extends Context(redex) {
-    def replaceHole(t: Expression) = t
-  }
-  // con e
-  case class ContextApp(head: Context, app: Application) extends Context(head.redex) {
-    def replaceHole(t: Expression) = Application(head.replaceHole(t), app.arg)
-  }
-  // case con of {}
-  case class ContextCase(selector: Context, ce: CaseExpression) extends Context(selector.redex) {
-    def replaceHole(t: Expression) = CaseExpression(selector.replaceHole(t), ce.branches)
-  }
-
-  def decompose(t: Expression): ExpressionDecomposition = t match {
-    // observable
-    case c: Constructor => ObservableCon(c)
-    case l: LambdaAbstraction => ObservableLam(l)
-    case app: Application if getCoreLocalVar(app) != null => ObservableVarApp(getCoreLocalVar(app), app)
-    case v: Variable if !v.global => ObservableVar(v)
-    // context
-    case t => createContext(t)
-  }
-
-  private def createContext(t: Expression): Context = t match {
-    case v: Variable if (v.global) => ContextHole(RedexCall(v))
-    case app @ Application(l: LambdaAbstraction, arg) => ContextHole(RedexLamApp(l, app))
-    case ce @ CaseExpression(v: Variable, _) if !v.global => ContextHole(RedexCaseVar(v, ce))
-    case ce @ CaseExpression(a: Application, _) if (getCoreLocalVar(a) != null) => ContextHole(RedexCaseVar(a, ce))
-    case ce @ CaseExpression(c: Constructor, _) => ContextHole(RedexCaseCon(c, ce))
-    //new logic here: towards more normalization
-    //case outer@CaseExpression(inner: CaseExpression, _) => ContextHole(RedexNestedCase(inner, outer))
-    case ce @ CaseExpression(s, _) => ContextCase(createContext(s), ce)
-    case a @ Application(h, _) => ContextApp(createContext(h), a)
-    case v: Variable => throw new IllegalArgumentException("cannot be decomposed as a context: " + v)
-    case lam: LambdaAbstraction => throw new IllegalArgumentException("cannot be decomposed as a context: " + lam)
-    case c: Constructor => throw new IllegalArgumentException("cannot be decomposed as a context: " + c)
-    case let: LetExpression => throw new IllegalArgumentException("cannot be decomposed as a context: " + let)
-    case letrec: LetRecExpression => throw new IllegalArgumentException("cannot be decomposed as a context: " + letrec)
-  }
-
   def getCoreLocalVar(app: Application): Variable = app.head match {
     case v: Variable if (!v.global)=> v
     case a: Application => getCoreLocalVar(a)
