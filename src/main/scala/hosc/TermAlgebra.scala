@@ -3,25 +3,6 @@ package hosc
 import HLanguage._
 
 object TermAlgebra {
-  var i = 0
-  def newVar(): Variable = {
-    i += 1
-    Variable("$" + i)
-  }
-
-  def applySubstitution(term: Expression, s: Map[Variable, Expression]): Expression = term match {
-    case v: Variable => s.get(v) match {case Some(t) => t; case None => v}
-    case Constructor(n, args) => Constructor(n, args map {applySubstitution(_, s)})
-    case LambdaAbstraction(v, t) =>
-      LambdaAbstraction(v, applySubstitution(t, s - v))
-    case Application(h, a) => Application(applySubstitution(h, s), applySubstitution(a, s))
-    case CaseExpression(sel, bs) =>
-      CaseExpression(applySubstitution(sel, s),
-          bs map {b => Branch(b.pattern, applySubstitution(b.term, s -- b.pattern.args))})
-    case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
-    case letrec: LetRecExpression => throw new IllegalArgumentException("unexpected expr: " + letrec)
-  }
-
   def getFreeVars(t: Expression): List[Variable] = t match {
     case v: Variable => if (v.global) List() else List(v)
     case Constructor(_, args) => (List[Variable]() /: args) {(vs, exp) =>  vs ++ (getFreeVars(exp).filterNot(vs.contains))}
@@ -38,5 +19,4 @@ object TermAlgebra {
     }
     case let: LetExpression => throw new IllegalArgumentException("unexpected expr: " + let)
   }
-
 }
