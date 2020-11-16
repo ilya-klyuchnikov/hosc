@@ -53,7 +53,7 @@ object GraphAnalysis {
    *
    *  This method changes the state of a given graph.
    *
-   *  @param graph the graph to be traversed
+   *  @param g the graph to be traversed
    */
   private def depthFirstTraverse(g: Graph): Unit = {
     var n = 0
@@ -141,7 +141,7 @@ object GraphAnalysis {
    *  Revert topological ordering is a linear ordering of components in which
    *  each component comes after all components to which it has outbound edges.
    *
-   *  @param graph the graph to be traversed
+   *  @param g the graph to be traversed
    */
   private def topologicalSort(components: List[GraphComponent], g: Graph): List[GraphComponent] = {
     def findIndependentComponent(cs: List[GraphComponent]): GraphComponent = {

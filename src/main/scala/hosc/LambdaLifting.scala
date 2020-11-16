@@ -3,12 +3,11 @@ package hosc
 import scala.collection.mutable.ListBuffer
 
 import HLanguage._
-import TermAlgebra._
 
 object LambdaLifting {
 
   var i = 0
-  def newVar() = {
+  def newVar(): Variable = {
     i += 1
     Variable("_" + i)
   }
