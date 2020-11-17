@@ -37,13 +37,14 @@ case class TypeScheme(private val genericVars: List[TypeVariable], t: Type) {
 case class TypeEnv(map: Map[TypeVariable, TypeScheme]){
   def value(tv: TypeVariable): TypeScheme =
     map(tv)
-  def install(tv: TypeVariable, ts: TypeScheme) =
+  def install(tv: TypeVariable, ts: TypeScheme): TypeEnv =
     TypeEnv(map + {(tv, ts)})
-  def install(tvs: List[(TypeVariable, TypeScheme)]) =
+  def install(tvs: List[(TypeVariable, TypeScheme)]): TypeEnv =
     TypeEnv(map ++ tvs)
   def nonGenericVars: List[TypeVariable] =
     map.values.toList.flatMap(_.nonGenericVars).distinct
-  def sub(s: Subst) = TypeEnv(map transform {(_, v) => v.sub(s)})
+  def sub(s: Subst): TypeEnv =
+    TypeEnv(map transform { (_, v) => v.sub(s)})
 }
 
 object TypeInferrer {
