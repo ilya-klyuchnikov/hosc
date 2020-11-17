@@ -1,6 +1,6 @@
 package hosc
 
-import java.io.{BufferedReader, File, FileReader}
+import java.io.{BufferedReader, FileReader}
 
 import hosc.HLanguage._
 
