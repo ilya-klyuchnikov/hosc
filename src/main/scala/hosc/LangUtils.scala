@@ -24,10 +24,10 @@ object LangUtils {
       LetRecExpression((Variable(b._1.name), hl0ToELC(b._2)) :: Nil, hl0ToELC(lexpr))
   }
 
-  private def normalize(p: Program0): Expression = {
+  def normalize(p: Program0): Expression = {
     val fs = (Map[String, Function0]() /: p.fs) {(m, f) => m + (f.name -> f)}
     val vxs = (Map[String, Vertex]() /: p.fs) {(m, f) => m + (f.name -> Vertex(f.name))}
-    var arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.body).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
+    val arcs = (List[Arc]() /: p.fs) {(a, f) => a ::: (getFreeVars(f.body).toList map {t => Arc(vxs(f.name), vxs(t.name))})}
     val g = Graph(vxs.values.toList, arcs)
     val sccs = analyzeDependencies(g)
     var expr: Expression = hl0ToELC(p.goal)
@@ -52,10 +52,6 @@ object LangUtils {
       getFreeVars(sel) ++ (Set[Variable0]() /: bs) {(vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args)}
     case LetRecExpression0(bs, expr) => getFreeVars(expr) ++ getFreeVars(bs._2) - bs._1
     case LetExpression0(bs, expr) =>
-      ((getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)}) -- (bs map {_._1})
+      (getFreeVars(expr) /: bs) {(vs, b) => vs ++ getFreeVars(b._2)} -- (bs map {_._1})
   }
-
-  def hl0ToELC(p: Program0): Expression =
-    normalize(p)
-
 }

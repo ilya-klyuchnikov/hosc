@@ -13,9 +13,9 @@ object Util {
       val program = pr.get
       val program1 = LambdaLifting.lift(program)
       val ti = new TypeInferrer(program1.ts)
-      ti.inferType(hl0ToELC(program1))
+      ti.inferType(normalize(program1))
       program1
-    } else { 
+    } else {
       throw new IllegalArgumentException(pr.toString)
     }
   }
@@ -25,13 +25,13 @@ object Util {
     if (pr.successful) {
       val program = pr.get
       val ti = new TypeInferrer(program.ts)
-      ti.inferType(hl0ToELC(program))
+      ti.inferType(normalize(program))
       program
-    } else { 
+    } else {
       throw new IllegalArgumentException(pr.toString)
     }
   }
-  
+
   def inferGoalType(fileName: String): Type = {
     val in = new FileReader(new File(fileName))
     val pr = HParsers.parseProgram(StreamReader(in))
@@ -39,19 +39,19 @@ object Util {
       val program = pr.get
       val program1 = LambdaLifting.lift(program)
       val ti = new TypeInferrer(program1.ts)
-      ti.inferType(hl0ToELC(program1))
-    } else { 
+      ti.inferType(normalize(program1))
+    } else {
       throw new IllegalArgumentException(pr.toString)
     }
   }
-  
+
   def rawProgramFromFile(fileName: String): Program = {
     val in = new FileReader(new File(fileName))
     val pr = HParsers.parseProgram(StreamReader(in))
     if (pr.successful) {
       pr.get
-    } else { 
+    } else {
       throw new IllegalArgumentException(pr.toString)
-    }    
+    }
   }
 }

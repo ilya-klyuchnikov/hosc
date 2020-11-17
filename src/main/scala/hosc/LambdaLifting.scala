@@ -27,7 +27,7 @@ object LambdaLifting {
     while (letrecOpt.isDefined) {
       val LetRecExpression((f, e0), _) = letrecOpt.get
       val freeVars = TermAlgebra.getFreeVars(e0)
-      for (v <- freeVars.toList) {
+      for (v <- freeVars) {
         result = injectArgument(result, f, v)
       }
       letrecOpt = findLetRec(result)
@@ -91,12 +91,9 @@ object LambdaLifting {
   }
 
   private def letrecToHl(letrec: LetRecExpression, p: ListBuffer[Function]): Expression = {
-    extractGlobals(letrec.binding._2, p) match {
-      case x =>  {
-        Function(letrec.binding._1.name, x) +: p
-        extractGlobals(letrec.expr, p)
-      }
-    }
+    val x = extractGlobals(letrec.binding._2, p)
+    Function(letrec.binding._1.name, x) +: p
+    extractGlobals(letrec.expr, p)
   }
 
 }

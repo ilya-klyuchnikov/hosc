@@ -10,16 +10,16 @@ import HLanguage._
 object TUtils {
   def termResultFromString(input: String) =
     HParsers.parseTerm(new CharArrayReader(input.toCharArray))
-    
+
   def typeExprResultFromString(input: String) =
     HParsers.parseType(new CharArrayReader(input.toCharArray))
-    
-  def termFromString(input: String) = 
+
+  def termFromString(input: String) =
     termResultFromString(input).get
-    
+
   def programResultFromString(input: String) =
     HParsers.parseProgram(new CharArrayReader(input.toCharArray))
-    
+
   def programResultFromFile(fileName: String) = {
     val file = new File(fileName)
     val sb = new StringBuilder
@@ -35,7 +35,7 @@ object TUtils {
     in.close();
     HParsers.parseProgram(new CharArrayReader(sb.toString.toCharArray))
   }
-  
+
   def termFromString(input: String, program: Program) = {
     val pr = HParsers.parseTerm(new CharArrayReader(input.toCharArray))
     if (pr.isEmpty) throw new IllegalArgumentException(pr.toString)
@@ -43,10 +43,10 @@ object TUtils {
     Validator.valTermWithFreeVars(Set.empty[String] ++ (program.fs map {f => f.name}), term, program)
     val globals = Set[Variable]() ++ (program.fs map (f => Variable(f.name)))
     Postprocessor.process(term, globals)
-    
+
     val program1 = Program(program.ts, term, program.fs)
     val ti = new TypeInferrer(program1.ts)
-    ti.inferType(LangUtils.hl0ToELC(program1))
+    ti.inferType(LangUtils.normalize(program1))
     term
   }
 }
