@@ -208,7 +208,7 @@ class HParsersTest {
     assertSyntaxError("examples/" + "parser/syntax_err.hs", "")
   }
 
-  def assertValidationError(fileName: String, msg: String)  = {
+  def assertValidationError(fileName: String, msg: String): Unit = {
     println(fileName)
     try {
       TUtils.programResultFromFile("examples/" + fileName)
@@ -218,7 +218,7 @@ class HParsersTest {
     }
   }
 
-  def assertSyntaxError(fileName: String, msg: String)  = {
+  def assertSyntaxError(fileName: String, msg: String): Unit = {
     println(fileName)
     val r = TUtils.programResultFromFile(fileName)
     println(r)
