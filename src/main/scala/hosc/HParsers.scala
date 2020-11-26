@@ -10,8 +10,8 @@ import scala.util.parsing.combinator.syntactical.StdTokenParsers
 
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
 
-  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "::", "|", "->", "\\", "[", "]", "=>")
-  lexical.reserved += ("case", "of", "where", "data", "letrec", "in", "choice")
+  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "|", "->", "\\")
+  lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
 
   def program = (typeConstrDefinition*) ~ term ~ (("where" ~> strong(function*)) | success(Nil)) ^^ Program
   def function = p(lident ~ ("=" ~> term <~ c(";")) ^^ Function)
