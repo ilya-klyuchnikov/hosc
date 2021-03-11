@@ -1,6 +1,8 @@
 name := "hosc"
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.13"
+
+scalacOptions ++= Seq("-deprecation", "-feature")
 
 libraryDependencies += "org.scala-lang.modules" %% "scala-parser-combinators" % "1.0.7"
 

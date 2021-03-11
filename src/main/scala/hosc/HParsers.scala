@@ -1,4 +1,6 @@
-package hosc;
+package hosc
+
+import scala.language.postfixOps
 
 import scala.util.parsing.input.{Positional, Reader}
 import scala.util.parsing.combinator.{ImplicitConversions, Parsers}
