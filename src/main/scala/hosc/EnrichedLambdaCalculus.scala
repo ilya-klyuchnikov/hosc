@@ -1,5 +1,6 @@
 package hosc
 
+// BOOK - p 39, - Enriched lambda calculus - yay!!!!
 object EnrichedLambdaCalculus {
    sealed trait Expression
    case class Variable(name: String) extends Expression {

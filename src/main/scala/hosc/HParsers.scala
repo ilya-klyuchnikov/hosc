@@ -17,7 +17,6 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def function = p(lident ~ ("=" ~> term <~ c(";")) ^^ Function)
 
   def term: Parser[Expression] = p(tr2 | appl) | err("term is expected")
-  def term1 = p(tr2 | appl)
   def appl = chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
 
   // head of application
