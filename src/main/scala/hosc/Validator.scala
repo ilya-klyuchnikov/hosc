@@ -72,11 +72,11 @@ object Validator {
   }
 
   private def err(msg: String, pos: Positional) = {
-    throw ValidatorError(error(msg))
+    throw ValidatorError(sys.error(msg))
   }
 
   private def err(msg: String) = {
-    throw ValidatorError(error(msg))
+    throw ValidatorError(sys.error(msg))
   }
 
   def valTerm(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
