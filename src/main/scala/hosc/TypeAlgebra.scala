@@ -12,9 +12,9 @@ object TypeAlgebra {
     case tv: TypeVariable =>
       List(tv)
     case Arrow(t1, t2) =>
-      tyvars(t1) union tyvars(t2)
+      tyvars(t1) ++ tyvars(t2)
     case TypeConstructor(_, ts) =>
-      ts.foldLeft(List[TypeVariable]())((tvs, t) => tvs union tyvars(t))
+      ts.foldLeft(List[TypeVariable]())((tvs, t) => tvs ++ tyvars(t))
   }
 
   def equivalent(type1: Type, type2: Type): Boolean = {

@@ -12,8 +12,8 @@ import scala.util.parsing.combinator.syntactical.StdTokenParsers
 
 object HParsers extends HTokenParsers with StrongParsers with ImplicitConversions {
 
-  lexical.delimiters += ("(", ")", ",", "=", ";", "{", "}", "|", "->", "\\")
-  lexical.reserved += ("case", "of", "where", "data", "letrec", "in")
+  lexical.delimiters ++= Seq("(", ")", ",", "=", ";", "{", "}", "|", "->", "\\")
+  lexical.reserved ++= Seq("case", "of", "where", "data", "letrec", "in")
 
   def program: Parser[Program] =
     rep(typeConstrDefinition) ~ term ~ (("where" ~> strong(rep(function))) | success(Nil)) ^^ Program
@@ -76,7 +76,7 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
 
   def validate(pr: ParseResult[Program]): ParseResult[Program] = pr match {
     case n: NoSuccess => n;
-    case s: Success[Program] => Validator.validate(s)
+    case s: Success[_] => Validator.validate(s)
   }
 
   def postprocess(pr: ParseResult[Program]): ParseResult[Program] =

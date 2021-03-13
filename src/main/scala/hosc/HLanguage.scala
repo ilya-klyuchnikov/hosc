@@ -61,7 +61,7 @@ object HLanguage {
      def / (s: Map[Variable, Expression]): Expression =
        LetExpression(bs map { b => (b._1, b._2/s)}, expr/s)
      override def toString: String =
-       "let " + (bs map { p => p._1 + "=" + p._2}).mkString(", ") + "\n in " + expr
+       "let " + (bs map { p => p._1.toString + "=" + p._2.toString}).mkString(", ") + "\n in " + expr.toString
    }
    case class LetRecExpression(binding: (Variable, Expression), expr: Expression) extends Expression {
      type termType = LetRecExpression
@@ -70,13 +70,13 @@ object HLanguage {
      def / (s: Map[Variable, Expression]): Expression =
        LetRecExpression((binding._1, binding._2/s), expr/s)
      override def toString: String =
-       "(letrec " + (binding._1 + "=" + binding._2) + "\n in " + expr + ")"
+       "(letrec " + (binding._1.toString + "=" + binding._2.toString) + "\n in " + expr + ")"
    }
 
    case class Branch(pattern: Pattern, term: Expression) extends Positional {
      def \\(s: Map[Variable, Variable]): Branch = Branch(pattern\\s, term\\s)
      override def toString: String =
-       pattern + " -> " + term + ";"
+       pattern.toString + " -> " + term.toString + ";"
    }
    case class Pattern(name: String, args: List[Variable]) extends Positional {
      def \\(s: Map[Variable, Variable]) = Pattern(name, args map {_\\s})

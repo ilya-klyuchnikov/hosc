@@ -1,6 +1,6 @@
 name := "hosc"
 
-scalaVersion := "2.12.13"
+scalaVersion := "2.13.5"
 
 scalacOptions ++= Seq("-deprecation", "-feature")
 
