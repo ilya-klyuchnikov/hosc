@@ -7,7 +7,7 @@ import HParsers._
 
 object Validator {
   case class ValidatorError(error: Error) extends Exception(error.toString) {}
-  def validate(s: Success[Program]): ParseResult[Program] =  {
+  def validate(s: Success[Program]): ParseResult[Program] = {
     val p = s.get
     var typeNames = Set[String]()
     var dataConNames = Set[String]()
@@ -49,9 +49,9 @@ object Validator {
             tvs += v
           }
           for (dc <- tcd.cons) valDC(dc)
-          tcd.args find {!tvsUsed.contains(_)} match {
+          tcd.args find { !tvsUsed.contains(_) } match {
             case Some(tv) => err("useless type variable " + tv.name)
-            case None =>
+            case None     =>
           }
       }
     }
@@ -62,8 +62,8 @@ object Validator {
     }
 
     try {
-      for(td <- p.ts) valTD(td)
-      for(f <- p.fs) valFD(f)
+      for (td <- p.ts) valTD(td)
+      for (f <- p.fs) valFD(f)
       valTermWithFreeVars(fNamesInDefs, p.goal, p)
       s
     } catch {
@@ -79,7 +79,7 @@ object Validator {
     throw ValidatorError(sys.error(msg))
   }
 
-  def valTerm(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
+  def valTerm(boundedVars: Set[String], term: Expression, p: Program): Unit = term match {
     case v: Variable =>
       if (!(boundedVars contains v.name)) err("unbounded variable " + v.name, v)
     case c: Constructor =>
@@ -115,27 +115,27 @@ object Validator {
       case Some(td) =>
         val consNames = Set.empty[String] ++ (td.cons map (_.name))
         var usedNames = Set.empty[String]
-        for (b <- c.branches){
+        for (b <- c.branches) {
           val pt = b.pattern
-          if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
+          if (!(consNames contains pt.name)) err("type " + td.name + " doesn't define constructor " + pt.name, pt)
           val dc = p.getDataConstructor(pt.name).get
           if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
           if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
           usedNames += pt.name
           var pVars = Set.empty[String]
-          for (v <- pt.args){
+          for (v <- pt.args) {
             if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
             if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
             pVars += v.name
           }
           valTerm(boundedVars ++ pVars, b.term, p)
         }
-        //val unused = consNames -- usedNames
-        //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+      //val unused = consNames -- usedNames
+      //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
     }
   }
 
-  def valTermWithFreeVars(boundedVars: Set[String], term: Expression, p: Program): Unit = term match{
+  def valTermWithFreeVars(boundedVars: Set[String], term: Expression, p: Program): Unit = term match {
     case v: Variable =>
     case c: Constructor =>
       p.getDataConstructor(c.name) match {
@@ -169,24 +169,24 @@ object Validator {
       case Some(td) =>
         val consNames = Set.empty[String] ++ (td.cons map (_.name))
         var usedNames = Set.empty[String]
-        for (b <- c.branches){
+        for (b <- c.branches) {
           val pt = b.pattern
-          if (!(consNames contains pt.name)) err("type " + td.name +" doesn't define constructor " + pt.name, pt)
+          if (!(consNames contains pt.name)) err("type " + td.name + " doesn't define constructor " + pt.name, pt)
           val dc = p.getDataConstructor(pt.name).get
           if (dc.args.length != pt.args.length) err("wrong number of parameters for constructor " + pt.name, pt)
           if (usedNames contains dc.name) err("duplicate pattern " + pt.name, pt)
           usedNames += pt.name
           var pVars = Set.empty[String]
-          for (v <- pt.args){
+          for (v <- pt.args) {
             if (boundedVars contains v.name) err("variable " + v.name + " is already bound", v)
             if (pVars contains v.name) err("duplicate variable " + v.name + " in pattern", v)
             pVars += v.name
           }
           valTermWithFreeVars(boundedVars ++ pVars, b.term, p)
         }
-        //val unused = consNames -- usedNames
-        // TODO: warning
-        //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
+      //val unused = consNames -- usedNames
+      // TODO: warning
+      //if (!(unused isEmpty)) err("case is not exhaustive. missing pattern(s) " + unused.mkString(", "), c.selector)
     }
   }
 

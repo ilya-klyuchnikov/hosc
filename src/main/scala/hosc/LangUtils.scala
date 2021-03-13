@@ -12,7 +12,7 @@ import HLanguage.{
   LetExpression => LetExpression0,
   LetRecExpression => LetRecExpression0,
   Expression => Expression0,
-  Program => Program0
+  Program => Program0,
 }
 
 object LangUtils {
@@ -27,8 +27,8 @@ object LangUtils {
       Application(hl0ToELC(h), hl0ToELC(a))
     case CaseExpression0(sel, bs) =>
       CaseExpression(
-          hl0ToELC(sel),
-          bs.map(b => Branch(Pattern(b.pattern.name, b.pattern.args.map(v => Variable(v.name))), hl0ToELC(b.term)))
+        hl0ToELC(sel),
+        bs.map(b => Branch(Pattern(b.pattern.name, b.pattern.args.map(v => Variable(v.name))), hl0ToELC(b.term))),
       )
     case LetExpression0(bs, lexpr) =>
       LetExpression(bs.map(b => (Variable(b._1.name), hl0ToELC(b._2))), hl0ToELC(lexpr))
@@ -38,12 +38,14 @@ object LangUtils {
 
   def normalize(p: Program0): Expression = {
     val fs = p.fs.foldLeft(Map[String, Function0]())((m, f) => m + (f.name -> f))
-    val vxs =  p.fs.foldLeft(Map[String, Vertex]())((m, f) => m + (f.name -> Vertex(f.name)))
-    val arcs = p.fs.foldLeft(List[Arc]())((a, f) => a ::: (getFreeVars(f.body).toList map {t => Arc(vxs(f.name), vxs(t.name))}))
+    val vxs = p.fs.foldLeft(Map[String, Vertex]())((m, f) => m + (f.name -> Vertex(f.name)))
+    val arcs = p.fs.foldLeft(List[Arc]())((a, f) =>
+      a ::: (getFreeVars(f.body).toList map { t => Arc(vxs(f.name), vxs(t.name)) })
+    )
     val g = Graph(vxs.values.toList, arcs)
     val sccs = analyzeDependencies(g)
     var expr: Expression = hl0ToELC(p.goal)
-    for (scc <- sccs){
+    for (scc <- sccs) {
       val bs = scc.vs.toList.map(x => (Variable(x.name), hl0ToELC(fs(x.name).body)))
       if (scc.recursive)
         expr = LetRecExpression(bs, expr)
@@ -63,7 +65,7 @@ object LangUtils {
     case Application0(head, arg) =>
       getFreeVars(head) ++ getFreeVars(arg)
     case CaseExpression0(sel, bs) =>
-      getFreeVars(sel) ++  bs.foldLeft(Set[Variable0]())((vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args))
+      getFreeVars(sel) ++ bs.foldLeft(Set[Variable0]())((vs, b) => vs ++ (getFreeVars(b.term) -- b.pattern.args))
     case LetRecExpression0(bs, expr) =>
       getFreeVars(expr) ++ getFreeVars(bs._2) - bs._1
     case LetExpression0(bs, expr) =>

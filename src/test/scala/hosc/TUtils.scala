@@ -19,7 +19,7 @@ object TUtils {
     var str: String = null
     do {
       str = in.readLine
-      if (str != null){
+      if (str != null) {
         sb.append(str)
         sb.append("\n")
       }
