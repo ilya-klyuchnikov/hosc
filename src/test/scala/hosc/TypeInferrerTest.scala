@@ -1,27 +1,38 @@
 package hosc
 
-import org.junit.Test
 import org.junit.Assert._
-import scala.util.parsing.input.{CharArrayReader, Reader}
+import org.junit.Test
 
 class TypeInferrerTest {
 
   @Test def case1(): Unit =
-    testTyping("types/case1.hs", "Pair a b -> a")
+    testTyping(
+      "types/case1.hs",
+      "Pair a b -> a",
+    )
 
   @Test def case2(): Unit =
-    testTyping("types/case2.hs", "Pair a b -> b")
+    testTyping(
+      "types/case2.hs",
+      "Pair a b -> b",
+    )
 
   @Test def church(): Unit =
-    testTyping("types/church.hs", "Nat -> (t -> t) -> (t -> t)")
+    testTyping(
+      "types/church.hs",
+      "Nat -> (t -> t) -> (t -> t)",
+    )
 
   @Test def churchAdd(): Unit =
-    testTyping("types/churchAdd.hs", "(t -> t2 -> t3) -> (t -> t1 -> t2) -> (t -> t1 -> t3)")
+    testTyping(
+      "types/churchAdd.hs",
+      "(t -> t2 -> t3) -> (t -> t1 -> t2) -> (t -> t1 -> t3)",
+    )
 
   @Test def churchSub(): Unit =
     testTyping(
       "types/churchSub.hs",
-      "t7 -> ((( ((t -> t1) -> (t1 -> t2) -> t2) -> (t3 -> t4) -> (t5 -> t5) -> t6) -> t -> t4 -> t6) -> t7 -> t8) -> t8",
+      "t7 -> (((((t -> t1) -> (t1 -> t2) -> t2) -> (t3 -> t4) -> (t5 -> t5) -> t6) -> t -> t4 -> t6) -> t7 -> t8) -> t8",
     )
 
   @Test def churchSubErr(): Unit =
@@ -31,7 +42,7 @@ class TypeInferrerTest {
     testTypeError("types/fixErr.hs")
 
   @Test def drec(): Unit =
-    println(Util.inferGoalType("examples/" + "sc/encoding.hs"))
+    println(Util.inferGoalType("examples/sc/encoding.hs"))
 
   @Test def evalErr(): Unit =
     testTypeError("types/evalErr.hs")
@@ -41,7 +52,7 @@ class TypeInferrerTest {
 
   def testTyping(fileName: String, typeString: String): Unit = {
     val actualType = Util.inferGoalType("examples/" + fileName)
-    val expectedType = HParsers.parseType(new CharArrayReader(typeString.toCharArray)).get
+    val expectedType = TUtils.typeResultFromString(typeString).get
     println("actual:")
     println(actualType)
     println("expected:")
