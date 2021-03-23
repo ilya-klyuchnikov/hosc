@@ -1,9 +1,7 @@
-package hosc;
-
-import scala.util.parsing.input.Positional
+package hosc
 
 object HLanguage {
-  sealed abstract class Expression extends Positional {
+  sealed abstract class Expression {
     type termType <: Expression
     def \\(s: Map[Variable, Variable]): termType
     def /(s: Map[Variable, Expression]): Expression
@@ -42,7 +40,6 @@ object HLanguage {
       Application(head \\ s, arg \\ s)
     def /(s: Map[Variable, Expression]): Application =
       Application(head / s, arg / s)
-    pos = head.pos
     override def toString: String =
       "(" + head + " " + arg + ")"
   }
@@ -74,20 +71,20 @@ object HLanguage {
       "(letrec " + (binding._1.toString + "=" + binding._2.toString) + "\n in " + expr + ")"
   }
 
-  case class Branch(pattern: Pattern, term: Expression) extends Positional {
+  case class Branch(pattern: Pattern, term: Expression) {
     def \\(s: Map[Variable, Variable]): Branch =
       Branch(pattern \\ s, term \\ s)
     override def toString: String =
       pattern.toString + " -> " + term.toString + ";"
   }
-  case class Pattern(name: String, args: List[Variable]) extends Positional {
+  case class Pattern(name: String, args: List[Variable]) {
     def \\(s: Map[Variable, Variable]): Pattern =
       Pattern(name, args map { _ \\ s })
     override def toString: String =
       name + " " + args.mkString(" ")
   }
 
-  case class Function(name: String, body: Expression) extends Positional
+  case class Function(name: String, body: Expression)
 
   case class Program(ts: List[TypeConstructorDefinition], goal: Expression, fs: List[Function]) {
     def getTypeConstructorDefinition(tcName: String): Option[TypeConstructorDefinition] = {

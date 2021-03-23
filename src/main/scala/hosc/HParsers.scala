@@ -18,37 +18,37 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
   def program: Parser[Program] =
     rep(typeConstrDefinition) ~ term ~ (("where" ~> strong(rep(function))) | success(Nil)) ^^ Program
   def function: Parser[Function] =
-    p(lident ~ ("=" ~> term <~ c(";")) ^^ Function)
+    lident ~ ("=" ~> term <~ c(";")) ^^ Function
 
   def term: Parser[Expression] =
-    p(tr2 | appl) | err("term is expected")
+    tr2 | appl | err("term is expected")
   def appl: Parser[Expression] =
     chainl1(tr0, tr1, success(Application(_: Expression, _: Expression)))
 
   // head of application
   private def tr0: Parser[Expression] =
-    p(variable | lambdaAbstraction | caseExpression | ("(" ~> appl <~ ")")) | letrec
+    variable | lambdaAbstraction | caseExpression | ("(" ~> appl <~ ")") | letrec
   // argument of or application constructor
   private def tr1: Parser[Expression] =
-    p(tr0 | uident ^^ { x => Constructor(x, Nil) } | ("(" ~> term <~ ")"))
+    tr0 | uident ^^ { x => Constructor(x, Nil) } | ("(" ~> term <~ ")")
   // top constructor; cannot be head of application
   private def tr2: Parser[Constructor] =
-    p(uident ~ rep(tr1) ^^ Constructor | ("(" ~> tr2 <~ ")"))
+    uident ~ rep(tr1) ^^ Constructor | ("(" ~> tr2 <~ ")")
 
   private def variable: Parser[Variable] =
-    p(lident ^^ Variable)
+    lident ^^ Variable
   private def lambdaAbstraction: Parser[LambdaAbstraction] =
-    p("\\" ~> c(variable +) ~ ((c("->") ~> term)) ^^ desugarLambda) | "(" ~> lambdaAbstraction <~ ")"
+    "\\" ~> c(variable +) ~ ((c("->") ~> term)) ^^ desugarLambda | "(" ~> lambdaAbstraction <~ ")"
   private def caseExpression: Parser[CaseExpression] =
-    p("case" ~> c(term) ~ (c("of") ~> c("{") ~> (branch *) <~ c("}")) ^^ CaseExpression)
+    "case" ~> c(term) ~ (c("of") ~> c("{") ~> (branch *) <~ c("}")) ^^ CaseExpression
   private def letrec: Parser[LetRecExpression] =
     ("letrec" ~> c(variable)) ~ (c("=") ~> c(term)) ~ (c("in") ~> c(term)) ^^ { case v ~ l ~ e =>
       LetRecExpression((v, l), e)
     } | ("(" ~> letrec <~ ")")
   private def branch =
-    p(pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch)
+    pattern ~ (c("->") ~> c(term) <~ c(";")) ^^ Branch
   private def pattern =
-    p(uident ~ (variable *) ^^ Pattern)
+    uident ~ (variable *) ^^ Pattern
 
   def parseTerm(r: Reader[Char]): ParseResult[Expression] =
     strong(term)(new lexical.Scanner(r))
@@ -81,9 +81,6 @@ object HParsers extends HTokenParsers with StrongParsers with ImplicitConversion
 
   def postprocess(pr: ParseResult[Program]): ParseResult[Program] =
     pr.map(Postprocessor.postprocess)
-
-  def p[T <: Positional](p: => Parser[T]): Parser[T] =
-    positioned(p)
 
   def c[T](p: => Parser[T]): Parser[T] =
     commit(p)
