@@ -18,8 +18,10 @@ object GraphAnalysis {
   }
 
   case class Arc(from: Vertex, to: Vertex) {
-    var visited = false
-    override def toString = from.name + "->" + to.name
+    var visited =
+      false
+    override def toString: String =
+      from.name + "->" + to.name
   }
 
   case class Graph(vertices: List[Vertex], arcs: List[Arc])
@@ -116,15 +118,18 @@ object GraphAnalysis {
     // 4.a construct strongly connected components
     for (a <- reversedGraph.arcs.filter { _.visited }) {
       components partition { comp => (comp.vs contains a.from) || (comp.vs contains a.to) } match {
-        case (Nil, l2) => components = GraphComponent(Set(a.from, a.to), true) :: l2
-        case (l1, l2)  => components = GraphComponent(l1.foldLeft(Set(a.from, a.to)) { _ ++ _.vs }, true) :: l2
+        case (Nil, l2) =>
+          components = GraphComponent(Set(a.from, a.to), recursive = true) :: l2
+        case (l1, l2) =>
+          components = GraphComponent(l1.foldLeft(Set(a.from, a.to)) { _ ++ _.vs }, recursive = true) :: l2
       }
     }
 
     // 4.b construct singleton components
     for (v <- reversedGraph.vertices) components find (_.vs contains v) match {
-      case None => components = GraphComponent(Set(v), false) :: components
-      case _    =>
+      case None =>
+        components = GraphComponent(Set(v), recursive = false) :: components
+      case _ =>
     }
 
     components
@@ -146,11 +151,10 @@ object GraphAnalysis {
 
     components match {
       case Nil => Nil;
-      case _ => {
+      case _ =>
         val ind = findIndependentComponent(components)
         val others = components filterNot { _ == ind }
         ind :: topologicalSort(others, g)
-      }
     }
   }
 

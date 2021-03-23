@@ -40,7 +40,8 @@ object HLanguage {
     type termType = Application
     def \\(s: Map[Variable, Variable]): Application =
       Application(head \\ s, arg \\ s)
-    def /(s: Map[Variable, Expression]) = Application(head / s, arg / s)
+    def /(s: Map[Variable, Expression]): Application =
+      Application(head / s, arg / s)
     pos = head.pos
     override def toString: String =
       "(" + head + " " + arg + ")"
@@ -74,12 +75,14 @@ object HLanguage {
   }
 
   case class Branch(pattern: Pattern, term: Expression) extends Positional {
-    def \\(s: Map[Variable, Variable]): Branch = Branch(pattern \\ s, term \\ s)
+    def \\(s: Map[Variable, Variable]): Branch =
+      Branch(pattern \\ s, term \\ s)
     override def toString: String =
       pattern.toString + " -> " + term.toString + ";"
   }
   case class Pattern(name: String, args: List[Variable]) extends Positional {
-    def \\(s: Map[Variable, Variable]) = Pattern(name, args map { _ \\ s })
+    def \\(s: Map[Variable, Variable]): Pattern =
+      Pattern(name, args map { _ \\ s })
     override def toString: String =
       name + " " + args.mkString(" ")
   }

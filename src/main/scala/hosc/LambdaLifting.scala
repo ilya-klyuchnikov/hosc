@@ -44,13 +44,12 @@ object LambdaLifting {
     case Application(head, arg)     => findLetRec(head).orElse(findLetRec(arg))
     case CaseExpression(sel, branches) =>
       branches.foldLeft(findLetRec(sel)) { (r, branch) => r.orElse(findLetRec(branch.term)) }
-    case letrec @ LetRecExpression((f, e1), e2) => {
+    case letrec @ LetRecExpression((f, e1), e2) =>
       val e1FreeVars = TermAlgebra.getFreeVars(e1).filterNot(_ == f)
       if (e1FreeVars.isEmpty)
         findLetRec(e1).orElse(findLetRec(e2))
       else
         Some(letrec)
-    }
     case l: LetExpression => throw new IllegalArgumentException("Unexpected let: " + l)
   }
 

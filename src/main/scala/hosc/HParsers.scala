@@ -122,21 +122,16 @@ class HLexical extends StdLexical with HTokens {
       | '/' ~ '*' ~ comment
       | '/' ~ '/' ~ rep(chrExcept(EofCh, '\n'))
       | '/' ~ '*' ~ failure("unclosed comment")
-
       | '{' ~ '-' ~ hComment
       | '-' ~ '-' ~ rep(chrExcept(EofCh, '\n'))
       | '{' ~ '-' ~ failure("unclosed comment")
   )
 
-  override protected def comment: Parser[Any] = (
-    '*' ~ '/' ^^ { case _ => ' ' }
-      | chrExcept(EofCh) ~ comment
-  )
+  override protected def comment: Parser[Any] =
+    '*' ~ '/' ^^^ ' ' | chrExcept(EofCh) ~ comment
 
-  protected def hComment: Parser[Any] = (
-    '-' ~ '}' ^^ { case _ => ' ' }
-      | chrExcept(EofCh) ~ hComment
-  )
+  protected def hComment: Parser[Any] =
+    '-' ~ '}' ^^^ ' ' | chrExcept(EofCh) ~ hComment
 }
 
 class HTokenParsers extends StdTokenParsers {
@@ -189,12 +184,12 @@ object Postprocessor {
     program
   }
   def process(t: Expression, globals: Set[Variable]): Unit = t match {
-    case v: Variable                  => v.global = (globals contains v)
+    case v: Variable                  => v.global = globals contains v
     case Constructor(_, args)         => for (a <- args) process(a, globals)
     case LambdaAbstraction(v, t)      => process(t, globals)
     case Application(h, a)            => process(h, globals); process(a, globals)
     case CaseExpression(s, bs)        => process(s, globals); for (b <- bs) process(b.term, globals)
-    case LetRecExpression((v, e), e0) => { v.global = true; process(e, globals + v); process(e0, globals + v) }
+    case LetRecExpression((v, e), e0) => v.global = true; process(e, globals + v); process(e0, globals + v)
     case l: LetExpression             => throw new IllegalArgumentException("Unexpected let: " + l)
   }
 }
